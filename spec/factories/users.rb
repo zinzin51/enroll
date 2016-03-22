@@ -29,7 +29,6 @@ FactoryGirl.define do
       user.person.hbx_staff_role = FactoryGirl.build :hbx_staff_role
       user.save
       end
-    end
   end
 
   trait :consumer do
