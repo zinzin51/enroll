@@ -33,6 +33,7 @@
  *= require layouts
  *= require bootstrap-slider
  *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+ *= require datatable
  *= require_self
  */
 
@@ -60,9 +61,16 @@
 .clear {
   clear: both;
 }
+.disabled-input {
+  background-color: #eee !important;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 .dn {
   display: none;
 }
+
  .starter {
    max-width: 660px;
  }
