@@ -116,6 +116,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def sep_index
+
+  end
+
   def broker_agency_index
     @broker_agency_profiles = BrokerAgencyProfile.all
 
@@ -164,6 +168,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     session[:person_id] = nil
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
+
   end
 
   # GET /exchanges/hbx_profiles/new

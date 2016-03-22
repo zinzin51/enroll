@@ -1,0 +1,16 @@
+
+<div class="row container">
+  <h3 class="title-inline">List of SEPs, enrollments, needing approval</h3>
+  <div class="form-inline button-group-wrapper families_search_div">
+    <div class="input-group search-wp">
+      <%= render 'shared/search', url: family_index_exchanges_hbx_profiles_path, q: @q, placeholder: "Name, SSN", remote: true %>
+    </div>
+  </div>
+</div>
+
+<div class="row container">
+  <div id="">
+    <%= render "sep/approval/sep_index"%>
+  </div>
+</div>
+

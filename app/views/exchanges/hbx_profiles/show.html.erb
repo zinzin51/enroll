@@ -1,7 +1,21 @@
 <div class="content landing">
 	<%= render "exchanges/hbx_profiles/shared/primary_nav", :active_tab => "home-tab" %>
 	
+	<br/><br/>
+	
+	<div class = 'sep_link'>
+		<div class="container">
+			<div class="row">
+		     	<div class ='col-md-6 col-md-offset-1' >
+		        	<%= link_to 'SEP Admin', sep_index_exchanges_hbx_profiles_path, :remote => true %> 
+		     	</div>
+		     </div>
+		 </div>
+	</div>
+	
 	<div class="home">
 		<%= render 'shared/tab_panel' %>
 	</div>
+
 </div>
+
