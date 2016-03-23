@@ -1,7 +1,7 @@
 <div class='sep_table'>
   <div id= 'message_form'></div>
     <div id="inbox_provider_form" class="table-responsive">
-      <table class="table table-condensed">
+      <table id='example' class="table table-striped table-bordered">
         <thead>
           <tr>
             <th>HBX ID</th>
@@ -29,10 +29,10 @@
       
         <tbody>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>000001</td>
+            <td>Johnson</td>
+            <td>Cathy</td>
+            <td>xxx-xx-9786</td>
             <td></td>
             <td></td>
             <td></td>
@@ -52,10 +52,33 @@
           </tr>
 
           <tr>
+            <td>864736</td>
+            <td>Banks</td>
+            <td>Lonnie</td>
+            <td>xxx-xx-3245</td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+
+          <tr>
+            <td>302938</td>
+            <td>Spoon</td>
+            <td>Roger</td>
+            <td>xxx-xx-3345</td>
             <td></td>
             <td></td>
             <td></td>
@@ -75,31 +98,18 @@
           </tr>
 
         </tbody>
-
-        <tfoot>
-          <tr>
-            <th>HBX ID</th>
-            <th>Last Name</th>
-            <th>First Name</th>
-            <th>SSN</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </tfoot>
      </table>
     </div>
 </div>
+
+<style type="text/css">
+  table.dataTable.select tbody tr,
+  table.dataTable thead th:first-child {
+     cursor: pointer;
+  }
+</style>
+
+<script type="text/javascript">
+  // $("#example").dataTable({"iDisplayLength": 10, "bLengthChange": false, "bFilter": false, "bSort": false });
+  $("#example").DataTable();
+</script>
