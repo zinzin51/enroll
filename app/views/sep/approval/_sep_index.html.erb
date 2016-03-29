@@ -8,32 +8,27 @@
             <th>Last Name</th>
             <th>First Name</th>
             <th>SSN</th>
+            <th>SEP REASON</th>
+            <th>EFFECTIVE ON</th>
+            <th></th>
           </tr>
         </thead>
       
         <tbody>
-          <tr>
-            <td>000001</td>
-            <td>Johnson</td>
-            <td>Cathy</td>
-            <td>xxx-xx-9786</td>
-          </tr>
-
-          <tr>
-            <td>864736</td>
-            <td>Banks</td>
-            <td>Lonnie</td>
-            <td>xxx-xx-3245</td>
-          </tr>
-
-          <tr>
-            <td>302938</td>
-            <td>Spoon</td>
-            <td>Roger</td>
-            <td>xxx-xx-3345</td>
-          </tr>
-
+          <% @families.each do |family| %>
+                <tr>
+                  <td><%=family.primary_applicant.person.hbx_id%></td>
+                  <td><%=family.primary_applicant.person.last_name%></td>
+                  <td><%=family.primary_applicant.person.first_name%></td>
+                  <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
+                  <td id='title'><%=family.special_enrollment_periods.to_a[0].title%></td>
+                  <td id='effective_on'><%=family.special_enrollment_periods.to_a[0].effective_on%></td>
+                  <td class="details-control"><i class="fa fa-plus-square"></i>
+                  </td>
+                </tr>
+          <% end %>
         </tbody>
+
      </table>
     </div>
 </div>
@@ -45,18 +40,14 @@
   }
 
   td.details-control {
-    background: url('../resources/details_open.png') no-repeat center center;
     cursor: pointer;
-}
-tr.shown td.details-control {
-    background: url('../resources/details_close.png') no-repeat center center;
+  }
+ 
+  div.slider {
+    display: none;
+  }
+ 
+  table.dataTable tbody td.no-padding {
+    padding: 0;
 }
 </style>
-
-<script type="text/javascript">
-  $(document).ready(function() {
-    $('#example').DataTable( {
-      "order": [[ 1, "asc" ]]
-      } );
-    } );
-</script>

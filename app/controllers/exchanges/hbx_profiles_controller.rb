@@ -117,7 +117,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def sep_index
-
+    all_families = Family.exists(special_enrollment_periods: true)
+    @families = all_families.to_a
   end
 
   def broker_agency_index

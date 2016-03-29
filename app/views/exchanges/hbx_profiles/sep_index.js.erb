@@ -1,2 +1,73 @@
 set_tab_content("<%= escape_javascript render "sep/index"%>")
 $('.sep_link').hide();
+
+var table = $('#example').DataTable( {
+    columnDefs: [
+    { targets: [4], visible: true},
+    { targets: [5], orderable: false}
+      ],
+
+    "order": [[ 1, "asc" ]]
+  } );
+
+
+function format ( d, title, effective_on) {
+    // `d` is the original data object for the row
+    return '<div class="slider">'+ 
+        '<br/>'+'<br/>'+ 
+        '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:200px; margin-left:200px">'+
+        '<thead>'+
+          '<tr>' +
+            '<th colspan="1"></th>' +
+            '<th colspan="2" style="text-align:center;">Medical</th>' +
+            '<th colspan="2" style="text-align:center;">Dental</th>' +
+        '</tr>' + 
+          '<tr>'+
+            '<th>SEP REASON</th>'+
+            '<th>Selected Date</th>'+
+            '<th>Effective Date</th>'+
+            '<th>Selected Date</th>'+
+            '<th>Effective Date</th>'+
+          '</tr>'+
+        '</thead>'+
+        '<tbody>'+
+            '<tr>'+
+            '<td>' + title + '</td>'+
+            '<td>16-01-09</td>'+
+            '<td>' + effective_on + '</td>'+
+            '<td>16-01-09</td>'+
+            '<td>16-02-01</td>'+
+          '</tr>'+
+        '</tbody>'+
+        '</table>'+
+        '<br/>'+'<br/>'+'<br/>'+
+    '</div>';
+}
+
+ 
+ $('#example tbody').on('click', 'td.details-control', function () {
+  var tr = $(this).closest('tr');
+  var row = table.row(tr);
+  var title = tr.find('#title').html();
+  var effective_on = tr.find('#effective_on').html();
+
+    //row.child('i').toggleClass('fa fa-plus-square fa fa-minus-square');
+  if ( row.child.isShown() ) {
+    $(this).removeClass('fa fa-minus-square');
+    $(this).find('i').addClass('fa fa-plus-square');
+  // This row is already open - close it
+    $('div.slider', row.child()).slideUp( function () {
+    row.child.hide();
+    //tr.removeClass('shown');
+    } );
+  }
+  
+  else {
+    $(this).find('i').removeClass('fa fa-plus-square');
+    $(this).addClass('fa fa-minus-square');
+  // Open this row
+    row.child( format(row.data(), title, effective_on), 'no-padding' ).show();
+    $('div.slider', row.child()).slideDown();
+  }
+
+  } );
