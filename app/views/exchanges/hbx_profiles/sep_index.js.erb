@@ -3,18 +3,17 @@ $('.sep_link').hide();
 
 var table = $('#example').DataTable( {
     columnDefs: [
-    { targets: [4], visible: true},
-    { targets: [5], orderable: false}
+    { targets: [7], orderable: false}
       ],
 
     "order": [[ 1, "asc" ]]
   } );
 
 
-function format ( d, title, effective_on) {
+function format ( d, title, submitted_at, effective_on) {
     // `d` is the original data object for the row
     return '<div class="slider">'+ 
-        '<br/>'+'<br/>'+ 
+        '<br/>'+
         '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:200px; margin-left:200px">'+
         '<thead>'+
           '<tr>' +
@@ -33,7 +32,7 @@ function format ( d, title, effective_on) {
         '<tbody>'+
             '<tr>'+
             '<td>' + title + '</td>'+
-            '<td>16-01-09</td>'+
+            '<td>' + submitted_at + '</td>'+
             '<td>' + effective_on + '</td>'+
             '<td>16-01-09</td>'+
             '<td>16-02-01</td>'+
@@ -48,8 +47,16 @@ function format ( d, title, effective_on) {
  $('#example tbody').on('click', 'td.details-control', function () {
   var tr = $(this).closest('tr');
   var row = table.row(tr);
-  var title = tr.find('#title').html();
+
+  
+
+  var title = tr.find('#title').data();
+
+  alert(title.size);
+
+  var submitted_at = tr.find('#submitted_at').html();
   var effective_on = tr.find('#effective_on').html();
+
 
     //row.child('i').toggleClass('fa fa-plus-square fa fa-minus-square');
   if ( row.child.isShown() ) {
@@ -66,7 +73,7 @@ function format ( d, title, effective_on) {
     $(this).find('i').removeClass('fa fa-plus-square');
     $(this).addClass('fa fa-minus-square');
   // Open this row
-    row.child( format(row.data(), title, effective_on), 'no-padding' ).show();
+    row.child( format(row.data(), title, submitted_at, effective_on), 'no-padding' ).show();
     $('div.slider', row.child()).slideDown();
   }
 

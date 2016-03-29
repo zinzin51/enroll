@@ -9,6 +9,7 @@
             <th>First Name</th>
             <th>SSN</th>
             <th>SEP REASON</th>
+            <th>START DATE</th>
             <th>EFFECTIVE ON</th>
             <th></th>
           </tr>
@@ -21,7 +22,11 @@
                   <td><%=family.primary_applicant.person.last_name%></td>
                   <td><%=family.primary_applicant.person.first_name%></td>
                   <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
-                  <td id='title'><%=family.special_enrollment_periods.to_a[0].title%></td>
+          <!-- <td id='title'><%=family.special_enrollment_periods.to_a[0].title%></td> -->
+          <!-- <td id='submitted_at'><%=family.special_enrollment_periods.to_a[0].submitted_at%></td> -->
+          <!-- <td id='effective_on'><%=family.special_enrollment_periods.to_a[0].effective_on%></td> -->
+                  <td id='title'><%=family.special_enrollment_periods.to_a%></td> 
+                  <td id='submitted_at'><%=family.special_enrollment_periods.to_a[0].submitted_at%></td>
                   <td id='effective_on'><%=family.special_enrollment_periods.to_a[0].effective_on%></td>
                   <td class="details-control"><i class="fa fa-plus-square"></i>
                   </td>
