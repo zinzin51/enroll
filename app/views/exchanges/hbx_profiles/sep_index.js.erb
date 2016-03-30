@@ -1,10 +1,11 @@
 set_tab_content("<%= escape_javascript render "sep/index"%>")
 $('.sep_link').hide();
 
-var table = $('#example').DataTable( {
+var table = $('#sepAdmin').DataTable( {
     columnDefs: [
-    { targets: [5], orderable: false}
-      ],
+      { targets: [6], orderable: false},
+      { targets: [4,5], visible: false}
+    ],
 
     "order": [[ 1, "asc" ]]
   } );
@@ -43,11 +44,21 @@ function format ( d, title, submitted_at, effective_on) {
 }
 
  
- $('#example tbody').on('click', 'td.details-control', function () {
+ $('#sepAdmin tbody').on('click', 'td.details-control', function () {
   var tr = $(this).closest('tr');
   var row = table.row(tr);
-  var title = tr.find('#title').html();
+  var title = row.data()[4];
+  var special = row.data()[5].size;
+  var car = row.data()[4];
 
+  alert(special);
+
+  
+  $.each( special, function( key, value ) {
+    alert( "Key: " + key + ", Value: " + value );
+  });
+
+  
   var submitted_at = tr.find('#submitted_at').html();
   var effective_on = tr.find('#effective_on').html();
 

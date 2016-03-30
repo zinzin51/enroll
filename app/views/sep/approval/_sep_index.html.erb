@@ -1,7 +1,7 @@
 <div class='sep_table'>
   <div id= 'message_form'></div>
     <div id="inbox_provider_form" class="table-responsive">
-      <table id='example' class="table table-striped table-bordered dataTable">
+      <table id='sepAdmin' class="table table-striped table-bordered dataTable module">
         <thead>
           <tr>
             <th>HBX ID</th>
@@ -9,6 +9,7 @@
             <th>First Name</th>
             <th>SSN</th>
             <th>SEP REASON</th>
+            <th>TEST</th>
             <th></th>
           </tr>
         </thead>
@@ -25,7 +26,8 @@
           <!-- <td id='effective_on'><%=family.special_enrollment_periods.to_a[0].effective_on%></td> 
             family.special_enrollment_periods.to_a
         -->
-              <td id='title'><%=family%></td> 
+              <td><%=family.special_enrollment_periods.to_a[0].title%></td> 
+              <td><%=family.special_enrollment_periods%></td> 
               <td class="details-control"><i class="fa fa-plus-square"></i>
               </td>
             </tr>
