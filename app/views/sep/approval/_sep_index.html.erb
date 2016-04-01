@@ -8,7 +8,6 @@
             <th>Last Name</th>
             <th>First Name</th>
             <th>SSN</th>
-            <th>OTHER DETAILS</th>
             <th></th>
           </tr>
         </thead>
@@ -20,12 +19,7 @@
               <td><%=family.primary_applicant.person.last_name%></td>
               <td><%=family.primary_applicant.person.first_name%></td>
               <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
-              <td class='<%=family.primary_applicant.person.hbx_id%>_details'>
-                      <% family.special_enrollment_periods.each do |s| %>
-                          <%=s.title%>
-                      <% end %>
-              </td> 
-              <td class="details-control"><i class="fa fa-plus-square"></i>
+              <td class='details-control'><i class="fa fa-plus-square"></i>
               </td>
             </tr>
           <% end %>
