@@ -1,16 +1,17 @@
 set_tab_content("<%= escape_javascript render "sep/index"%>")
-$('.sep_link').hide();
+
+
 
 var table = $('#sepAdmin').DataTable( {
     columnDefs: [
-      { targets: [6], orderable: false},
-      { targets: [4,5], visible: false}
+      { targets: [5], orderable: false},
+      { targets: [4], visible: false}
     ],
 
     "order": [[ 1, "asc" ]]
   } );
 
-function format ( d, title, submitted_at, effective_on) {
+function format ( d, reason, submitted_at, effective_on) {
     // `d` is the original data object for the row
     return '<div class="slider">'+ 
         '<br/>'+
@@ -31,7 +32,7 @@ function format ( d, title, submitted_at, effective_on) {
         '</thead>'+
         '<tbody>'+
             '<tr>'+
-            '<td>' + title + '</td>'+
+            '<td>' + reason + '</td>'+
             '<td>' + submitted_at + '</td>'+
             '<td>' + effective_on + '</td>'+
             '<td>16-01-09</td>'+
@@ -47,17 +48,8 @@ function format ( d, title, submitted_at, effective_on) {
  $('#sepAdmin tbody').on('click', 'td.details-control', function () {
   var tr = $(this).closest('tr');
   var row = table.row(tr);
-  var title = row.data()[4];
-  var special = row.data()[5].size;
-  var car = row.data()[4];
-
-  alert(special);
-
-  
-  $.each( special, function( key, value ) {
-    alert( "Key: " + key + ", Value: " + value );
-  });
-
+  var reason = row.data()[4];
+  var family = row.data()[5];
   
   var submitted_at = tr.find('#submitted_at').html();
   var effective_on = tr.find('#effective_on').html();
@@ -80,7 +72,7 @@ function format ( d, title, submitted_at, effective_on) {
     $(this).find('i').removeClass('fa fa-plus-square');
     $(this).addClass('fa fa-minus-square');
   // Open this row
-    row.child( format(row.data(), title, submitted_at, effective_on), 'no-padding' ).show();
+    row.child( format(row.data(), reason, submitted_at, effective_on), 'no-padding' ).show();
     $('div.slider', row.child()).slideDown();
   }
 

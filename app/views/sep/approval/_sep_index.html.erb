@@ -8,8 +8,7 @@
             <th>Last Name</th>
             <th>First Name</th>
             <th>SSN</th>
-            <th>SEP REASON</th>
-            <th>TEST</th>
+            <th>OTHER DETAILS</th>
             <th></th>
           </tr>
         </thead>
@@ -21,13 +20,11 @@
               <td><%=family.primary_applicant.person.last_name%></td>
               <td><%=family.primary_applicant.person.first_name%></td>
               <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
-          <!-- <td id='title'><%=family.special_enrollment_periods.to_a[0].title%></td> -->
-          <!-- <td id='submitted_at'><%=family.special_enrollment_periods.to_a[0].submitted_at%></td> -->
-          <!-- <td id='effective_on'><%=family.special_enrollment_periods.to_a[0].effective_on%></td> 
-            family.special_enrollment_periods.to_a
-        -->
-              <td><%=family.special_enrollment_periods.to_a[0].title%></td> 
-              <td><%=family.special_enrollment_periods%></td> 
+              <td class='<%=family.primary_applicant.person.hbx_id%>_details'>
+                      <% family.special_enrollment_periods.each do |s| %>
+                          <%=s.title%>
+                      <% end %>
+              </td> 
               <td class="details-control"><i class="fa fa-plus-square"></i>
               </td>
             </tr>
