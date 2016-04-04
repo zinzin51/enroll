@@ -4,42 +4,41 @@ $('.sep_link').hide();
 
 var table = $('#sepAdmin').DataTable( {
     columnDefs: [
-      { targets: [4], orderable: false}
+      { targets: [7], orderable: false},
+      { targets: [4,5,6], visible: false}
     ],
 
     "order": [[ 1, "asc" ]]
   } );
 
-function format ( d, reason, submitted_at, effective_on) {
+function displayTable(reason) {
     // `d` is the original data object for the row
     return '<div class="slider">'+ 
         '<br/>'+
-        '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:200px; margin-left:200px">'+
+        '<table cellpadding="25" cellspacing="0" border="0" style="padding-left:100px; margin-left:150px">'+
         '<thead>'+
           '<tr>' +
             '<th colspan="1"></th>' +
             '<th colspan="2" style="text-align:center;">Medical</th>' +
             '<th colspan="2" style="text-align:center;">Dental</th>' +
-        '</tr>' + 
-          '<tr>'+
-            '<th>SEP REASON</th>'+
-            '<th>Selected Date</th>'+
-            '<th>Effective Date</th>'+
-            '<th>Selected Date</th>'+
-            '<th>Effective Date</th>'+
-          '</tr>'+
-        '</thead>'+
-        '<tbody>'+
-            '<tr>'+
-            '<td>' + reason + '</td>'+
-            '<td>' + submitted_at + '</td>'+
-            '<td>' + effective_on + '</td>'+
-            '<td>16-01-09</td>'+
-            '<td>16-02-01</td>'+
-          '</tr>'+
-        '</tbody>'+
+          '</tr>' +
+        '</thead>'+ 
+          reason + 
         '</table>'+
-        '<br/>'+'<br/>'+'<br/>'+
+        '<br/>'+'<br/>'+
+        '<table cellpadding="25" cellspacing="0" border="0" style="padding-left:100px; margin-left:150px">'+
+        '<thead>'+
+          '<tr>' +
+            '<th class="col-md-4">SEP REASON</th>'+ 
+            '<th>Selected Date</th>'+
+            '<th>Effective Date Rule</th>'+
+            '<th>Approve/Deny</th>'+
+            '<th>CSL#</th>'+
+            '<th>Comment</th>'+
+          '</tr>' +
+        '</thead>'+ 
+       '</table>'+
+
     '</div>';
 }
 
@@ -47,9 +46,15 @@ function format ( d, reason, submitted_at, effective_on) {
  $('#sepAdmin tbody').on('click', 'td.details-control', function () {
   var tr = $(this).closest('tr');
   var row = table.row(tr);
-  var reason = row.data()[4];
-  var family = row.data()[5];
+  var reason_arr = row.data()[4];
+  var started_on_arr = row.data()[5];
+  var effective_on_arr = row.data()[6];
 
+  var reason = reason_arr.split("?dummyData");
+  var started_on = started_on_arr.split("?dummyData");
+  var effective_on = effective_on_arr.split("?dummyData");
+
+  var builder = buildTable(reason.length-1, reason, started_on, effective_on);
   
   var submitted_at = tr.find('#submitted_at').html();
   var effective_on = tr.find('#effective_on').html();
@@ -69,11 +74,44 @@ function format ( d, reason, submitted_at, effective_on) {
     $(this).find('i').removeClass('fa fa-plus-square');
     $(this).addClass('fa fa-minus-square');
   // Open this row
-    row.child( format(row.data(), reason, submitted_at, effective_on), 'no-padding' ).show();
+    row.child(displayTable(builder), 'no-padding' ).show();
     $('div.slider', row.child()).slideDown();
   }
 
   } );
+
+ function buildTable(size, reason, start, effective)
+ {
+    var val = ""
+
+    for(i=0; i<size; i++){
+
+       val =  
+
+              val + 
+              '<thead>'+  
+                '<tr>'+
+                '<th class="col-md-4">SEP REASON</th>'+ 
+                '<th>Selected Date</th>'+
+                '<th>Effective Date</th>'+
+                '<th>Selected Date</th>'+
+                '<th>Effective Date</th>'+
+                '</tr>'+
+              '</thead>'+
+        
+              '<tbody>'+
+                '<tr>'+
+                  '<td class="col-md-4">' + reason[i] + '</td>'+
+                  '<td>' + start[i] + '</td>'+
+                  '<td>' + effective[i] + '</td>'+
+                  '<td>16-01-09</td>'+
+                  '<td>16-02-01</td>'+
+                '</tr>'+
+              '</tbody>'
+    } 
+
+    return val;
+ }
 
 
  $(".btn").click(function() {

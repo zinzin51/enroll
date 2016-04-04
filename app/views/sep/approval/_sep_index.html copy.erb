@@ -8,9 +8,6 @@
             <th>Last Name</th>
             <th>First Name</th>
             <th>SSN</th>
-            <th>REASON</th>
-            <th>STARTEd_ON</th>
-            <th>EFFECTIVE_ON</th>
             <th></th>
           </tr>
         </thead>
@@ -22,24 +19,22 @@
               <td><%=family.primary_applicant.person.last_name%></td>
               <td><%=family.primary_applicant.person.first_name%></td>
               <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
-              <td>
-                 <%family.special_enrollment_periods.to_a.each do |f| %>
-                    <%=f.title%>?dummyData
-                  <% end %>
-              </td>
-              <td>
-                 <%family.special_enrollment_periods.to_a.each do |f| %>
-                    <%=f.start_on%>?dummyData
-                  <% end %>
-              </td>
-              <td>
-                 <%family.special_enrollment_periods.to_a.each do |f| %>
-                    <%=f.effective_on%>?dummyData
-                  <% end %>
-              </td>
               <td class='details-control' data><i class="fa fa-plus-square"></i>
               </td>
             </tr>
+
+            <tr class="accordian-body collapse" id="demo<%=family.primary_applicant.person.hbx_id%>">
+              <td> 
+                <%=family.primary_applicant.person.hbx_id%>
+              </td>
+                            <td> 
+                <%=family.primary_applicant.person.hbx_id%>
+              </td>
+                            <td> 
+               <%=family.primary_applicant.person.hbx_id%>
+              </td>
+            </tr>
+          
           <% end %>
         </tbody>
      </table>
