@@ -4,14 +4,14 @@ $('.sep_link').hide();
 
 var table = $('#sepAdmin').DataTable( {
     columnDefs: [
-      { targets: [7], orderable: false},
-      { targets: [4,5,6], visible: false}
+      { targets: [4], orderable: false},
+      { targets: [5,6,7,8,9,10,11], visible: false}
     ],
 
     "order": [[ 1, "asc" ]]
   } );
 
-function displayTable(reason) {
+function displayTable(reason, admin_decision, csl_val, select_reason, comment) {
     // `d` is the original data object for the row
     return '<div class="slider">'+ 
         '<br/>'+
@@ -25,20 +25,38 @@ function displayTable(reason) {
         '</thead>'+ 
           reason + 
         '</table>'+
-        '<br/>'+'<br/>'+
-        '<table cellpadding="25" cellspacing="0" border="0" style="padding-left:100px; margin-left:150px">'+
-        '<thead>'+
-          '<tr>' +
-            '<th class="col-md-4">SEP REASON</th>'+ 
-            '<th>Selected Date</th>'+
-            '<th>Effective Date Rule</th>'+
-            '<th>Approve/Deny</th>'+
-            '<th>CSL#</th>'+
-            '<th>Comment</th>'+
-          '</tr>' +
-        '</thead>'+ 
-       '</table>'+
+        '<br/>'+'<br/>'+'<br/>'+
 
+      '<div class= "row container">' +
+        '<div class = col-md-offset-1>' + 
+          '<table margin-left:100px">'+
+            '<thead>'+
+              '<tr>' +
+                '<th class="col-md-3">SEP REASON</th>'+ 
+                '<th >Effective Date Rule</th>'+
+                '<th>Accept/Reject</th>'+
+                '<th class="col-md-3">CSL#</th>'+
+                '<th></th>'+
+              '</tr>' +
+            '</thead>'+ 
+
+            '<tbody>'+
+              '<tr>'+
+                '<td class="col-md-3">' + select_reason + '</td>'+
+                '<td></td>'+
+                '<td>' + 
+                  admin_decision +
+                '</td>'+
+                '<td class="col-md-3">' +
+                  csl_val +
+                '</td>'+
+                '<td>' + comment + '</td>' +
+                '</tr>'+
+            '</tbody>' +
+         '</table>'+
+        '</div>' + 
+         '<br/>'+'<br/>' + '<br/>' +
+      '</div>' +
     '</div>';
 }
 
@@ -46,18 +64,21 @@ function displayTable(reason) {
  $('#sepAdmin tbody').on('click', 'td.details-control', function () {
   var tr = $(this).closest('tr');
   var row = table.row(tr);
-  var reason_arr = row.data()[4];
-  var started_on_arr = row.data()[5];
-  var effective_on_arr = row.data()[6];
+  var reason_arr = row.data()[5];
+  var started_on_arr = row.data()[6];
+  var effective_on_arr = row.data()[7];
+  var select_reason_arr = row.data()[8];
+  var admin_decision = row.data()[9];
+  var csl_val = row.data()[10];
+  var comment = row.data()[11];
+ 
 
   var reason = reason_arr.split("?dummyData");
   var started_on = started_on_arr.split("?dummyData");
   var effective_on = effective_on_arr.split("?dummyData");
+  var select_reason = select_reason_arr.split("?dummyData");
 
   var builder = buildTable(reason.length-1, reason, started_on, effective_on);
-  
-  var submitted_at = tr.find('#submitted_at').html();
-  var effective_on = tr.find('#effective_on').html();
 
     //row.child('i').toggleClass('fa fa-plus-square fa fa-minus-square');
   if ( row.child.isShown() ) {
@@ -74,7 +95,7 @@ function displayTable(reason) {
     $(this).find('i').removeClass('fa fa-plus-square');
     $(this).addClass('fa fa-minus-square');
   // Open this row
-    row.child(displayTable(builder), 'no-padding' ).show();
+    row.child(displayTable(builder, admin_decision, csl_val, select_reason, comment), 'no-padding' ).show();
     $('div.slider', row.child()).slideDown();
   }
 
@@ -82,13 +103,10 @@ function displayTable(reason) {
 
  function buildTable(size, reason, start, effective)
  {
-    var val = ""
+    var val = "";
 
     for(i=0; i<size; i++){
-
-       val =  
-
-              val + 
+       val =   val + 
               '<thead>'+  
                 '<tr>'+
                 '<th class="col-md-4">SEP REASON</th>'+ 
@@ -108,7 +126,7 @@ function displayTable(reason) {
                   '<td>16-02-01</td>'+
                 '</tr>'+
               '</tbody>'
-    } 
+    }
 
     return val;
  }

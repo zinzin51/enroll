@@ -8,10 +8,14 @@
             <th>Last Name</th>
             <th>First Name</th>
             <th>SSN</th>
-            <th>REASON</th>
-            <th>STARTEd_ON</th>
-            <th>EFFECTIVE_ON</th>
             <th></th>
+            <th>CONSUMER SEP REASON</th>
+            <th>STARTED_ON</th>
+            <th>EFFECTIVE_ON</th>
+            <th>ACCEPT/DENY</th>
+            <th>CSL#</th>
+            <th>ADMIN SEP REASON</th>
+            <th> COMMENTS </th>
           </tr>
         </thead>
       
@@ -22,22 +26,41 @@
               <td><%=family.primary_applicant.person.last_name%></td>
               <td><%=family.primary_applicant.person.first_name%></td>
               <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
+              <td class='details-control' data><i class="fa fa-plus-square"></i></td>
+
               <td>
-                 <%family.special_enrollment_periods.to_a.each do |f| %>
-                    <%=f.title%>?dummyData
+                  <%family.special_enrollment_periods.to_a.each do |f| %>
+                    <%= f.title %>?dummyData
                   <% end %>
               </td>
+
               <td>
                  <%family.special_enrollment_periods.to_a.each do |f| %>
                     <%=f.start_on%>?dummyData
                   <% end %>
               </td>
+              
               <td>
                  <%family.special_enrollment_periods.to_a.each do |f| %>
                     <%=f.effective_on%>?dummyData
                   <% end %>
               </td>
-              <td class='details-control' data><i class="fa fa-plus-square"></i>
+
+              <td>
+                <%= select_tag "people", options_from_collection_for_select(@qualifying_life_events, "id", "title"), prompt: "Select Reason" %>
+              </td>
+              
+              <td>
+                <%=  link_to "Accept", 'www.google.com', method: :put, class: "btn btn-success"%>
+                <%=  link_to "Reject", 'www.google.com', method: :put, class: "btn btn-danger"%>
+              </td>
+              
+              <td>
+                 
+              </td>
+
+              <td>
+                 <%= link_to 'Comment', 'www.google.com', class: "btn btn-default", remote: true %>
               </td>
             </tr>
           <% end %>
@@ -45,6 +68,8 @@
      </table>
     </div>
 </div>
+
+
 
 <style type="text/css">
   table.dataTable.select tbody tr,
