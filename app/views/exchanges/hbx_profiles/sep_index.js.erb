@@ -5,59 +5,32 @@ $('.sep_link').hide();
 var table = $('#sepAdmin').DataTable( {
     columnDefs: [
       { targets: [4], orderable: false},
-      { targets: [5,6,7,8,9,10,11], visible: false}
+      { targets: [5,6,7,8,9,10,11,12,13,14], visible: false}
     ],
 
     "order": [[ 1, "asc" ]]
   } );
 
-function displayTable(reason, admin_decision, csl_val, select_reason, comment) {
+function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason, date_ruling, comment_btn, dataForm) {
     // `d` is the original data object for the row
-    return '<div class="slider">'+ 
-        '<br/>'+
-        '<table cellpadding="25" cellspacing="0" border="0" style="padding-left:100px; margin-left:150px">'+
-        '<thead>'+
-          '<tr>' +
-            '<th colspan="1"></th>' +
-            '<th colspan="2" style="text-align:center;">Medical</th>' +
-            '<th colspan="2" style="text-align:center;">Dental</th>' +
-          '</tr>' +
-        '</thead>'+ 
-          reason + 
-        '</table>'+
-        '<br/>'+'<br/>'+'<br/>'+
+    return '<div class="slider">'+
+            '<div class="row container">' + 
 
-      '<div class= "row container">' +
-        '<div class = col-md-offset-1>' + 
-          '<table margin-left:100px">'+
-            '<thead>'+
-              '<tr>' +
-                '<th class="col-md-3">SEP REASON</th>'+ 
-                '<th >Effective Date Rule</th>'+
-                '<th>Accept/Reject</th>'+
-                '<th class="col-md-3">CSL#</th>'+
-                '<th></th>'+
-              '</tr>' +
-            '</thead>'+ 
-
-            '<tbody>'+
-              '<tr>'+
-                '<td class="col-md-3">' + select_reason + '</td>'+
-                '<td></td>'+
-                '<td>' + 
-                  admin_decision +
-                '</td>'+
-                '<td class="col-md-3">' +
-                  csl_val +
-                '</td>'+
-                '<td>' + comment + '</td>' +
-                '</tr>'+
-            '</tbody>' +
-         '</table>'+
-        '</div>' + 
-         '<br/>'+'<br/>' + '<br/>' +
-      '</div>' +
-    '</div>';
+            dataForm + 
+              
+              '<table class = "table table-striped">'+
+                '<thead>'+
+                  '<tr>' +
+                    '<th colspan="1"></th>' +
+                    '<th colspan="2" style="text-align:center;">Medical</th>' +
+                    '<th colspan="2" style="text-align:center;">Dental</th>' +
+                  '</tr>' +
+                '</thead>'+ 
+                    sep_reasons_table + 
+              '</table>'+
+              '<br/>'+'<br/>'+'<br/>'+
+            '</div>' +
+            '</div>';
 }
 
  
@@ -68,17 +41,22 @@ function displayTable(reason, admin_decision, csl_val, select_reason, comment) {
   var started_on_arr = row.data()[6];
   var effective_on_arr = row.data()[7];
   var select_reason_arr = row.data()[8];
-  var admin_decision = row.data()[9];
-  var csl_val = row.data()[10];
-  var comment = row.data()[11];
- 
+  var date_ruling = row.data()[9];
+  var admin_decision = row.data()[10];
+  var csl_val = row.data()[11];
+  var comment_btn = row.data()[12];
+  var admin_comment_arr = row.data()[13];
+  var dataForm = row.data()[14];
+
+  //alert(dataForm.split("?dummyData"));
 
   var reason = reason_arr.split("?dummyData");
   var started_on = started_on_arr.split("?dummyData");
   var effective_on = effective_on_arr.split("?dummyData");
   var select_reason = select_reason_arr.split("?dummyData");
+  var admin_comment = admin_comment_arr.split("?dummyData");
 
-  var builder = buildTable(reason.length-1, reason, started_on, effective_on);
+  var builder = buildTable(reason.length-1, reason, started_on, effective_on, admin_comment);
 
     //row.child('i').toggleClass('fa fa-plus-square fa fa-minus-square');
   if ( row.child.isShown() ) {
@@ -95,37 +73,46 @@ function displayTable(reason, admin_decision, csl_val, select_reason, comment) {
     $(this).find('i').removeClass('fa fa-plus-square');
     $(this).addClass('fa fa-minus-square');
   // Open this row
-    row.child(displayTable(builder, admin_decision, csl_val, select_reason, comment), 'no-padding' ).show();
+    row.child(displayTable(builder, admin_decision, csl_val, select_reason, date_ruling, comment_btn, dataForm), 'no-padding' ).show();
     $('div.slider', row.child()).slideDown();
   }
 
   } );
 
- function buildTable(size, reason, start, effective)
+ function buildTable(size, reason, start, effective, admin_comment)
  {
     var val = "";
 
+    comment_section = 'Comment: N/A';
+
     for(i=0; i<size; i++){
-       val =   val + 
+       val =   val +
               '<thead>'+  
                 '<tr>'+
-                '<th class="col-md-4">SEP REASON</th>'+ 
+                '<th>SEP REASON</th>'+ 
                 '<th>Selected Date</th>'+
                 '<th>Effective Date</th>'+
                 '<th>Selected Date</th>'+
                 '<th>Effective Date</th>'+
+                '<th style="text-align:center";>Review Status</th>'+
                 '</tr>'+
               '</thead>'+
         
               '<tbody>'+
                 '<tr>'+
-                  '<td class="col-md-4">' + reason[i] + '</td>'+
+                  '<td>' + reason[i] + '</td>'+
                   '<td>' + start[i] + '</td>'+
                   '<td>' + effective[i] + '</td>'+
                   '<td>16-01-09</td>'+
                   '<td>16-02-01</td>'+
+                  '<td style="text-align:center";><i class="fa fa-spinner fa-spin" style="color:grey"></i></td>'+
+                '</tr>'+ 
+
+                '<tr>' +
+                   '<td>&nbsp;&nbsp;&nbsp;&nbsp;' + comment_section + '</td>' +
                 '</tr>'+
-              '</tbody>'
+
+              '</tbody>' 
     }
 
     return val;
