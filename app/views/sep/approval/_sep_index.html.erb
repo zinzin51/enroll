@@ -12,10 +12,13 @@
             <th>CONSUMER SEP REASON</th>
             <th>STARTED_ON</th>
             <th>EFFECTIVE_ON</th>
+            <th>ADMIN SEP REASON</th>
+            <th>EFFECTIVE DATE RULE</th>
             <th>ACCEPT/DENY</th>
             <th>CSL#</th>
-            <th>ADMIN SEP REASON</th>
-            <th> COMMENTS </th>
+            <th>COMMENT_BTN</th>
+            <th>ADMIN_COMMENTS</th>
+            <th>N/A</th>
           </tr>
         </thead>
       
@@ -27,40 +30,50 @@
               <td><%=family.primary_applicant.person.first_name%></td>
               <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
               <td class='details-control' data><i class="fa fa-plus-square"></i></td>
-
               <td>
+                  <% @sep_reasons = [] %>
                   <%family.special_enrollment_periods.to_a.each do |f| %>
+                    <% @sep_reasons.push(f.title) %>
                     <%= f.title %>?dummyData
                   <% end %>
               </td>
-
               <td>
                  <%family.special_enrollment_periods.to_a.each do |f| %>
                     <%=f.start_on%>?dummyData
                   <% end %>
               </td>
-              
               <td>
                  <%family.special_enrollment_periods.to_a.each do |f| %>
                     <%=f.effective_on%>?dummyData
                   <% end %>
               </td>
+              <td>
+                <!--
+                    <%= select_tag "people", options_for_select(@sep_reasons, "id"), prompt: "Select Reason"%>
+                -->
+                <%= select_tag "life_events", options_from_collection_for_select(@qualifying_life_events, "id", "title"), prompt: "Select Reason" %>
+              </td>
+              <td>
+                <%= text_field_tag 'dob22', class: "date-picker floatlabel form-control", required: true, placeholder: 'DATE' %>
+              </td>
+              <td>
+                <!--
+                    <%=  link_to "Accept", 'www.google.com', method: :put, class: "btn btn-success"%>
+                    <%=  link_to "Reject", 'www.google.com', method: :put, class: "btn btn-danger"%>
+                -->
 
-              <td>
-                <%= select_tag "people", options_from_collection_for_select(@qualifying_life_events, "id", "title"), prompt: "Select Reason" %>
               </td>
-              
               <td>
-                <%=  link_to "Accept", 'www.google.com', method: :put, class: "btn btn-success"%>
-                <%=  link_to "Reject", 'www.google.com', method: :put, class: "btn btn-danger"%>
+                <%= text_field_tag 'name' %> 
               </td>
-              
-              <td>
-                 
-              </td>
-
               <td>
                  <%= link_to 'Comment', 'www.google.com', class: "btn btn-default", remote: true %>
+              </td>
+              <td>
+                  Comment: N/A?dummyData
+              </td>
+              <td>
+                  <%= render 'sep/approval/admin_detail', f: family, q: @qualifying_life_events %>
               </td>
             </tr>
           <% end %>
