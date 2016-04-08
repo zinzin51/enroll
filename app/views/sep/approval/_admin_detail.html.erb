@@ -1,12 +1,35 @@
+    <div class="row">
+       <div class="col-xs-11">   
+     <!--
+      	<div class="carousel-inner" role="listbox" style='min-height: 180px;'>
+      		<% count = 0 %>
+      		<% @qualifying_life_events.each_slice(5) do |qles| %>
+        
+        	<div class="item <%= 'active' if count == 0 %>">
+          		<ul class="list-qle">
+            		<% qles.each_with_index do |qle, index| %>
+              		<p><%= qle_link_generater(qle, index) %></p>
+            		<% end %>
+         	 	</ul>
+        	</div>
+        	
+        	<% count += 1 %>
+      	<% end %>
+    </div>
+   -->
+   <br/></br/>
+    <%= select_tag "life_events", options_from_collection_for_select(@qualifying_life_events, "id", "title"), prompt: "Select Reason" %>
 
-      <div class="row">
-        <div class="col-xs-11">
+    	<% url, http_method = '/insured/family_members', :get %>
 
-			<% @qualifying_life_events.each do |qles| %>
+    	<%= form_tag url, method: http_method, class: 'input-no-pd', id: 'qle_form' do %>
 
-				<%= qles.title%> <br/>
-			<%end %>
+    		<%= hidden_field_tag 'qle_id' %>
+
+    	<% end %>
+
         </div>
     </div>
+     <br/></br/>
 
   
