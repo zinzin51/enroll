@@ -5,11 +5,18 @@ $('.sep_link').hide();
 var table = $('#sepAdmin').DataTable( {
     columnDefs: [
       { targets: [4], orderable: false},
-      { targets: [5,6,7,8,9,10,11,12,13,14], visible: false}
+      { targets: [5,6,7,8,9,10,11,12,13, 14], visible: false}
     ],
 
     "order": [[ 1, "asc" ]]
   } );
+
+$(document).ready(function() {
+    
+
+});
+
+
 
 function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason, date_ruling, comment_btn, dataForm) {
     // `d` is the original data object for the row
@@ -28,6 +35,25 @@ function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason,
                 '</thead>'+ 
                     sep_reasons_table + 
               '</table>'+
+
+
+              '<table id="sepAdmin2" class = "table">'+
+                '<thead>'+
+                  '<tr>' +
+                    '<th>Special Reason</th>' +
+                    '<th>Reason</th>' +
+                  '</tr>' +
+                '</thead>'+
+
+                '<tbody>'+
+                  '<tr>' +
+                    '<td><%= text_field_tag "name" %></td>' +
+                    '<td><%= text_field_tag "name" %></td>' +
+                  '</tr>' +
+                '</tbody>'+
+                    
+              '</table>'+
+
               '<br/>'+'<br/>'+'<br/>'+
             '</div>' +
             '</div>';
@@ -74,6 +100,16 @@ function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason,
     $(this).addClass('fa fa-minus-square');
   // Open this row
     row.child(displayTable(builder, admin_decision, csl_val, select_reason, date_ruling, comment_btn, dataForm), 'no-padding' ).show();
+   
+    var table2 = $('#sepAdmin2').DataTable( {
+      columnDefs: [
+      { targets: [1], orderable: false},
+      { targets: [0], visible: false},
+      ],
+    } );
+
+
+
     $('div.slider', row.child()).slideDown();
   }
 
