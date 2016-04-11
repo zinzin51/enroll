@@ -120,8 +120,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     all_families = Family.exists(special_enrollment_periods: true)
     @families = all_families.to_a
     @qualifying_life_events = QualifyingLifeEventKind.all
-    @sep_form = SpecialEnrollmentPeriod.new
   end
+
+
 
   def broker_agency_index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -171,7 +172,23 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     session[:person_id] = nil
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
+  end
 
+
+  def add_new_sep
+    if params[:qle_id].present?
+      qle = QualifyingLifeEventKind.find(params[:qle_id])
+      @family = Family.find(params[:person])
+      special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
+      special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
+      special_enrollment_period.start_on = Date.strptime(params[:start_on], "%m/%d/%Y") if params[:start_on].present?
+      special_enrollment_period.end_on = Date.strptime(params[:end_on], "%m/%d/%Y") if params[:end_on].present?
+      special_enrollment_period.qualifying_life_event_kind = qle
+      special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment]
+      special_enrollment_period.qle_on = Date.strptime(params[:event_date], "%m/%d/%Y")
+      special_enrollment_period.save
+    end
+    redirect_to exchanges_hbx_profiles_root_path
   end
 
   # GET /exchanges/hbx_profiles/new
