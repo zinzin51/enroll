@@ -11,19 +11,15 @@ var table = $('#sepAdmin').DataTable( {
     "order": [[ 1, "asc" ]]
   } );
 
-$(document).ready(function() {
-    
-
-});
-
-
 
 function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason, date_ruling, comment_btn, dataForm) {
     // `d` is the original data object for the row
-    return '<div class="slider">'+
-            '<div class="row container">' + 
+    return '<div class="datatable_slider" style="display:none">'+
+            
 
             dataForm + 
+
+            '<div class="row container">' + 
               
               '<table class = "table table-striped">'+
                 '<thead>'+
@@ -35,25 +31,6 @@ function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason,
                 '</thead>'+ 
                     sep_reasons_table + 
               '</table>'+
-
-
-              '<table id="sepAdmin2" class = "table">'+
-                '<thead>'+
-                  '<tr>' +
-                    '<th>Special Reason</th>' +
-                    '<th>Reason</th>' +
-                  '</tr>' +
-                '</thead>'+
-
-                '<tbody>'+
-                  '<tr>' +
-                    '<td><%= text_field_tag "name" %></td>' +
-                    '<td><%= text_field_tag "name" %></td>' +
-                  '</tr>' +
-                '</tbody>'+
-                    
-              '</table>'+
-
               '<br/>'+'<br/>'+'<br/>'+
             '</div>' +
             '</div>';
@@ -64,8 +41,8 @@ function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason,
   var tr = $(this).closest('tr');
   var row = table.row(tr);
   var reason_arr = row.data()[5];
-  var started_on_arr = row.data()[6];
-  var effective_on_arr = row.data()[7];
+  var started_on = row.data()[6];
+  var effective_on = row.data()[7];
   var select_reason_arr = row.data()[8];
   var date_ruling = row.data()[9];
   var admin_decision = row.data()[10];
@@ -77,8 +54,8 @@ function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason,
   //alert(dataForm.split("?dummyData"));
 
   var reason = reason_arr.split("?dummyData");
-  var started_on = started_on_arr.split("?dummyData");
-  var effective_on = effective_on_arr.split("?dummyData");
+  //var started_on = started_on_arr.split("?dummyData");
+  //var effective_on = effective_on_arr.split("?dummyData");
   var select_reason = select_reason_arr.split("?dummyData");
   var admin_comment = admin_comment_arr.split("?dummyData");
 
@@ -89,7 +66,7 @@ function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason,
     $(this).removeClass('fa fa-minus-square');
     $(this).find('i').addClass('fa fa-plus-square');
   // This row is already open - close it
-    $('div.slider', row.child()).slideUp( function () {
+    $('div.datatable_slider', row.child()).slideUp( function () {
     row.child.hide();
     //tr.removeClass('shown');
     } );
@@ -100,17 +77,8 @@ function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason,
     $(this).addClass('fa fa-minus-square');
   // Open this row
     row.child(displayTable(builder, admin_decision, csl_val, select_reason, date_ruling, comment_btn, dataForm), 'no-padding' ).show();
-   
-    var table2 = $('#sepAdmin2').DataTable( {
-      columnDefs: [
-      { targets: [1], orderable: false},
-      { targets: [0], visible: false},
-      ],
-    } );
 
-
-
-    $('div.slider', row.child()).slideDown();
+    $('div.datatable_slider', row.child()).slideDown();
   }
 
   } );
@@ -118,10 +86,15 @@ function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason,
  function buildTable(size, reason, start, effective, admin_comment)
  {
     var val = "";
+    var comment_section;
 
-    comment_section = 'Comment: N/A';
+    for(i=size-1; i>=0; i--){
 
-    for(i=0; i<size; i++){
+      if(admin_comment[i] == "")
+        comment_section = 'Admin Comment: N/A';
+      else
+        comment_section = 'Admin Comment: ' + admin_comment[i];
+
        val =   val +
               '<thead>'+  
                 '<tr>'+
@@ -137,10 +110,10 @@ function displayTable(sep_reasons_table, admin_decision, csl_val, select_reason,
               '<tbody>'+
                 '<tr>'+
                   '<td>' + reason[i] + '</td>'+
-                  '<td>' + start[i] + '</td>'+
-                  '<td>' + effective[i] + '</td>'+
-                  '<td>16-01-09</td>'+
-                  '<td>16-02-01</td>'+
+                  '<td></td>'+
+                  '<td></td>'+
+                  '<td></td>'+
+                  '<td></td>'+
                   '<td style="text-align:center";><i class="fa fa-spinner fa-spin" style="color:grey"></i></td>'+
                 '</tr>'+ 
 

@@ -38,14 +38,14 @@
                   <% end %>
               </td>
               <td>
-                 <%family.special_enrollment_periods.to_a.each do |f| %>
-                    <%=f.start_on%>?dummyData
-                  <% end %>
+                <% if family.enrollments.present? %>
+                  N/A
+                <% else %>
+                  N/A
+                <% end %>  
               </td>
               <td>
-                 <%family.special_enrollment_periods.to_a.each do |f| %>
-                    <%=f.effective_on%>?dummyData
-                  <% end %>
+                  N/A
               </td>
               <td>
                 <!--
@@ -70,10 +70,12 @@
                  <%= link_to 'Comment', 'www.google.com', class: "btn btn-default", remote: true %>
               </td>
               <td>
-                  Comment: N/A?dummyData
+                  <%family.special_enrollment_periods.to_a.each do |f| %>
+                    <%=f.admin_comment%>?dummyData
+                  <% end %>
               </td>
               <td>
-                    <%= text_field_tag 'name'  %>
+                    <%= render 'sep/approval/admin_detail', f: family, q: @qualifying_life_events %>
               </td>
             </tr>
           <% end %>
