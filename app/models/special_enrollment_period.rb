@@ -33,9 +33,29 @@ class SpecialEnrollmentPeriod
   # Date Enrollment Period ends
   field :end_on, type: Date
 
+  # Next Possible Event Date
+  field :next_poss_event_date, type: Date
+
+  # Date Option 1
+  field :option1_date, type: Date
+
+  # Date Option 2
+  field :option2_date, type: Date
+
+  # Date Option 3
+  field :option3_date, type: Date
+
+  # CSL#
+  field :csl_num, type: String
+
   validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on, :effective_on_kind, :submitted_at
   validate :end_date_follows_start_date
+
+   validates :csl_num,
+    length: { minimum: 7, maximum: 7},
+    numericality: true,
+    allow_blank: true
 
 
   scope :shop_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.shop_market_events.map(&:id)) }

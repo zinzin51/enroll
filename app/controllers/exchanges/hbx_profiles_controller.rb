@@ -117,12 +117,12 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def sep_index
-    all_families = Family.exists(special_enrollment_periods: true)
-    @families = all_families.to_a
+    if Family.exists(special_enrollment_periods: true).present?
+      all_families = Family.exists(special_enrollment_periods: true) 
+      @families = all_families.to_a 
+    end
     @qualifying_life_events = QualifyingLifeEventKind.all
   end
-
-
 
   def broker_agency_index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -184,7 +184,12 @@ class Exchanges::HbxProfilesController < ApplicationController
       special_enrollment_period.start_on = Date.strptime(params[:start_on], "%m/%d/%Y") if params[:start_on].present?
       special_enrollment_period.end_on = Date.strptime(params[:end_on], "%m/%d/%Y") if params[:end_on].present?
       special_enrollment_period.qualifying_life_event_kind = qle
-      special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment]
+      special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment] if params[:admin_comment].present?
+      special_enrollment_period.csl_num = params.permit(:csl_num)[:csl_num] if params[:csl_num].present?
+      special_enrollment_period.next_poss_event_date = params.permit(:next_poss_event_date)[:next_poss_event_date] if params[:next_poss_event_date].present?
+      special_enrollment_period.option1_date = Date.strptime(params[:option1_date], "%m/%d/%Y") if params[:option1_date].present?
+      special_enrollment_period.option2_date = Date.strptime(params[:option2_date], "%m/%d/%Y") if params[:option2_date].present?
+      special_enrollment_period.option3_date = Date.strptime(params[:option3_date], "%m/%d/%Y") if params[:option3_date].present?
       special_enrollment_period.qle_on = Date.strptime(params[:event_date], "%m/%d/%Y")
       special_enrollment_period.save
     end
