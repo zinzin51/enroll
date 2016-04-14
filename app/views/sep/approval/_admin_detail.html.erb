@@ -1,43 +1,104 @@
 
-<br/><br/>
+<br/>
 
-<div class='container row' >
+<div class="col-md-10 col-md-offset-1 col-sm-12 content-bottom">
 
+ 	<div class="row no-buffer"> 
+ 		<div id="personal_info">
+ 			<h3 class='title-inline'>Add SEP</h3>
+  			<div class="col-md-12 no-pd col-sm-12 col-xs-12">
 
- <% url, http_method = add_new_sep_exchanges_hbx_profiles_path, :post %>
- 	<%= form_tag url, method: http_method, class: 'input-no-pd' do %> 
-		
-		  	<%= hidden_field_tag "person", f.id %>
-		  	<%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
+ 				<% url, http_method = add_new_sep_exchanges_hbx_profiles_path, :post %>
+ 				<%= form_tag url, method: http_method, class: 'input' do %> 
+			
+				<div class="row row-form-wrapper no-buffer">
+					<%= hidden_field_tag "person", f.id %>
+					<%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
 
-		  	<div class="col-md-3 form-group form-group-lg no-pd">
-			      <%= select_tag :qle_id, options_from_collection_for_select(q, "id", "title"), :prompt => 'SEP REASON', class: "floatlabel form-control", required: true %>
-		    </div>
+           			<div class='admin_selected_sep_reason'>
+           				<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd"> 
+            				<%= select_tag :qle_id, options_from_collection_for_select(qle, "id", "title"), class: "selectric form-control", required: true, prompt: "SEP REASON" %>
+         	    		</div>
+         	    	</div>
 
+         	    	<% effective_kinds = ['date_of_event', 'fixed_first_of_next_month']%>
 
-		  	<div class="col-md-3 form-group form-group-lg no-pd">
-			      <%= select_tag :effective_date_rule, options_from_collection_for_select(q, "id", "title"), :prompt => 'SEP REASON', class: "floatlabel form-control", required: true %>
-		    </div>
+         	    	<div class='init_event_date'>
+         	    		<div class="col-md-3 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+		      				<%= text_field_tag :event_date, "", :'data-date-max'=> "110y", :'data-date-min'=> "-110y",class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE" %>
+		 				</div>
+		 			</div>
+
+         	    	<div class='admin_effective_on_kind_options'>
+						<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+	            			<%= select_tag :effective_on_date, options_for_select(['1st of next month', '15th day rule']), class: "selectric form-control", required: true, prompt: "EFFECTIVE DATE RULE" %>
+	          			</div>
+	          		</div>
 		    
-		    <div class="col-md-3 form-group form-group-lg no-pd">
-		      <%= text_field_tag :event_date, "", :'data-date-max'=> "0d", :'data-date-min'=> "0d",class: "required date-picker qle-date-picker form-control", required: true, placeholder: "MM/DD/YYYY" %>
-		    </div>
+		    		<div class='csl_num_options'>
+						<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+	            			<%=text_field_tag :csl_num, "", class: "floatlabel form-control", placeholder: "CSL#"%>
+	          			</div>
+          			</div>
 
-		    <div class="col-md-3 form-group form-group-lg no-pd">
-		      <%= text_field_tag :start_on, "", :'data-date-max'=> "+0d", :'data-date-min'=> "0d",class: "required date-picker qle-date-picker form-control", required: true, placeholder: "MM/DD/YYYY" %>
-		    </div>
-		    <div class="col-md-3 form-group form-group-lg no-pd">
-		      <%= text_field_tag :end_on, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "required date-picker qle-date-picker form-control", required: true, placeholder: "MM/DD/YYYY" %>
-		    </div>
+		 		</div>
 
-			<div class="col-md-3 form-group form-group-lg no-pd">
-		    <%= text_area_tag :admin_comment, "", class: "floatlabel form-control interaction-control-broker-message-body", required: true, rows: 10, placeholder: "Enter Comment" %>
-	      
-        <br/>
-		  <%= submit_tag("Submit") %>
-  	<% end %>
+		 		<div class='row row-form-wrapper no-buffer'>
 
- </div>
+		 			<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+		      			<%= text_field_tag :start_on, "", :'data-date-max'=> "+0d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "SEP START DATE", value: Date.current %>
+		 			</div>
+
+		 			<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+		      			<%= text_field_tag :end_on, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "SEP END DATE", value: Date.current + 61.days %>
+					</div>
+
+					<div class='init_effective_date'>
+						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+					    	<%= text_field_tag :next_poss_event_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", required: true, disabled: true, placeholder: "NEXT POSSIBLE EFFECTIVE DATE" %>
+						</div>
+					</div>
+				</div>
+
+				<div class='row row-form-wrapper no-buffer'>
+					
+					<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+					    <%= text_field_tag :option1_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", placeholder: "DATE 1 OPTION" %>
+					</div>
+
+					<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+					    <%= text_field_tag :option2_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", placeholder: "DATE 2 OPTION" %>
+					</div>
+
+					<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+					    <%= text_field_tag :option3_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", placeholder: "DATE 3 OPTION" %>
+					</div>
+				</div>
+
+				<div class='row row-form-wrapper no-buffer'>
+
+					<div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+		    			<%= text_area_tag :admin_comment, "", class: "floatlabel form-control interaction-control-broker-message-body", rows: 2, placeholder: "Enter Comments Here" %>
+					</div>
+				</div>
+
+				<div class="col-md-12 col-md-offset-5 col-sm-6 col-xs-12 form-group form-group-lg no-pd" style="margin-top:10px;">
+		 			<%= submit_tag "Submit",  class: "btn btn-primary" %>
+		 		</div>
+				<% end %>
+			</div>
+		 </div>
+	</div> 
+        
+
+  
+       
+</div>
+
+
+
+
+
 
 
 
