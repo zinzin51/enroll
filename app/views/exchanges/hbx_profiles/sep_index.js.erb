@@ -31,11 +31,20 @@ $(document).on('change','.init_event_date input', function(){
   }  
 });
 
-var table, table2;
+var ivlTable, shopTable, ivl_shop_Table, selectedTable;
 
 $(document).ready(function() {
+
+  ivl_shop_Table = $('#sepAdmin').DataTable( {
+      columnDefs: [
+        { targets: [6,7], orderable: false},
+        { targets: [8, 9, 10, 11, 12, 13], visible: false}
+      ],
+
+      "order": [[ 2, "asc" ]]
+    } );
    
-  table = $('#sepAdmin').DataTable( {
+  ivlTable = $('#sepAdmin1').DataTable( {
       columnDefs: [
         { targets: [6,7], orderable: false},
         { targets: [8, 9, 10, 11, 12, 13], visible: false}
@@ -44,7 +53,7 @@ $(document).ready(function() {
       "order": [[ 2, "asc" ]]
     } );
 
-  table2 = $('#sepAdmin2').DataTable( {
+  shopTable = $('#sepAdmin2').DataTable( {
       columnDefs: [
         { targets: [6,7], orderable: false},
         { targets: [8, 9, 10, 11, 12, 13], visible: false}
@@ -55,6 +64,21 @@ $(document).ready(function() {
 
     $( '#tab_datatables a[data-toggle="tab"]:last').trigger("click");
     $( '#tab_datatables a[data-toggle="tab"]:first').trigger("click");
+
+    $('#tab_datatables a[data-toggle="tab"]').on("click", function(){
+
+    switch($(this).attr('data-target')) {
+      case '#ivl_shop_Table':   
+        selectedTable = ivl_shop_Table; 
+        break;
+      case '#ivlTable':
+        selectedTable = ivlTable;
+        break;
+      case '#shopTable':   
+        selectedTable = shopTable; 
+        break;
+      }
+    });
 } );
 
 
@@ -86,14 +110,11 @@ function displayTable(custom_table, className) {
 }
 
 
-$('#sepAdmin tbody').on('click', 'td.add-control', function () {
+$('.sep_table tbody').on('click', 'td.add-control', function () {
   var btn_class = $(this).attr("class");
   var tr = $(this).closest('tr');
-  var row = table.row(tr);
+  var row = selectedTable.row(tr);
   var builder = row.data()[10];
-
-
-  //alert(row.data()[13]);
 
   if (row.child.isShown() ) {
     $(this).removeClass('fa fa-minus-square');
@@ -132,10 +153,10 @@ $('#sepAdmin tbody').on('click', 'td.add-control', function () {
   }  
 });
  
- $('#sepAdmin tbody').on('click', 'td.history-control', function () {
+ $('.sep_table tbody').on('click', 'td.history-control', function () {
   var btn_class = $(this).attr("class");
   var tr = $(this).closest('tr');
-  var row = table.row(tr);
+  var row = ivlTable.row(tr);
   var reason_arr = row.data()[8];
   var admin_comment_arr = row.data()[9];
 
