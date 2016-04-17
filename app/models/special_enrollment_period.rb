@@ -36,6 +36,9 @@ class SpecialEnrollmentPeriod
   # Next Possible Event Date
   field :next_poss_event_date, type: Date
 
+  # Next Possible Event Date
+  field :next_poss_effective_date, type: Date
+
   # Date Option 1
   field :option1_date, type: Date
 
@@ -53,7 +56,7 @@ class SpecialEnrollmentPeriod
   validate :end_date_follows_start_date
 
    validates :csl_num,
-    length: { minimum: 7, maximum: 7},
+    length: { minimum: 10, maximum: 10},
     numericality: true,
     allow_blank: true
 
