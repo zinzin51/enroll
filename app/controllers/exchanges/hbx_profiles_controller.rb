@@ -123,16 +123,16 @@ class Exchanges::HbxProfilesController < ApplicationController
       all_families = Family.exists(special_enrollment_periods: true) 
       @families = all_families.to_a
 
-      if QualifyingLifeEventKind.where(:market_kind => 'shop').present?
-        shop_qles = QualifyingLifeEventKind.where(:market_kind => 'shop').map(&:id)  
-        all_families_in_shop = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => shop_qles)
-        @families_in_shop = all_families_in_shop.to_a
-      end
-
       if QualifyingLifeEventKind.where(:market_kind => 'individual').present?
         ivl_qles = QualifyingLifeEventKind.where(:market_kind => 'individual').map(&:id)  
         all_families_in_ivl = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => ivl_qles)
         @families_in_ivl = all_families_in_ivl.to_a
+      end
+
+      if QualifyingLifeEventKind.where(:market_kind => 'shop').present?
+        shop_qles = QualifyingLifeEventKind.where(:market_kind => 'shop').map(&:id)  
+        all_families_in_shop = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => shop_qles)
+        @families_in_shop = all_families_in_shop.to_a
       end
 
     end
@@ -202,7 +202,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment] if params[:admin_comment].present?
       special_enrollment_period.csl_num = params.permit(:csl_num)[:csl_num] if params[:csl_num].present?
-      special_enrollment_period.next_poss_event_date = params.permit(:next_poss_event_date)[:next_poss_event_date] if params[:next_poss_event_date].present?
+      special_enrollment_period.next_poss_effective_date = params.permit(:next_poss_effective_date)[:next_poss_effective_date] if params[:next_poss_effective_date].present?
       special_enrollment_period.option1_date = Date.strptime(params[:option1_date], "%m/%d/%Y") if params[:option1_date].present?
       special_enrollment_period.option2_date = Date.strptime(params[:option2_date], "%m/%d/%Y") if params[:option2_date].present?
       special_enrollment_period.option3_date = Date.strptime(params[:option3_date], "%m/%d/%Y") if params[:option3_date].present?
