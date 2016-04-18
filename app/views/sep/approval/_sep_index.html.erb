@@ -2,7 +2,7 @@
   <div id= 'message_form'></div>
     <div id="inbox_provider_form" class="table-responsive">
       <ul class="nav nav-tabs" id="tab_datatables">
-          <li class='active'><a data-toggle="tab" data-target="#ivl_shop_Table">All</a></li>
+          <li><a data-toggle="tab" data-target="#ivl_shop_Table">All</a></li>
           <li><a data-toggle="tab" data-target="#ivlTable">IVL</a></li>
           <li><a data-toggle="tab" data-target="#shopTable">EE</a></li>
       </ul>
@@ -29,6 +29,8 @@
                 <th>END ON</th>
                 <th>EVENT DATE</th>
                 <th>NEXT POSSIBLE EFFECTIVE DATE</th>
+                <th> MEDICAL </th>
+                <th> DENTAL </th>
               </tr>
             </thead>
           
@@ -36,6 +38,7 @@
 
               <tbody>
                 <% @families.each do |family| %>
+                <% if family.primary_applicant.person.consumer_role.present? && family.primary_applicant.person.active_employee_roles.present?%>
                   <tr id='individual'>
                     <td><%=family.primary_applicant.person.hbx_id%></td>
                     <td><%=family.primary_applicant.person.first_name%></td>
@@ -57,7 +60,7 @@
                         <% end %>
                     </td>
                     <td>
-                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events %>
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events, eventKind: @event_kinds_all %>
                     </td>
                     <td>
                        <%family.special_enrollment_periods.to_a.each do |f| %>
@@ -89,7 +92,15 @@
                           <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date + "?dummyData" : "N/A?dummyData" %>
                         <% end %>
                     </td>
+                    <td>
+                        alisdjflajdflkajflaskjfaldfsf
+                    </td>
+
+                    <td>
+                      adlkajfljflafjafjlafjalkjfalksfjalf
+                    </td>
                   </tr>
+                  <% end %>
                 <% end %>
               </tbody>
            <% end %> 
@@ -116,13 +127,16 @@
                 <th>START ON</th>
                 <th>END ON</th>
                 <th>EVENT DATE</th>
-                <th>NEXT POSSIBLE EFFECTIVE DATE</th> 
+                <th>NEXT POSSIBLE EFFECTIVE DATE</th>
+                <th> MEDICAL </th>
+                <th> DENTAL </th> 
               </tr>
             </thead>
           
             <% if @families.present? && @families_in_ivl.present? %>
               <tbody>
                 <% @families.each do |family| %>
+                <% if family.primary_applicant.person.consumer_role.present? %>
                   <tr id='individual'>
                     <td><%=family.primary_applicant.person.hbx_id%></td>
                     <td><%=family.primary_applicant.person.first_name%></td>
@@ -143,7 +157,8 @@
                         <% end %>
                     </td>
                     <td>
-                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events %>
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events,
+                            eventKind: @event_kinds_ivl %>
                     </td>
                     <td>
                        <%family.special_enrollment_periods.to_a.each do |f| %>
@@ -175,7 +190,15 @@
                           <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date + "?dummyData" : "N/A?dummyData" %>
                         <% end %>
                     </td>
+                    <td>
+                        alisdjflajdflkajflaskjfaldfsf
+                    </td>
+
+                    <td>
+                      adlkajfljflafjafjlafjalkjfalksfjalf
+                    </td>
                   </tr>
+                  <% end %>
                 <% end %>
               </tbody>
            <% end %> 
@@ -203,6 +226,8 @@
             <th>END ON</th>
             <th>EVENT DATE</th>
             <th>NEXT POSSIBLE EFFECTIVE DATE</th> 
+            <th> MEDICAL </th>
+            <th> DENTAL </th>
           </tr>
         </thead>
 
@@ -210,13 +235,14 @@
 
               <tbody>
                 <% @families_in_shop.each do |family| %>
+                <% if family.primary_applicant.person.active_employee_roles.present? %>
                   <tr id='individual'>
                     <td><%=family.primary_applicant.person.hbx_id%></td>
                     <td><%=family.primary_applicant.person.first_name%></td>
                     <td><%=family.primary_applicant.person.last_name%></td>
                     <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
                     <td class='consumer_role_present'><%= family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %></td>
-                    <td class='employee_roles_present'><%= family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %></td>
+                    <td class='employee_roles_present'><%= family.primary_applicant.person.active_employee_roles.present?  ? "Yes" : "No" %></td>
                     <td class='history-control' data><i class="fa fa-folder" aria-hidden="true"></i></td>
                     <td class='add-control' data><i class="fa fa-plus-square"></i></td>
 
@@ -231,7 +257,7 @@
                         <% end %>
                     </td>
                     <td>
-                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events %>
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events, eventKind: @event_kinds_shop %>
                     </td>
                     <td>
                        <%family.special_enrollment_periods.to_a.each do |f| %>
@@ -263,7 +289,15 @@
                           <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date + "?dummyData" : "N/A?dummyData" %>
                         <% end %>
                     </td>
+                    <td>
+                        alisdjflajdflkajflaskjfaldfsf
+                    </td>
+
+                    <td>
+                      adlkajfljflafjafjlafjalkjfalksfjalf
+                    </td>
                   </tr>
+                  <% end %>
                 <% end %>
               </tbody>
            <% end %> 
