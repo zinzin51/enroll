@@ -29,8 +29,9 @@
                 <th>END ON</th>
                 <th>EVENT DATE</th>
                 <th>NEXT POSSIBLE EFFECTIVE DATE</th>
-                <th> MEDICAL </th>
-                <th> DENTAL </th>
+                <th>OPTION DATE 1</th>
+                <th>OPTION DATE 2</th>
+                <th>OPTION DATE 3</th>
               </tr>
             </thead>
           
@@ -39,7 +40,7 @@
               <tbody>
                 <% @families.each do |family| %>
                 <% if family.primary_applicant.person.consumer_role.present? && family.primary_applicant.person.active_employee_roles.present?%>
-                  <tr id='individual'>
+                  <tr>
                     <td><%=family.primary_applicant.person.hbx_id%></td>
                     <td><%=family.primary_applicant.person.first_name%></td>
                     <td><%=family.primary_applicant.person.last_name%></td>
@@ -93,11 +94,19 @@
                         <% end %>
                     </td>
                     <td>
-                        alisdjflajdflkajflaskjfaldfsf
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option1_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
                     </td>
-
                     <td>
-                      adlkajfljflafjafjlafjalkjfalksfjalf
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option2_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option3_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
                     </td>
                   </tr>
                   <% end %>
@@ -128,8 +137,9 @@
                 <th>END ON</th>
                 <th>EVENT DATE</th>
                 <th>NEXT POSSIBLE EFFECTIVE DATE</th>
-                <th> MEDICAL </th>
-                <th> DENTAL </th> 
+                <th>OPTION DATE 1</th>
+                <th>OPTION DATE 2</th>
+                <th>OPTION DATE 3</th>
               </tr>
             </thead>
           
@@ -137,7 +147,7 @@
               <tbody>
                 <% @families.each do |family| %>
                 <% if family.primary_applicant.person.consumer_role.present? %>
-                  <tr id='individual'>
+                  <tr>
                     <td><%=family.primary_applicant.person.hbx_id%></td>
                     <td><%=family.primary_applicant.person.first_name%></td>
                     <td><%=family.primary_applicant.person.last_name%></td>
@@ -191,12 +201,20 @@
                         <% end %>
                     </td>
                     <td>
-                        alisdjflajdflkajflaskjfaldfsf
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option1_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
                     </td>
-
                     <td>
-                      adlkajfljflafjafjlafjalkjfalksfjalf
-                    </td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option2_date.present? ? f.option2_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td> 
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option3_date.present? ? f.option3_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td> 
                   </tr>
                   <% end %>
                 <% end %>
@@ -226,8 +244,9 @@
             <th>END ON</th>
             <th>EVENT DATE</th>
             <th>NEXT POSSIBLE EFFECTIVE DATE</th> 
-            <th> MEDICAL </th>
-            <th> DENTAL </th>
+            <th>OPTION DATE 1</th>
+            <th>OPTION DATE 2</th>
+            <th>OPTION DATE 3</th>
           </tr>
         </thead>
 
@@ -236,7 +255,7 @@
               <tbody>
                 <% @families_in_shop.each do |family| %>
                 <% if family.primary_applicant.person.active_employee_roles.present? %>
-                  <tr id='individual'>
+                  <tr>
                     <td><%=family.primary_applicant.person.hbx_id%></td>
                     <td><%=family.primary_applicant.person.first_name%></td>
                     <td><%=family.primary_applicant.person.last_name%></td>
@@ -290,11 +309,19 @@
                         <% end %>
                     </td>
                     <td>
-                        alisdjflajdflkajflaskjfaldfsf
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option1_date.present? ? f.option1_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
                     </td>
-
                     <td>
-                      adlkajfljflafjafjlafjalkjfalksfjalf
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option2_date.present? ? f.option2_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%family.special_enrollment_periods.to_a.each do |f| %>
+                          <%= f.option3_date.present? ? f.option3_date.to_s + "?dummyData" : "N/A?dummyData" %>
+                        <% end %>
                     </td>
                   </tr>
                   <% end %>

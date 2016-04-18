@@ -122,20 +122,17 @@ class Exchanges::HbxProfilesController < ApplicationController
 
       all_families = Family.exists(special_enrollment_periods: true) 
       @families = all_families.to_a
-      @event_kinds_all = ['1st of next month', '15th day rule'];
 
       if QualifyingLifeEventKind.where(:market_kind => 'individual').present?
         ivl_qles = QualifyingLifeEventKind.where(:market_kind => 'individual').map(&:id)  
         all_families_in_ivl = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => ivl_qles)
         @families_in_ivl = all_families_in_ivl.to_a
-        
       end
 
       if QualifyingLifeEventKind.where(:market_kind => 'shop').present?
         shop_qles = QualifyingLifeEventKind.where(:market_kind => 'shop').map(&:id)  
         all_families_in_shop = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => shop_qles)
         @families_in_shop = all_families_in_shop.to_a
-        
       end
 
     end

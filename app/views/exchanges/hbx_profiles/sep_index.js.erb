@@ -10,7 +10,7 @@ var tab_counter = 0;
 
 var columnVal = [
                   { targets: [6,7], orderable: false},
-                  { targets: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], visible: false}
+                  { targets: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], visible: false}
                 ];
 
 $(document).ready(function() {
@@ -135,10 +135,12 @@ $('.sep_table tbody').on('click', 'td.history-control', function () {
   var end_on = row.data()[14].split("?dummyData");
   var event_date = row.data()[15].split("?dummyData");
   var next_poss_date = row.data()[16].split("?dummyData");
-  var medical = row.data()[17];
-  var dental = row.data()[18];
+  var option1_date = row.data()[17].split("?dummyData");
+  var option2_date = row.data()[18].split("?dummyData");
+  var option3_date = row.data()[19].split("?dummyData");
+  //var dental = row.data()[18];
 
-  var builder = buildTable(reason.length-1, reason, admin_comment, csl, effective_on_kind, start_on, end_on, event_date, next_poss_date, medical, dental);
+  var builder = buildTable(reason.length-1, reason, admin_comment, csl, effective_on_kind, start_on, end_on, event_date, next_poss_date, option1_date, option2_date, option3_date);
 
   if ( row.child.isShown() ) {
     history_btn_counter--;
@@ -213,8 +215,12 @@ function displayTable(custom_table, className, name) {
               '<h3>' + name + '</h3>' +
         
               '<div class = "table-responsive">' + 
-                '<table class = "table table-striped table-bordered">'+
-                    custom_table + 
+                '<table class = "table table-striped table-bordered table-history">'+
+                  '<div class="col-md-16 no-pd col-sm-16 col-xs-16">' +
+                 
+                      custom_table + 
+                
+                  '</div>' + 
                 '</table>'+
               '</div>' + 
               '<br/>'+ 
@@ -223,7 +229,7 @@ function displayTable(custom_table, className, name) {
 }
 
 
- function buildTable(size, reason, admin_comment, csl, effective_on_kind, start_on, end_on, event_date, next_poss_date, medical, dental)
+ function buildTable(size, reason, admin_comment, csl, effective_on_kind, start_on, end_on, event_date, next_poss_date, option1_date, option2_date, option3_date)
  {
     var val = "";
     var comment_section;
@@ -236,6 +242,8 @@ function displayTable(custom_table, className, name) {
         comment_section = 'Admin Comment: ' + admin_comment[i];
 
       val =   val + 
+
+              '<thead>' +              
                 '<tr>'+
                 '<th>SEP REASON</th>'+ 
                 '<th>EFFECTIVE DATE RULE</th>'+ 
@@ -247,14 +255,10 @@ function displayTable(custom_table, className, name) {
                 '<th>CHOICE DATE 2</th>'+
                 '<th>CHOICE DATE 3</th>'+
                 '<th>CSL#</th>'+
-                //'<th>MEDICAL</th>'+
-                //'<th>DENTAL</th>'+
-                //'<th>MEDICAL</th>'+
-                //'<th>DENTAL</th>'+
-                //'<th>Selected Date</th>'+
-                //'<th>Effective Date</th>'+
-                //'<th>Selected Date</th>'+
-                //'<th>Effective Date</th>'+
+                '<th>MEDICAL SELECTED DATE</th>'+
+                '<th>MEDICAL EFFECTIVE DATE</th>'+
+                '<th>MEDICAL SELECTED DATE</th>'+
+                '<th>MEDICAL EFFECTIVE DATE</th>'+
                 //'<th style="text-align:center";>Review Status</th>'+
                 '</tr>'+
               '</thead>'+
@@ -267,21 +271,13 @@ function displayTable(custom_table, className, name) {
                   '<td>' + start_on[i] + '</td>'+
                   '<td>' + end_on[i] + '</td>'+
                   '<td>' + next_poss_date[i] + '</td>'+
-                  '<td></td>'
-                  '<td></td>'
-                  '<td></td>'
+                  '<td>' + option1_date[i] + '</td>'+
+                  '<td>' + option2_date[i] + '</td>'+
+                  '<td>' + option3_date[i] + '</td>'+
                   '<td>' + csl[i] + '</td>'+
-                  //'<td>' + medical + '</td>'+
-                  //'<td>' + dental + '</td>'+
-                  //'<td>' + medical + '</td>'+
-                  //'<td>' + dental + '</td>'+
-                  //'<td>' + reason[i] + '</td>'+
-                  //'<td>' + reason[i] + '</td>'+
-                  //'<td>' + reason[i] + '</td>'+
-                  //'<td>' + reason[i] + '</td>'+
-                  //'<td>' + reason[i] + '</td>'+
-                  //'<td>' + reason[i] + '</td>'+
-                  //'<td></td>'+
+                  '<td></td>'+
+                  '<td></td>'+
+                  '<td></td>'+
                   //'<td style="text-align:center";><i class="fa fa-spinner fa-spin" style="color:grey"></i></td>'+
                 '</tr>'+ 
 
