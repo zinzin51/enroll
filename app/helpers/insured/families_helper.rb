@@ -16,7 +16,7 @@ module Insured::FamiliesHelper
   end
 
   def shift_purchase_time(policy)
-    policy.created_at.in_time_zone('Eastern Time (US & Canada)') 
+    policy.created_at.in_time_zone('Eastern Time (US & Canada)')
   end
 
   def format_policy_purchase_date(policy)
@@ -76,6 +76,17 @@ module Insured::FamiliesHelper
     end
 
     options
+  end
+
+  def admin_permitted_sep_effective_dates(person, qle)
+    additional_options = []
+    sep = person.primary_family.special_enrollment_periods.detect { |sep| sep.qualifying_life_event_kind_id.to_s == qle.id.to_s }
+    if sep.present?
+      additional_options << sep.option1_date if sep.option1_date.present?
+      additional_options << sep.option2_date if sep.option2_date.present?
+      additional_options << sep.option3_date if sep.option3_date.present?
+    end
+    return additional_options
   end
 
   def show_employer_panel?(person, hbx_enrollments)
