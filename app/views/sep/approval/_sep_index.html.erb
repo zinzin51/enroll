@@ -90,7 +90,7 @@
                     </td>
                     <td>
                        <%family.special_enrollment_periods.to_a.each do |f| %>
-                          <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date + "?dummyData" : "N/A?dummyData" %>
+                          <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date : "N/A?dummyData" %>
                         <% end %>
                     </td>
                     <td>
@@ -197,7 +197,7 @@
                     </td>
                     <td>
                        <%family.special_enrollment_periods.to_a.each do |f| %>
-                          <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date + "?dummyData" : "N/A?dummyData" %>
+                          <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date  : "N/A?dummyData" %>
                         <% end %>
                     </td>
                     <td>
@@ -305,7 +305,7 @@
                     </td>
                     <td>
                        <%family.special_enrollment_periods.to_a.each do |f| %>
-                          <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date + "?dummyData" : "N/A?dummyData" %>
+                          <%= f.next_poss_effective_date.present? ? f.next_poss_effective_date  : "N/A?dummyData" %>
                         <% end %>
                     </td>
                     <td>
