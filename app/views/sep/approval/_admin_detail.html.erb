@@ -16,14 +16,14 @@
 					<%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
 
            			<div class='admin_selected_sep_reason'>
-           				<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd"> 
-            				<%= select_tag :qle_id, options_from_collection_for_select(qle, "id", "title"), class: "selectric form-control", required: true, prompt: "SEP REASON" %>
+         	    		 <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd"> 
+            				<%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.is_self_attested]}), class: "selectric form-control", required: true, prompt: "SEP REASON" %>
          	    		</div>
          	    	</div>
 
          	    	<div class='init_event_date'>
          	    		<div class="col-md-3 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-		      				<%= text_field_tag :event_date, "", :'data-date-max'=> "110y", :'data-date-min'=> "-110y",class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE" %>
+		      				<%= text_field_tag :event_date, "", :'data-date-max'=> "110y", :'data-date-min'=> "-110y",class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE", value: Date.current %>
 		 				</div>
 		 			</div>
 
@@ -43,13 +43,17 @@
 
 		 		<div class='row row-form-wrapper no-buffer'>
 
-		 			<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-		      			<%= text_field_tag :start_on, "", :'data-date-max'=> "+0d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "SEP START DATE", value: Date.current %>
-		 			</div>
+		 			<div class = "start_end_date">
+		 		
+				 		<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+				      		<%= text_field_tag :start_on, "", :'data-date-max'=> "+0d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", required: true, disabled: true, placeholder: "SEP START DATE", value: Date.current %>
+				 		</div>
 
-		 			<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-		      			<%= text_field_tag :end_on, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "SEP END DATE", value: Date.current + 61.days %>
+				 		<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+				      		<%= text_field_tag :end_on, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", required: true, disabled: true, placeholder: "SEP END DATE", value: Date.current + 61.days %>
+						</div>
 					</div>
+					
 
 					<div class='init_effective_date'>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
