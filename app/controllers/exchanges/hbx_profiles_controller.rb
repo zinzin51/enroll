@@ -129,6 +129,8 @@ class Exchanges::HbxProfilesController < ApplicationController
         @families_in_ivl = all_families_in_ivl.to_a
       end
 
+ 
+
       if QualifyingLifeEventKind.where(:market_kind => 'shop').present?
         shop_qles = QualifyingLifeEventKind.where(:market_kind => 'shop').map(&:id)  
         all_families_in_shop = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => shop_qles)
