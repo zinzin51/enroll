@@ -43,6 +43,9 @@ $(document).on('change','.admin_selected_sep_reason select',function(){
   else{
    $('.init_event_date').show();
    $('.admin_effective_on_kind_options').hide();
+
+   
+   //alert($(this).attr('data-hint'));
    
    $(this).val() == 'true' ? $('#start_on, #end_on').prop('disabled', true) : $('#start_on, #end_on').prop('disabled', false);
 

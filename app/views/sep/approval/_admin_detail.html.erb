@@ -17,7 +17,7 @@
 
            			<div class='admin_selected_sep_reason'>
          	    		 <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd"> 
-            				<%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.is_self_attested]}), class: "selectric form-control", required: true, prompt: "SEP REASON" %>
+            				<%= select_tag :qle_id, options_from_collection_for_select(qle, "id", "title"), class: 'selectric form-control', required: true, prompt: "SEP REASON" %>
          	    		</div>
          	    	</div>
 
@@ -57,7 +57,7 @@
 
 					<div class='init_effective_date'>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-					    	<%= text_field_tag :next_poss_effective_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", required: true, disabled: true, placeholder: "NEXT POSSIBLE EFFECTIVE DATE" %>
+					    	<%= text_field_tag :next_poss_effective_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-date-picker form-control", required: true,  placeholder: "NEXT POSSIBLE EFFECTIVE DATE" %>
 						</div>
 					</div>
 				</div>
