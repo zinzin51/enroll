@@ -167,7 +167,7 @@
                         <% end %>
                     </td>
                     <td>
-                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events,
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual,
                             eventKind: @event_kinds_ivl %>
                     </td>
                     <td>
@@ -276,7 +276,7 @@
                         <% end %>
                     </td>
                     <td>
-                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events, eventKind: @event_kinds_shop %>
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_shop, eventKind: @event_kinds_shop %>
                     </td>
                     <td>
                        <%family.special_enrollment_periods.to_a.each do |f| %>

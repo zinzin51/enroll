@@ -129,8 +129,6 @@ class Exchanges::HbxProfilesController < ApplicationController
         @families_in_ivl = all_families_in_ivl.to_a
       end
 
- 
-
       if QualifyingLifeEventKind.where(:market_kind => 'shop').present?
         shop_qles = QualifyingLifeEventKind.where(:market_kind => 'shop').map(&:id)  
         all_families_in_shop = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => shop_qles)
@@ -142,7 +140,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     @event_kinds_all = ['1st of next month', '15th day rule'];
     @event_kinds_shop = ['1st of next month'];
     @event_kinds_ivl = ['1st of next month', '15th day rule'];
-    @qualifying_life_events = QualifyingLifeEventKind.all
+    @qualifying_life_events_shop = QualifyingLifeEventKind.shop_market_events
+    @qualifying_life_events_individual = QualifyingLifeEventKind.individual_market_events
   end
 
   def broker_agency_index
