@@ -1,0 +1,1 @@
+As an HBX admin, I want to be able to search an IVL enrollment for SEP information
