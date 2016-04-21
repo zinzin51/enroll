@@ -9,12 +9,15 @@ Feature: search IVL enrollment for SEP information
 
 	Scenario: successfully navigate to SEP page
 		Then the SEP page is displayed
-		#assert default text is search box is "Name, SSN"
+		#assert default text in search box is "Name, SSN"
 		And a search box is displayed where I can search by name or ssn 
 		And the ALL, IVL and EE buttons appear above the display list
 		And I see columns with headings HBX ID, Last Name, First Name, SSN, Consumer and Employee
 		And I see the Add SEP and History buttons
 	
+	#TODO create scenario to verify social security number appears in the form xxx-xx-1111
+
+
 	Scenario: primary subscriber is registered only as a consumer
 		Given I search for a subscriber who is only registered as a consumer
 		When I enter his name in the search box
@@ -45,4 +48,4 @@ Feature: search IVL enrollment for SEP information
 			| 	EE 	 |     0     |     3	  |   0  |
 			|   All  |     0     |     0    |   3  |
 
-			
+
