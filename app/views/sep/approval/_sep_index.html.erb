@@ -61,7 +61,7 @@
                         <% end %>
                     </td>
                     <td>
-                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events, eventKind: @event_kinds_all %>
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, qle_shop: @qualifying_life_events_shop, qle_individual: @qualifying_life_events_individual, eventKind: @event_kinds_all %>
                     </td>
                     <td>
                        <%family.special_enrollment_periods.to_a.each do |f| %>
@@ -146,7 +146,8 @@
             <% if @families.present? && @families_in_ivl.present? %>
               <tbody>
                 <% @families.each do |family| %>
-                <% if family.primary_applicant.person.consumer_role.present? %>
+                <% if family.primary_applicant.person.consumer_role.present?%>
+                 <% unless family.primary_applicant.person.active_employee_roles.present? %>
                   <tr>
                     <td><%=family.primary_applicant.person.hbx_id%></td>
                     <td><%=family.primary_applicant.person.first_name%></td>
@@ -217,6 +218,7 @@
                     </td> 
                   </tr>
                   <% end %>
+                  <% end %>
                 <% end %>
               </tbody>
            <% end %> 
@@ -255,6 +257,7 @@
               <tbody>
                 <% @families_in_shop.each do |family| %>
                 <% if family.primary_applicant.person.active_employee_roles.present? %>
+                 <% unless family.primary_applicant.person.consumer_role.present? %>
                   <tr>
                     <td><%=family.primary_applicant.person.hbx_id%></td>
                     <td><%=family.primary_applicant.person.first_name%></td>
@@ -324,6 +327,7 @@
                         <% end %>
                     </td>
                   </tr>
+                  <% end %>
                   <% end %>
                 <% end %>
               </tbody>
