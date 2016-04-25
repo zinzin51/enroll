@@ -138,8 +138,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     
     @event_kinds_all = ['1st of next month', '15th day rule'];
-    @event_kinds_shop = ['1st of next month'];
-    @event_kinds_ivl = ['1st of next month', '15th day rule'];
+    @event_kinds_default = ['1st of next month'];
     @qualifying_life_events_shop = QualifyingLifeEventKind.shop_market_events
     @qualifying_life_events_individual = QualifyingLifeEventKind.individual_market_events
   end

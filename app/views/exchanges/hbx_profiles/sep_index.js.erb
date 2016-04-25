@@ -4,12 +4,12 @@ $('.admin_effective_on_kind_options').hide();
 $('.init_event_date').hide();
 $('.start_end_date').hide();
 
-
 var ivlTable, shopTable, ivl_shop_Table, selectedTable, idTable;
 var history_btn_counter = 0;
 var add_btn_counter = 0;
 var add_btn_state = true;
 var history_btn_state = true;
+var market;
 
 var columnVal = [
                   { targets: [6,7], orderable: false},
@@ -58,11 +58,9 @@ function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_d
     }
     var cur_qle_title = $('.qle-details-title').html();
 
-
     objDateMin = dateMin;
     objDateMax = dateMax;
    
-
     $(target).val('');
     $(target).datepicker('destroy');
     $(target).datepicker({
@@ -87,6 +85,7 @@ $(document).on('change','.admin_selected_sep_reason select',function(){
    $('.init_event_date').hide();    
    $('.admin_effective_on_kind_options').hide();
    $('.start_end_date').hide();
+   $('.csl_num_options input:text').val("");
   }
   else{
    $('.init_event_date').show();
@@ -101,7 +100,8 @@ $(document).on('change','.admin_selected_sep_reason select',function(){
    //init_datepicker_for_qle_date(getObj.data('pre-event-sep-in-days'), getObj.data('post-event-sep-in-days'), getObj.data('current-date'));
    init_datepicker_for_qle_date(getObj.data('pre-event-sep-in-days'), getObj.data('post-event-sep-in-days'), getDate());
 
-   self_attested == true ? $('.start_end_date').addClass("disabled-input") : $('.start_end_date').removeClass("disabled-input");
+   
+   self_attested == true ? $('#start_on, #end_on').addClass("disabled-input") : $('#start_on').removeClass("disabled-input");
 
 
    $('input.floatlabel').floatlabel({
@@ -130,8 +130,14 @@ function set_start_date(init_target, start_day_target, end_day_target ){
 
   if (idTable == '#sepAdmin1')
     convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 2, eventDate.getDate());
-  else
+  else if(idTable == '#sepAdmin2')
     convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, eventDate.getDate());
+  else {
+    if (market == 'ivl')
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 2, eventDate.getDate());
+    else
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, eventDate.getDate());
+  }
 
   $(start_day_target).datepicker().datepicker('setDate', eventDate);
   $(end_day_target).datepicker().datepicker('setDate', convertDate);
@@ -145,8 +151,15 @@ function set_end_date(init_target, end_target){
 
   if (idTable == '#sepAdmin1')
     convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 2, eventDate.getDate());
-  else
+  else if(idTable == '#sepAdmin2')
     convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, eventDate.getDate());
+  else {
+    if (market == 'ivl')
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 2, eventDate.getDate());
+    else
+      convertDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, eventDate.getDate());
+  }
+
 
   $(end_target).datepicker().datepicker('setDate', convertDate);
 
@@ -201,9 +214,16 @@ function getDate(){
 $(document).on('change','.radio_option input', function(){
 
   if($(this).val() == 'shop')
-    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select(@qualifying_life_events_shop.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  })%>").selectric("refresh");
+    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qualifying_life_events_shop.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
   else
-    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select(@qualifying_life_events_individual.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
+    $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qualifying_life_events_individual.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
+
+  market = $(this).val();
+  $('.admin_effective_on_kind_options').hide();
+  $('.init_event_date').hide();
+  $('.start_end_date').hide();
+  $('.init_effective_date input').val('');
+  $('.csl_num_options input').val('');
 });
 
 
@@ -217,7 +237,18 @@ $(document).on('change','.init_event_date input', function(){
    $('.admin_effective_on_kind_options #effective_on_date').val("");
    $('.admin_effective_on_kind_options').show();
 
-   $('.admin_effective_on_kind_options .selectric-hide-select select').selectric("refresh");
+   
+   if(self_attested == true)
+    $('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DAY RULE', '']]) + options_for_select(@event_kinds_default)%>").selectric("refresh");
+   else { 
+      if(market == 'ivl')  
+        $('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DAY RULE', '']]) + options_for_select(@event_kinds_all)%>").selectric("refresh");
+      else
+        $('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DAY RULE', '']]) + options_for_select(@event_kinds_default)%>").selectric("refresh");
+
+   }
+   //$('.admin_effective_on_kind_options .selectric-hide-select select').selectric("refresh");
+   
    $('.init_effective_date input').val("");
 
   
@@ -259,14 +290,17 @@ $('#tab_datatables a[data-toggle="tab"]').on("click", function(){
     case '#ivl_shop_Table':   
       selectedTable = ivl_shop_Table;
       idTable = '#sepAdmin'; 
+      market = 'ivl';
       break;
     case '#ivlTable':
       selectedTable = ivlTable;
       idTable = '#sepAdmin1';
+      market = 'ivl';
       break;
     case '#shopTable':   
       selectedTable = shopTable;
       idTable = '#sepAdmin2';
+      market = 'shop';
       break;
     }  
     add_btn_state = true;
