@@ -18,7 +18,7 @@
                 <th>SSN</th>
                 <th>Consumer?</th>
                 <th>Employee?</th>
-                <th>Archive</th>
+                <th></th>
                 <th></th>
                 <th>CONSUMER SEP REASON</th>
                 <th>ADMIN COMMENTS</th>
@@ -47,9 +47,8 @@
                     <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
                     <td class='consumer_role_present'><%= family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %></td>
                     <td class='employee_roles_present'><%= family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %></td>
-                    <td class='history-control' data><i class="fa fa-folder" aria-hidden="true"></i></td>
                     <td class='add-control' data><i class="fa fa-plus-square"></i></td>
-
+                    <td> <%= link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.id, family_id: family), class: "btn btn-default" %> </td>
                     <td>
                         <%family.special_enrollment_periods.to_a.each do |f| %>
                           <%= f.title %>?dummyData
@@ -126,7 +125,7 @@
                 <th>SSN</th>
                 <th>Consumer?</th>
                 <th>Employee?</th>
-                <th>Archive</th>
+                <th></th>
                 <th></th>
                 <th>CONSUMER SEP REASON</th>
                 <th>ADMIN_COMMENTS</th>
@@ -155,8 +154,8 @@
                     <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
                     <td class='consumer_role_present'><%= family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %></td>
                     <td class='employee_roles_present'><%= family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %></td>
-                    <td class='history-control' data><i class="fa fa-folder" aria-hidden="true"></i></td>
                     <td class='add-control' data><i class="fa fa-plus-square"></i></td>
+                    <td> <%= link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.id, family_id: family), class: "btn btn-default" %> </td>
                     <td>
                         <%family.special_enrollment_periods.to_a.each do |f| %>
                           <%= f.title %>?dummyData
@@ -168,8 +167,7 @@
                         <% end %>
                     </td>
                     <td>
-                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual,
-                            eventKind: @event_kinds_all %>
+                        <%= render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, eventKind: @event_kinds_all %>
                     </td>
                     <td>
                        <%family.special_enrollment_periods.to_a.each do |f| %>
@@ -235,7 +233,7 @@
             <th>SSN</th>
             <th>Consumer?</th>
             <th>Employee?</th>
-            <th>Archive</th>
+            <th></th>
             <th></th>
             <th>CONSUMER SEP REASON</th>
             <th>ADMIN_COMMENTS</th>
@@ -265,9 +263,8 @@
                     <td><%=begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %></td>
                     <td class='consumer_role_present'><%= family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %></td>
                     <td class='employee_roles_present'><%= family.primary_applicant.person.active_employee_roles.present?  ? "Yes" : "No" %></td>
-                    <td class='history-control' data><i class="fa fa-folder" aria-hidden="true"></i></td>
                     <td class='add-control' data><i class="fa fa-plus-square"></i></td>
-
+                    <td> <%= link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.id, family_id: family), class: "btn btn-default" %> </td>
                     <td>
                         <%family.special_enrollment_periods.to_a.each do |f| %>
                           <%= f.title %>?dummyData

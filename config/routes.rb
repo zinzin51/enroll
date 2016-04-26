@@ -338,6 +338,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :sep_history, only: [:index]
+
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
 

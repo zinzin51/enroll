@@ -15,8 +15,7 @@ var columnVal = [
                   { targets: [6,7], orderable: false},
                   { targets: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], visible: false}
                 ];
-
-$(document).ready(function() {
+                
 
   ivl_shop_Table = $('#sepAdmin').DataTable( {
       columnDefs: columnVal,
@@ -33,7 +32,7 @@ $(document).ready(function() {
       "order": [[ 2, "asc" ]]
     } );
 
-  });
+
 
 var objDateMin;
 var objDateMax;
@@ -276,6 +275,7 @@ $(document).on('change','.start_end_date .start_btn input', function(){
 
 $('#tab_datatables a[data-toggle="tab"]').on("click", function(){
 
+
   if(add_btn_counter > 0){
     add_btn_state = false;
     $(idTable + ' td.add-control').trigger('click');
@@ -286,11 +286,11 @@ $('#tab_datatables a[data-toggle="tab"]').on("click", function(){
     $(idTable + ' td.history-control').trigger('click');
   }
 
+
   switch($(this).attr('data-target')) {
     case '#ivl_shop_Table':   
       selectedTable = ivl_shop_Table;
       idTable = '#sepAdmin'; 
-      market = 'ivl';
       break;
     case '#ivlTable':
       selectedTable = ivlTable;
@@ -306,13 +306,17 @@ $('#tab_datatables a[data-toggle="tab"]').on("click", function(){
     add_btn_state = true;
     history_btn_state = true;
 
+
+
   });
+
+
 
 $('.sep_table tbody').on('click', 'td.add-control', function () {
 
   var btn_class = $(this).attr("class");
   var tr = $(this).closest('tr');
-  var row = selectedTable.row(tr);
+  var row = selectedTable.row(tr); 
   var builder = row.data()[10];
 
   if (row.child.isShown() ) {
@@ -353,9 +357,6 @@ $('.sep_table tbody').on('click', 'td.add-control', function () {
   }
 
       idTable == '#sepAdmin' ? $('.radio_option').show() : $('.radio_option').hide();
-
-
-
 });
 
 
