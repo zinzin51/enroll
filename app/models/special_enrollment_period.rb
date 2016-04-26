@@ -58,6 +58,7 @@ class SpecialEnrollmentPeriod
    validates :csl_num,
     length: { minimum: 10, maximum: 10},
     numericality: true,
+    uniqueness: true,
     allow_blank: true
 
 
