@@ -53,7 +53,7 @@
 				<%= raw (link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.id, family_id: family), class: "btn btn-default").to_json%>,
 				"",
 				"",
-				<%= raw (render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, qle_shop: @qualifying_life_events_shop, qle_individual: @qualifying_life_events_individual, eventKind: @event_kinds_all).to_json %>,
+				<%= raw (render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, qle_shop: @qualifying_life_events_shop, qle_individual: @qualifying_life_events_individual, eventKind: @event_kinds_all, formats: [:html]).to_json %>,
 				"",
 				"",
 				"",
