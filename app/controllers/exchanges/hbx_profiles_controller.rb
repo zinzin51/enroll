@@ -1,5 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
 
+  include DataTablesAdapter
+
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show]
@@ -116,24 +118,94 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+
   def sep_index
+    respond_to do |format|
+      format.html { render "sep/approval/sep_index" }
+      format.js {}
+    end
+  end
+
+  def sep_index_datatable
 
     if Family.exists(special_enrollment_periods: true).present?
 
-      all_families = Family.exists(special_enrollment_periods: true) 
-      @families = all_families.to_a
+      if(params[:q] == 'both')
 
-      if QualifyingLifeEventKind.where(:market_kind => 'individual').present?
-        ivl_qles = QualifyingLifeEventKind.where(:market_kind => 'individual').map(&:id)  
-        all_families_in_ivl = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => ivl_qles)
-        @families_in_ivl = all_families_in_ivl.to_a
-      end
+        dt_query = extract_datatable_parameters
 
-      if QualifyingLifeEventKind.where(:market_kind => 'shop').present?
-        shop_qles = QualifyingLifeEventKind.where(:market_kind => 'shop').map(&:id)  
-        all_families_in_shop = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => shop_qles)
-        @families_in_shop = all_families_in_shop.to_a
-      end
+        families_dt = []
+
+        all_families = Family.exists(special_enrollment_periods: true)
+
+        #@families = all_families.to_a     
+
+        if dt_query.search_string.blank?
+          families_dt = all_families
+        else
+          person_ids = Person.search(dt_query.search_string).pluck(:id)
+          families_dt = all_families.where({
+          "family_members.person_id" => {"$in" => person_ids}
+          })
+        end
+
+        @draw = dt_query.draw
+        @total_records = all_families.count
+        @records_filtered = families_dt.count
+        @families = families_dt.skip(dt_query.skip).limit(dt_query.take)
+        @state = 'both'
+
+     elsif(params[:q] == 'ivl')
+
+        if QualifyingLifeEventKind.where(:market_kind => 'individual').present?
+          ivl_qles = QualifyingLifeEventKind.where(:market_kind => 'individual').map(&:id)  
+          all_families_in_ivl = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => ivl_qles)
+          
+          dt_query = extract_datatable_parameters
+          families_dt = []
+
+          if dt_query.search_string.blank?
+            families_dt = all_families_in_ivl
+          else
+            person_ids = Person.search(dt_query.search_string).pluck(:id)
+            families_dt = all_families_in_ivl.where({
+            "family_members.person_id" => {"$in" => person_ids}
+            })
+          end
+
+          @draw = dt_query.draw
+          @total_records = all_families_in_ivl.count
+          @records_filtered = families_dt.count
+          @families = families_dt.skip(dt_query.skip).limit(dt_query.take)
+          @state = 'ivl'
+        end
+
+     else
+
+        if QualifyingLifeEventKind.where(:market_kind => 'shop').present?
+            shop_qles = QualifyingLifeEventKind.where(:market_kind => 'shop').map(&:id)  
+            all_families_in_shop = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => shop_qles)
+        
+            dt_query = extract_datatable_parameters
+            families_dt = []
+
+            if dt_query.search_string.blank?
+              families_dt = all_families_in_shop
+            else
+              person_ids = Person.search(dt_query.search_string).pluck(:id)
+              families_dt = all_families_in_shop.where({
+              "family_members.person_id" => {"$in" => person_ids}
+              })
+            end
+
+            @draw = dt_query.draw
+            @total_records = all_families_in_shop.count
+            @records_filtered = families_dt.count
+            @families = families_dt.skip(dt_query.skip).limit(dt_query.take)
+            @state = 'shop'
+
+        end
+     end
 
     end
     
@@ -141,7 +213,11 @@ class Exchanges::HbxProfilesController < ApplicationController
     @event_kinds_default = ['1st of next month'];
     @qualifying_life_events_shop = QualifyingLifeEventKind.shop_market_events
     @qualifying_life_events_individual = QualifyingLifeEventKind.individual_market_events
+  
+    render
+
   end
+
 
   def broker_agency_index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -180,6 +256,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
+
     if current_user.has_csr_role? || current_user.try(:has_assister_role?)
       redirect_to home_exchanges_agents_path
       return
@@ -191,6 +268,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     session[:person_id] = nil
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
+
   end
 
 

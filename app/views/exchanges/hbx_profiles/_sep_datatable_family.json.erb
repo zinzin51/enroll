@@ -1,0 +1,99 @@
+
+
+<% init_arr = [] %>
+
+<% if state == 'both' %>
+
+   <% fam.each do|f| %>
+	  <% if f.primary_applicant.person.consumer_role.present? && f.primary_applicant.person.active_employee_roles.present? %>
+			
+		 <% init_arr.push(f) %>
+
+	  <% end %>
+	<% end %>
+
+<% elsif state == 'ivl'%>
+	
+   <% fam.each do|f| %>
+	  <% if f.primary_applicant.person.consumer_role.present? %>
+		<% unless f.primary_applicant.person.active_employee_roles.present? %>
+			<% init_arr.push(f) %>
+		<% end %>
+
+	  <% end %>
+   <% end %>
+
+ <% else %>
+
+   <% fam.each do|f| %>
+	  <% if f.primary_applicant.person.active_employee_roles.present? %>
+		<% unless f.primary_applicant.person.consumer_role.present? %>
+
+			<% init_arr.push(f) %>
+		<% end %>
+
+	  <% end %>
+   <% end %>
+
+<% end %>
+
+
+<% init_arr.each do|family| %>
+
+		<% if family == init_arr.last %>
+
+			[
+				"<%= family.primary_applicant.person.hbx_id.to_json %>",
+				"<%= family.primary_applicant.person.first_name.to_json%>",
+				"<%= family.primary_applicant.person.last_name.to_json %>",
+				"<%= json_escape begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %>",
+				"<%= json_escape family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %>",
+				"<%= json_escape family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %>",
+				 <%= raw ("<span class='add-control'><i class='fa fa-plus-square add-control'></i></span>").to_json %>,
+				<%= raw (link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.id, family_id: family), class: "btn btn-default").to_json%>,
+				"",
+				"",
+				<%= raw (render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, qle_shop: @qualifying_life_events_shop, qle_individual: @qualifying_life_events_individual, eventKind: @event_kinds_all).to_json %>,
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				""
+			]
+
+		<% else %>
+			
+			[
+				"<%= family.primary_applicant.person.hbx_id.to_json %>",
+				"<%= family.primary_applicant.person.first_name.to_json%>",
+				"<%= family.primary_applicant.person.last_name.to_json %>",
+				"<%= json_escape begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %>",
+				"<%= json_escape family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %>",
+				"<%= json_escape family.primary_applicant.person.employee_roles.present?  ? "Yes" : "No" %>",
+				<%= raw ("<span class='add-control'><i class='fa fa-plus-square add-control'></i></span>").to_json %>,
+				<%= raw (link_to "SEP HISTORY", sep_history_index_path(:person_id => family.primary_applicant.person.id, family_id: family), class: "btn btn-default").to_json%>,
+				"",
+				"",
+				<%= raw (render 'sep/approval/admin_detail', f: family, qle: @qualifying_life_events_individual, qle_shop: @qualifying_life_events_shop, qle_individual: @qualifying_life_events_individual, eventKind: @event_kinds_all).to_json  %>,
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				""
+			],
+
+		<% end %>
+
+
+
+<% end %>
+
+
