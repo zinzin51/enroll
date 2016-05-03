@@ -1,6 +1,5 @@
 Given(/^I have logged in as an HBX\-Admin$/) do
   pending # Write code here that turns the phrase above into concrete actions
-
 end
 
 Given(/^I click the SEP link from the Admin DC Health Link login page$/) do
