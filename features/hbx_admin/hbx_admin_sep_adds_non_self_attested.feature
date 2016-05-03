@@ -12,7 +12,7 @@ Feature: HBX-Admin needs to add a non self-attested SEP for an enrollment/househ
 		When I click on the Add SEP button
 		Then the SEP add page is displayed with the following <field>
 
-		Examples
+		Examples:
 		| field 											 |
 		|	IVL/EE Radio button 				 |
 		| SEP Reason dropdown 				 |
@@ -33,7 +33,7 @@ Feature: HBX-Admin needs to add a non self-attested SEP for an enrollment/househ
 		When I click on the Add SEP button
 		Then <button> is enabled
 
-		Examples
+		Examples:
 		| button 		 			|
 		| Event date 			|
 		| SEP Start  			|
