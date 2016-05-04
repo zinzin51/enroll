@@ -120,6 +120,12 @@ class Exchanges::HbxProfilesController < ApplicationController
 
 
   def sep_index
+
+    @event_kinds_all = ['1st of next month', '15th day rule'];
+    @event_kinds_default = ['1st of next month'];
+    @qualifying_life_events_shop = QualifyingLifeEventKind.shop_market_events
+    @qualifying_life_events_individual = QualifyingLifeEventKind.individual_market_events
+
     respond_to do |format|
       format.html { render "sep/approval/sep_index" }
       format.js {}
@@ -213,7 +219,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @event_kinds_default = ['1st of next month'];
     @qualifying_life_events_shop = QualifyingLifeEventKind.shop_market_events
     @qualifying_life_events_individual = QualifyingLifeEventKind.individual_market_events
-  
+
     render
 
   end
