@@ -1,9 +1,13 @@
-Given(/^I have logged in as an HBX\-Admin$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
+#Given(/^I have logged in as an HBX\-Admin$/) do
+ # visit "/"
+ # click_link 'HBX Portal'
+#end
 
 Given(/^I click the SEP link from the Admin DC Health Link login page$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  visit "/"
+  click_link 'HBX Portal'
+
+  click_link 'SEP Admin'
 end
 
 Then(/^the SEP page is displayed$/) do
