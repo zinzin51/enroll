@@ -51,17 +51,14 @@ class SpecialEnrollmentPeriod
   # CSL#
   field :csl_num, type: String
 
+  # MARKET KIND
+  field :market_kind, type:String
+
 
 
   validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on, :effective_on_kind, :submitted_at
   validate :end_date_follows_start_date
-
-   validates :csl_num,
-    length: { minimum: 10, maximum: 10},
-    numericality: true,
-    uniqueness: true,
-    allow_blank: true
 
 
   scope :shop_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.shop_market_events.map(&:id)) }

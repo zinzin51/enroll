@@ -294,9 +294,8 @@ class Exchanges::HbxProfilesController < ApplicationController
       special_enrollment_period.option2_date = Date.strptime(params[:option2_date], "%m/%d/%Y") if params[:option2_date].present?
       special_enrollment_period.option3_date = Date.strptime(params[:option3_date], "%m/%d/%Y") if params[:option3_date].present?
       special_enrollment_period.qle_on = Date.strptime(params[:event_date], "%m/%d/%Y") if params[:event_date].present?
-      #special_enrollment_period.market_kind = params.permit(:market_kind)[:market_kind] if params[:market_kind].present?
+      special_enrollment_period.market_kind = params.permit(:market_kind)[:market_kind] if params[:market_kind].present?
       special_enrollment_period.save
-      binding.pry
     end
     redirect_to exchanges_hbx_profiles_root_path
   end
