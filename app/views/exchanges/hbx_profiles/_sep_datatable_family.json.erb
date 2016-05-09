@@ -24,7 +24,7 @@
    <% end %>
 
  <% else %>
-
+ 	 
    <% fam.each do|f| %>
 	  <% if f.primary_applicant.person.active_employee_roles.present? %>
 		<% unless f.primary_applicant.person.consumer_role.present? %>
