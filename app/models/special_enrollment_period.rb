@@ -55,10 +55,10 @@ class SpecialEnrollmentPeriod
   field :market_kind, type:String
 
 
-
   validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on, :effective_on_kind, :submitted_at
   validate :end_date_follows_start_date
+
 
 
   scope :shop_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.shop_market_events.map(&:id)) }
@@ -231,4 +231,9 @@ private
     errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
   end
 
+  def csl_validates
+    if csl_num.present?
+      errors.add(:base, "csl_num cannot be less than 10 digits") if self.csl_num.length < 10
+    end
+  end
 end

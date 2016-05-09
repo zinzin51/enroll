@@ -269,12 +269,12 @@ $('#tab_datatables a[data-toggle="tab"]').on("click", function(){
 
   if(add_btn_counter > 0){
     add_btn_state = false;
-    $(idTable + ' span.add-control').trigger('click');
+    $(idTable + 'span.add-control').trigger('click');
   }
 
   if(history_btn_counter > 0){
     history_btn_state = false;
-    $(idTable + ' i.history-control').trigger('click');
+    $(idTable + 'i.history-control').trigger('click');
   }
 
   switch($(this).attr('data-target')) {
