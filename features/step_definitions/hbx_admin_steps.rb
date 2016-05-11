@@ -16,6 +16,7 @@ Given(/^I click the SEP link from the Admin DC Health Link login page$/) do
   sleep 2
   visit "/"
   screenshot("home")
+  debugger
   click_link 'HBX Portal'
   screenshot("hbx login")
   click_link 'SEP Admin'
@@ -35,12 +36,9 @@ Then(/^the ALL, IVL and EE buttons appear above the display list$/) do
   expect(page).to have_content('All')
   expect(page).to have_content('IVL')
   expect(page).to have_content('EE')
-  screenshot("blah")
-  find(:xpath, '//*[@id="tab_datatables"]/li[2]/a').click
 end
 
 Then(/^I see columns with headings HBX ID, Last Name, First Name, SSN, Consumer and Employee$/) do
-  screenshot("IVL tab")
   expect(page).to have_content('HBX ID')
   
   expect(page).to have_content('Last Name')
@@ -55,20 +53,26 @@ end
 Then(/^I see the Add SEP and History buttons$/) do
   #expect(page).to have_content('SEP HISTORY')
   page.has_button?("SEP HISTORY")
-  screenshot("Sep add button")
-  expect(page).to have_css('add-control fa fa-plus-square')
 end
 
-Given(/^I search for a subscriber who is only registered as a consumer$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+Given(/^I have a primary subscriber who is registered only as a consumer$/) do
+  person = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_employee_role)
+  family = person.primary_family
+  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
+  qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle.id)
+  FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event")
+  Caches::PlanDetails.load_record_cache!
+  debugger
 end
 
-When(/^I enter his name in the search box$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+When(/^I click the IVL tab$/) do
+  #find(:xpath, '//*[@id="tab_datatables"]/li[2]').click
+  click_link 'IVL'
 end
 
 Then(/^I see Yes in the Consumer Field and No in the Employee field for his search results$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  screenshot("IVL results")
 end
 
 Given(/^I search for a subscriber who is only registered as an employee$/) do

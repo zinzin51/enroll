@@ -19,8 +19,8 @@ Feature: search IVL enrollment for SEP information
 
 
 	Scenario: primary subscriber is registered only as a consumer
-		Given I search for a subscriber who is only registered as a consumer
-		When I enter his name in the search box
+		Given I have a primary subscriber who is registered only as a consumer
+		When I click the IVL tab
 		Then I see Yes in the Consumer Field and No in the Employee field for his search results
 
 	Scenario: primary subscriber is registered only as an employee
