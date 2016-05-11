@@ -12,11 +12,13 @@ Given(/^I click the SEP link from the Admin DC Health Link login page$/) do
   FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event")
   Caches::PlanDetails.load_record_cache!
   #binding.pry 
+  er_profile = FactoryGirl.create(:employer_profile)
+  census_ee = FactoryGirl.create(:census_employee, employer_profile: er_profile)
+  person.employee_roles.first.census_employee = census_ee
 
   sleep 2
   visit "/"
   screenshot("home")
-  debugger
   click_link 'HBX Portal'
   screenshot("hbx login")
   click_link 'SEP Admin'
@@ -52,6 +54,9 @@ end
 
 Then(/^I see the Add SEP and History buttons$/) do
   #expect(page).to have_content('SEP HISTORY')
+  find('.nav-tabs').find('a', :text => "EE").click
+  wait_for_ajax
+  screenshot("EE Tab Display")
   page.has_button?("SEP HISTORY")
 end
 
@@ -63,7 +68,7 @@ Given(/^I have a primary subscriber who is registered only as a consumer$/) do
   FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle.id)
   FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event")
   Caches::PlanDetails.load_record_cache!
-  debugger
+  
 end
 
 When(/^I click the IVL tab$/) do
