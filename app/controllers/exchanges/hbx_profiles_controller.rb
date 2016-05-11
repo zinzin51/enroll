@@ -10,6 +10,14 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_csr_or_hbx_staff, only: [:family_index]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
+  before_action :check_csl_num, only: [:add_new_sep]
+
+  def check_csl_num
+    if params[:csl_num].to_s.length < 10
+      redirect_to :back, :flash => { :error => "CSL NUM needs to be 10 digits" }
+    end
+  end
+
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
@@ -278,10 +286,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
 
-    def add_new_sep
+  def add_new_sep
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       @family = Family.find(params[:person])
+      @name = params.permit(:firstName)[:firstName] + " " + params.permit(:lastName)[:lastName] 
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
       special_enrollment_period.selected_effective_on = params.permit(:effective_on_date)[:effective_on_date] if params[:effective_on_date].present?
       special_enrollment_period.start_on = Date.strptime(params[:start_on], "%m/%d/%Y") if params[:start_on].present?
@@ -295,7 +304,12 @@ class Exchanges::HbxProfilesController < ApplicationController
       special_enrollment_period.option3_date = Date.strptime(params[:option3_date], "%m/%d/%Y") if params[:option3_date].present?
       special_enrollment_period.qle_on = Date.strptime(params[:event_date], "%m/%d/%Y") if params[:event_date].present?
       special_enrollment_period.market_kind = params.permit(:market_kind)[:market_kind] if params[:market_kind].present?
-      special_enrollment_period.save
+
+      if special_enrollment_period.save
+        flash[:notice] = 'SEP added for ' + @name
+      else
+        flash[:error] = "Not saved"
+      end
     end
     redirect_to exchanges_hbx_profiles_root_path
   end

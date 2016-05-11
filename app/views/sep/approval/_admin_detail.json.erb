@@ -36,6 +36,8 @@
 				
 					<div class="row row-form-wrapper no-buffer">
 						<%= hidden_field_tag "person", f.id %>
+						<%= hidden_field_tag "firstName", f.primary_applicant.person.first_name %>
+						<%= hidden_field_tag "lastName", f.primary_applicant.person.last_name %>
 
 						<div class = "qle_market">
 							<%= hidden_field_tag :market_kind, "ivl" %>
