@@ -10,11 +10,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_csr_or_hbx_staff, only: [:family_index]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
-  before_action :check_csl_num, only: [:add_new_sep]
+  before_action :check_params, only: [:add_new_sep]
 
-  def check_csl_num
-    if params[:csl_num].to_s.length < 10
-      redirect_to :back, :flash => { :error => "CSL NUM needs to be 10 digits" }
+  def check_params
+    if params[:csl_num].to_s.length < 10 
+      redirect_to :back, :flash => { error: "SEP not saved. CSL# should be a maximum of 10 digits" }
     end
   end
 
