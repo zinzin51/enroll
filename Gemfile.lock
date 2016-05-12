@@ -534,11 +534,7 @@ DEPENDENCIES
   forgery
   haml
   jbuilder (~> 2.0)
-<<<<<<< HEAD
-  jquery-datatables-rails
-=======
   jquery-datatables-rails (~> 3.3.0)
->>>>>>> 8649dd6... added necessary jquery datatable files
   jquery-rails (= 4.0.5)
   jquery-turbolinks
   jquery-ui-rails
