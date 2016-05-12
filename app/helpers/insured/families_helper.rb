@@ -1,5 +1,18 @@
 module Insured::FamiliesHelper
 
+  def plan_shopping_dependent_text(hbx_enrollment)
+    subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
+    if subscriber.present? && dependents.count == 0
+      ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>").html_safe
+    elsif subscriber.blank? && dependents.count == 1
+      ("<span class='dependent-text'>#{dependents.first.person.full_name}</span>").html_safe
+    elsif subscriber.blank? && dependents.count > 1
+      (link_to(pluralize(dependents.count, "dependent"), "", data: {toggle: "modal", target: "#dependentsList"}, class: "dependent-text")).html_safe + render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
+    else
+      ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>" + " + " + link_to(pluralize(dependents.count, "dependent"), "", data: {toggle: "modal", target: "#dependentsList"}, class: "dependent-text")).html_safe + render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
+    end
+  end
+
   def current_premium hbx_enrollment
     if hbx_enrollment.kind == 'employer_sponsored'
       hbx_enrollment.total_employee_cost
@@ -30,8 +43,10 @@ module Insured::FamiliesHelper
   def render_plan_type_details(plan)
     plan_details = [ plan.try(:plan_type).try(:upcase) ].compact
 
+    metal_level = display_dental_metal_level(plan)
+
     if plan_level = plan.try(:metal_level).try(:humanize)
-      plan_details << "<span class=\"#{plan_level.try(:downcase)}-icon\">#{plan_level}</span>"
+      plan_details << "<span class=\"#{plan_level.try(:downcase)}-icon\">#{metal_level}</span>"
     end
 
     if plan.try(:nationwide)
@@ -47,9 +62,7 @@ module Insured::FamiliesHelper
     options = {class: 'qle-menu-item'}
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
-      post_event_sep_in_days: qle.post_event_sep_in_days,
-      pre_event_sep_in_days: qle.pre_event_sep_in_days,
-      date_hint: qle.date_hint, is_self_attested: qle.is_self_attested,
+      is_self_attested: qle.is_self_attested,
       current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     }
 
@@ -78,6 +91,12 @@ module Insured::FamiliesHelper
     options
   end
 
+  def newhire_enrollment_eligible?(employee_role)
+    return false if employee_role.blank? || employee_role.census_employee.blank?
+
+    employee_role.census_employee.newhire_enrollment_eligible? && employee_role.can_select_coverage?
+  end
+
   def admin_permitted_sep_effective_dates(person, qle)
     additional_options = []
     sep = person.primary_family.special_enrollment_periods.detect { |sep| sep.qualifying_life_event_kind_id.to_s == qle.id.to_s }
@@ -98,5 +117,13 @@ module Insured::FamiliesHelper
     else
       true
     end
+  end
+
+  def has_writing_agent?(employee_role)
+    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
+  end
+
+  def has_writing_agent?(employee_role)
+    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
 end

@@ -17,10 +17,10 @@ module Factories
       ## Works only for data migrated into Enroll 
       ## FIXME add logic to support Enroll native renewals 
 
-      return nil if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
+      return true if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
 
-      shop_enrollments  = @family.enrollments.shop_market + @family.active_household.hbx_enrollments.waived
-      return nil if shop_enrollments.any? {|enrollment| enrollment.effective_on >= @renewing_plan_year.start_on }
+      shop_enrollments  = @family.active_household.hbx_enrollments.enrolled.shop_market + @family.active_household.hbx_enrollments.waived
+      return true if shop_enrollments.any? {|enrollment| enrollment.effective_on >= @renewing_plan_year.start_on }
 
       @plan_year_start_on = @renewing_plan_year.start_on
       prev_plan_year_start = @plan_year_start_on - 1.year
@@ -29,11 +29,10 @@ module Factories
       shop_enrollments.reject! {|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
       shop_enrollments.reject!{|enrollment| !enrollment.currently_active? }
 
-      if shop_enrollments.empty?
+      if shop_enrollments.compact.empty?
         renew_waived_enrollment
       else
-        
-        active_enrollment = shop_enrollments.sort_by{|e| e.created_at}.last
+        active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
 
         # shop_enrollments.each do |active_enrollment|
           # next unless active_enrollment.currently_active?
@@ -132,7 +131,7 @@ module Factories
          renewal_enrollment.send("#{attr}=", active_enrollment.send(attr))
       end
 
-      renewal_enrollment.plan_id = active_enrollment.plan.renewal_plan_id
+      renewal_enrollment.plan_id = active_enrollment.plan.renewal_plan_id if active_enrollment.plan.present?
       renewal_enrollment
     end
 

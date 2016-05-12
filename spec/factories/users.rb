@@ -23,6 +23,9 @@ FactoryGirl.define do
 
   trait :hbx_staff do
     roles ["hbx_staff"]
+    after :create do |user|
+      FactoryGirl.create :person, :with_hbx_staff_role, :with_family, :user => user
+    end
   end
 
   trait :consumer do
@@ -51,6 +54,33 @@ FactoryGirl.define do
 
   trait "broker_agency_staff" do
     roles ["broker_agency_staff"]
+  end
+
+  trait :employer do
+    transient do
+      organization {}
+    end
+
+    after :create do |user, evaluator|
+      #person = FactoryGirl.create :person, :with_family, :user => user
+      evaluator.organization.employer_profile = FactoryGirl.create(:employer_profile,
+        employee_roles: [ FactoryGirl.create(:employee_role, :person => user.person) ],
+        organization: evaluator.organization)
+      user.person.employer_staff_roles.push FactoryGirl.create(:employer_staff_role, employer_profile_id: evaluator.organization.employer_profile.id)
+      user.save
+    end
+  end
+
+  trait :with_consumer_role do
+    after :create do |user|
+      FactoryGirl.create :person, :with_consumer_role, :with_family, :user => user
+    end
+  end
+
+  trait :with_csr_sub_role do
+    after :create do |user|
+      FactoryGirl.create :person, :with_csr_role, :with_family, :user => user
+    end
   end
 
   trait :with_family do

@@ -10,6 +10,7 @@
               <thead>              
                 <tr>
                   <th>SEP REASON</th>
+                  <th>MARKET KIND</th>
                   <th>EFFECTIVE DATE RULE</th> 
                   <th>EVENT DATE</th>
                   <th>SEP START DATE</th>
@@ -26,8 +27,14 @@
                 <tr>
                   <td><%=f.title %></td>
 
+                  <% if f.market_kind.present? %>
+                    <td><%=f.market_kind.upcase%></td>
+                  <% else %>
+                    <td>N/A</td>
+                  <% end %>
+
                   <% if f.effective_on_kind.present? %>
-                    <td><%=f.effective_on_kind %></td>
+                    <td><%=f.effective_on_kind.humanize %></td>
                   <% else %>
                     <td>N/A</td>
                   <% end %>
