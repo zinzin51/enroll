@@ -4,18 +4,21 @@
 #end
 
 Given(/^I click the SEP link from the Admin DC Health Link login page$/) do
-  person = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_employee_role)
+  person = FactoryGirl.create(:person, :with_family, :with_employee_role)
   family = person.primary_family
   FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
-  qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle.id)
-  FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event")
-  Caches::PlanDetails.load_record_cache!
+  #FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event")
+  #Caches::PlanDetails.load_record_cache!
   #binding.pry 
   er_profile = FactoryGirl.create(:employer_profile)
   census_ee = FactoryGirl.create(:census_employee, employer_profile: er_profile)
   person.employee_roles.first.census_employee = census_ee
-
+  person.employee_roles.first.save!
+  Caches::PlanDetails.load_record_cache!
+  #family = Family.find(family.id)
+  #binding.pry
   sleep 2
   visit "/"
   screenshot("home")
@@ -27,7 +30,6 @@ end
 
 Then(/^the SEP page is displayed$/) do
   expect(page).to have_content('SEP Dashboard')
-  screenshot("here")
 end
 
 Then(/^a search box is displayed where I can search by name or ssn$/) do
@@ -54,6 +56,12 @@ end
 
 Then(/^I see the Add SEP and History buttons$/) do
   #expect(page).to have_content('SEP HISTORY')
+  #find('.nav-tabs').find('a', :text => "All").click
+  #wait_for_ajax
+  #screenshot("All Tab Display")
+  #find('.nav-tabs').find('a', :text => "IVL").click
+  #wait_for_ajax
+  #screenshot("IVL Tab Display")
   find('.nav-tabs').find('a', :text => "EE").click
   wait_for_ajax
   screenshot("EE Tab Display")
