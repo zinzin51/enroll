@@ -103,6 +103,7 @@
    * clashing of variable names and that they can easily referenced for reuse.
    */
 
+
   // Defined else where
   //  _selector_run
   //  _selector_opts
@@ -120,7 +121,6 @@
   var _re_date_start = /^[\w\+\-]/;
   var _re_date_end = /[\w\+\-]$/;
 
-
   // Escape regular expression special characters
   var _re_escape_regex = new RegExp( '(\\' + [ '/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\', '$', '^', '-' ].join('|\\') + ')', 'g' );
 
@@ -135,6 +135,7 @@
   // - \u2009 is thin space and \u202F is narrow no-break space, both used in many
   //   standards as thousands separators.
   var _re_formatted_numeric = /[',$£€¥%\u2009\u202F\u20BD\u20a9\u20BArfk]/gi;
+
 
   var _empty = function ( d ) {
     return !d || d === true || d === '-' ? true : false;
@@ -162,14 +163,12 @@
   var _isNumber = function ( d, decimalPoint, formatted ) {
     var strType = typeof d === 'string';
 
-
     // If empty return immediately so there must be a number if it is a
     // formatted string (this stops the string "k", or "kr", etc being detected
     // as a formatted number for currency
     if ( _empty( d ) ) {
       return true;
     }
-
 
     if ( decimalPoint && strType ) {
       d = _numToDecimal( d, decimalPoint );
@@ -188,6 +187,7 @@
     return _empty( d ) || typeof d === 'string';
   };
 
+
   var _htmlNumeric = function ( d, decimalPoint, formatted ) {
     if ( _empty( d ) ) {
       return true;
@@ -200,6 +200,7 @@
         true :
         null;
   };
+
 
   var _pluck = function ( a, prop, prop2 ) {
     var out = [];
@@ -222,9 +223,9 @@
       }
     }
 
-
     return out;
   };
+
 
   // Basically the same as _pluck, but rather than looping over `a` we use `order`
   // as the indexes to pick from `a`
@@ -250,6 +251,7 @@
 
     return out;
   };
+
 
   var _range = function ( len, start )
   {
@@ -291,6 +293,7 @@
     return d.replace( _re_html, '' );
   };
 
+
   /**
    * Find the unique elements in a source array.
    *
@@ -327,6 +330,7 @@
   };
 
 
+
   /**
    * Create a mapping object that allows camel case parameters to be looked up
    * for their Hungarian counterparts. The mapping is stored in a private
@@ -345,7 +349,6 @@
     $.each( o, function (key, val) {
       match = key.match(/^([^A-Z]+?)([A-Z])/);
 
-
       if ( match && hungarian.indexOf(match[1]+' ') !== -1 )
       {
         newKey = key.replace( match[0], match[2].toLowerCase() );
@@ -360,6 +363,7 @@
 
     o._hungarianMap = map;
   }
+
 
   /**
    * Convert from camel case parameters to Hungarian, based on a Hungarian map
@@ -402,6 +406,8 @@
       }
     } );
   }
+
+
   /**
    * Language compatibility - when certain options are given, and others aren't, we
    * need to duplicate the values over, in order to provide backwards compatibility
@@ -435,12 +441,13 @@
       lang.sThousands = lang.sInfoThousands;
     }
 
-
     var decimal = lang.sDecimal;
     if ( decimal ) {
       _addNumericSort( decimal );
     }
   }
+
+
   /**
    * Map one parameter onto another
    *  @param {object} o Object to map
@@ -452,6 +459,7 @@
       o[ old ] = o[ knew ];
     }
   };
+
 
   /**
    * Provide backwards compatibility for the main DT options. Note that the new
@@ -480,7 +488,6 @@
       init.scrollX = init.scrollX ? '100%' : '';
     }
 
-
     // Column search objects are in an array, so it needs to be converted
     // element by element
     var searchCols = init.aoSearchCols;
@@ -493,6 +500,7 @@
       }
     }
   }
+
 
   /**
    * Provide backwards compatibility for column options. Note that the new options
@@ -513,6 +521,7 @@
       init.aDataSort = [ dataSort ];
     }
   }
+
 
   /**
    * Browser feature detection for capabilities, quirks
@@ -573,12 +582,10 @@
       // Get scrollbar width
       browser.barWidth = outer[0].offsetWidth - outer[0].clientWidth;
 
-
       // IE6/7 will oversize a width 100% element inside a scrolling element, to
       // include the width of the scrollbar, while other browsers ensure the inner
       // element is contained without forcing scrolling
       browser.bScrollOversize = inner[0].offsetWidth === 100 && outer[0].clientWidth !== 100;
-
 
       // In rtl text layout, some browsers (most, but not all) will place the
       // scrollbar on the left, rather than the right.
@@ -617,7 +624,6 @@
       if ( ! that.hasOwnProperty(i) ) {
         continue;
       }
-
 
       value = isSet ?
         fn( value, that[i], i, that ) :
@@ -693,10 +699,8 @@
       // Backwards compatibility
       _fnCompatCols( oOptions );
 
-
       // Map camel case parameters to their Hungarian counterparts
       _fnCamelToHungarian( DataTable.defaults.column, oOptions );
-
 
       /* Backwards compatibility for mDataProp */
       if ( oOptions.mDataProp !== undefined && !oOptions.mData )
@@ -719,7 +723,6 @@
       $.extend( oCol, oOptions );
       _fnMap( oCol, oOptions, "sWidth", "sWidthOrig" );
 
-
       /* iDataSort to be applied (backwards compatibility), but aDataSort will take
        * priority if defined
        */
@@ -741,7 +744,8 @@
     oCol._bAttrSrc = $.isPlainObject( mDataSrc ) && (
       attrTest(mDataSrc.sort) || attrTest(mDataSrc.type) || attrTest(mDataSrc.filter)
     );
-   oCol.fnGetData = function (rowData, type, meta) {
+
+    oCol.fnGetData = function (rowData, type, meta) {
       var innerData = mData( rowData, type, undefined, meta );
 
       return mRender && type ?
@@ -790,6 +794,7 @@
     }
   }
 
+
   /**
    * Adjust the table column widths for new data. Note: you would probably want to
    * do a redraw after calling this function!
@@ -837,6 +842,7 @@
       null;
   }
 
+
   /**
    * Covert the index of an index in the data array and convert it to the visible
    *   column index (take account of hidden columns)
@@ -850,9 +856,9 @@
     var aiVis = _fnGetColumns( oSettings, 'bVisible' );
     var iPos = $.inArray( iMatch, aiVis );
 
-
     return iPos !== -1 ? iPos : null;
   }
+
 
   /**
    * Get the number of visible columns
@@ -865,6 +871,7 @@
     return _fnGetColumns( oSettings, 'bVisible' ).length;
   }
 
+
   /**
    * Get an array of column indexes that match a given property
    *  @param {object} oSettings dataTables settings object
@@ -876,6 +883,7 @@
   function _fnGetColumns( oSettings, sParam )
   {
     var a = [];
+
     $.map( oSettings.aoColumns, function(val, i) {
       if ( val[sParam] ) {
         a.push( i );
@@ -884,6 +892,7 @@
 
     return a;
   }
+
 
   /**
    * Calculate the 'type' of a column
@@ -902,6 +911,7 @@
     for ( i=0, ien=columns.length ; i<ien ; i++ ) {
       col = columns[i];
       cache = [];
+
       if ( ! col.sType && col._sManualType ) {
         col.sType = col._sManualType;
       }
@@ -913,7 +923,8 @@
             if ( cache[k] === undefined ) {
               cache[k] = _fnGetCellData( settings, k, i, 'type' );
             }
-         detectedType = types[j]( cache[k], settings );
+
+            detectedType = types[j]( cache[k], settings );
 
             // If null, then this type can't apply to this column, so
             // rather than testing all cells, break out. There is an
@@ -946,6 +957,7 @@
       }
     }
   }
+
 
   /**
    * Take the column definitions and static columns arrays and calculate how
@@ -1053,49 +1065,31 @@
     /* Create the cells */
     var nTd, sThisType;
     var columns = oSettings.aoColumns;
+
     // Invalidate the column types as the new data needs to be revalidated
     for ( var i=0, iLen=columns.length ; i<iLen ; i++ )
     {
       columns[i].sType = null;
     }
-<<<<<<< HEAD
-  
-    /* Add to the display array */
-    oSettings.aiDisplayMaster.push( iRow );
-  
-=======
 
     /* Add to the display array */
     oSettings.aiDisplayMaster.push( iRow );
 
->>>>>>> hotfix-5338-not-working
     var id = oSettings.rowIdFn( aDataIn );
     if ( id !== undefined ) {
       oSettings.aIds[ id ] = oData;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Create the DOM information, or register it if already present */
     if ( nTr || ! oSettings.oFeatures.bDeferRender )
     {
       _fnCreateTr( oSettings, iRow, nTr, anTds );
     }
-<<<<<<< HEAD
-  
-    return iRow;
-  }
-  
-  
-=======
 
     return iRow;
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Add one or more TR elements to the table. Generally we'd expect to
    * use this for reading data from a DOM sourced table, but it could be
@@ -1109,32 +1103,19 @@
   function _fnAddTr( settings, trs )
   {
     var row;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Allow an individual node to be passed in
     if ( ! (trs instanceof $) ) {
       trs = $(trs);
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return trs.map( function (i, el) {
       row = _fnGetRowElements( settings, el );
       return _fnAddData( settings, row.data, el, row.cells );
     } );
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Take a TR element and convert it to an index in aoData
    *  @param {object} oSettings dataTables settings object
@@ -1146,13 +1127,8 @@
   {
     return (n._DT_RowIndex!==undefined) ? n._DT_RowIndex : null;
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Take a TD element and convert it into a column data index (not the visible index)
    *  @param {object} oSettings dataTables settings object
@@ -1165,13 +1141,8 @@
   {
     return $.inArray( n, oSettings.aoData[ iRow ].anCells );
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get the data for a given cell from the internal cache, taking into account data mapping
    *  @param {object} settings dataTables settings object
@@ -1192,11 +1163,7 @@
       row:      rowIdx,
       col:      colIdx
     } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( cellData === undefined ) {
       if ( settings.iDrawError != draw && defaultContent === null ) {
         _fnLog( settings, 0, "Requested unknown parameter "+
@@ -1206,11 +1173,7 @@
       }
       return defaultContent;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* When the data source is null, we can use default column data */
     if ( (cellData === rowData || cellData === null) && defaultContent !== null ) {
       cellData = defaultContent;
@@ -1220,23 +1183,14 @@
       // executing in the scope of the data object (for instances)
       return cellData.call( rowData );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( cellData === null && type == 'display' ) {
       return '';
     }
     return cellData;
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Set the value for a specific cell, into the internal data cache
    *  @param {object} settings dataTables settings object
@@ -1249,32 +1203,19 @@
   {
     var col     = settings.aoColumns[colIdx];
     var rowData = settings.aoData[rowIdx]._aData;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     col.fnSetData( rowData, val, {
       settings: settings,
       row:      rowIdx,
       col:      colIdx
     }  );
   }
-<<<<<<< HEAD
-  
-  
-  // Private variable that is used to match action syntax in the data property object
-  var __reArray = /\[.*?\]$/;
-  var __reFn = /\(\)$/;
-  
-=======
 
 
   // Private variable that is used to match action syntax in the data property object
   var __reArray = /\[.*?\]$/;
   var __reFn = /\(\)$/;
 
->>>>>>> hotfix-5338-not-working
   /**
    * Split string on periods, taking into account escaped periods
    * @param  {string} str String to split
@@ -1286,13 +1227,8 @@
       return s.replace(/\\./g, '.');
     } );
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Return a function that can be used to get data from a source object, taking
    * into account the ability to use nested objects as a source
@@ -1311,11 +1247,7 @@
           o[key] = _fnGetObjectDataFn( val );
         }
       } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       return function (data, type, row, meta) {
         var t = o[type] || o._;
         return t !== undefined ?
@@ -1347,76 +1279,44 @@
        */
       var fetchData = function (data, type, src) {
         var arrayNotation, funcNotation, out, innerSrc;
-<<<<<<< HEAD
-  
-        if ( src !== "" )
-        {
-          var a = _fnSplitObjNotation( src );
-  
-=======
 
         if ( src !== "" )
         {
           var a = _fnSplitObjNotation( src );
 
->>>>>>> hotfix-5338-not-working
           for ( var i=0, iLen=a.length ; i<iLen ; i++ )
           {
             // Check if we are dealing with special notation
             arrayNotation = a[i].match(__reArray);
             funcNotation = a[i].match(__reFn);
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
             if ( arrayNotation )
             {
               // Array notation
               a[i] = a[i].replace(__reArray, '');
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
               // Condition allows simply [] to be passed in
               if ( a[i] !== "" ) {
                 data = data[ a[i] ];
               }
               out = [];
-<<<<<<< HEAD
-  
-              // Get the remainder of the nested object to get
-              a.splice( 0, i+1 );
-              innerSrc = a.join('.');
-  
-=======
 
               // Get the remainder of the nested object to get
               a.splice( 0, i+1 );
               innerSrc = a.join('.');
 
->>>>>>> hotfix-5338-not-working
               // Traverse each entry in the array getting the properties requested
               if ( $.isArray( data ) ) {
                 for ( var j=0, jLen=data.length ; j<jLen ; j++ ) {
                   out.push( fetchData( data[j], type, innerSrc ) );
                 }
               }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
               // If a string is given in between the array notation indicators, that
               // is used to join the strings together, otherwise an array is returned
               var join = arrayNotation[0].substring(1, arrayNotation[0].length-1);
               data = (join==="") ? out : out.join(join);
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
               // The inner call to fetchData has already traversed through the remainder
               // of the source requested, so we exit from the loop
               break;
@@ -1428,11 +1328,7 @@
               data = data[ a[i] ]();
               continue;
             }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
             if ( data === null || data[ a[i] ] === undefined )
             {
               return undefined;
@@ -1440,17 +1336,10 @@
             data = data[ a[i] ];
           }
         }
-<<<<<<< HEAD
-  
-        return data;
-      };
-  
-=======
 
         return data;
       };
 
->>>>>>> hotfix-5338-not-working
       return function (data, type) { // row and meta also passed, but not used
         return fetchData( data, type, mSource );
       };
@@ -1463,13 +1352,8 @@
       };
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Return a function that can be used to set data from a source object, taking
    * into account the ability to use nested objects as a source
@@ -1507,39 +1391,23 @@
         var a = _fnSplitObjNotation( src ), b;
         var aLast = a[a.length-1];
         var arrayNotation, funcNotation, o, innerSrc;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         for ( var i=0, iLen=a.length-1 ; i<iLen ; i++ )
         {
           // Check if we are dealing with an array notation request
           arrayNotation = a[i].match(__reArray);
           funcNotation = a[i].match(__reFn);
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           if ( arrayNotation )
           {
             a[i] = a[i].replace(__reArray, '');
             data[ a[i] ] = [];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
             // Get the remainder of the nested object to set so we can recurse
             b = a.slice();
             b.splice( 0, i+1 );
             innerSrc = b.join('.');
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
             // Traverse each entry in the array setting the properties requested
             if ( $.isArray( val ) )
             {
@@ -1557,11 +1425,7 @@
               // is to just save the value.
               data[ a[i] ] = val;
             }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
             // The inner call to setData has already traversed through the remainder
             // of the source and has set the data, thus we can exit here
             return;
@@ -1572,11 +1436,7 @@
             a[i] = a[i].replace(__reFn, '');
             data = data[ a[i] ]( val );
           }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           // If the nested object doesn't currently exist - since we are
           // trying to set the value - create it
           if ( data[ a[i] ] === null || data[ a[i] ] === undefined )
@@ -1585,11 +1445,7 @@
           }
           data = data[ a[i] ];
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Last item in the input - i.e, the actual set
         if ( aLast.match(__reFn ) )
         {
@@ -1603,11 +1459,7 @@
           data[ aLast.replace(__reArray, '') ] = val;
         }
       };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       return function (data, val) { // meta is also passed in, but not used
         return setData( data, val, mSource );
       };
@@ -1620,13 +1472,8 @@
       };
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Return an array with the full table data
    *  @param {object} oSettings dataTables settings object
@@ -1637,13 +1484,8 @@
   {
     return _pluck( settings.aoData, '_aData' );
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Nuke the table
    *  @param {object} oSettings dataTables settings object
@@ -1656,13 +1498,8 @@
     settings.aiDisplay.length = 0;
     settings.aIds = {};
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
    /**
    * Take an array of integers (index array) and remove a target integer (value - not
    * the key!)
@@ -1673,11 +1510,7 @@
   function _fnDeleteIndex( a, iTarget, splice )
   {
     var iTargetIndex = -1;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     for ( var i=0, iLen=a.length ; i<iLen ; i++ )
     {
       if ( a[i] == iTarget )
@@ -1689,23 +1522,14 @@
         a[i]--;
       }
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( iTargetIndex != -1 && splice === undefined )
     {
       a.splice( iTargetIndex, 1 );
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Mark cached data as invalid such that a re-read of the data will occur when
    * the cached data is next requested. Also update from the data source object.
@@ -1733,17 +1557,10 @@
       while ( cell.childNodes.length ) {
         cell.removeChild( cell.firstChild );
       }
-<<<<<<< HEAD
-  
-      cell.innerHTML = _fnGetCellData( settings, rowIdx, col, 'display' );
-    };
-  
-=======
 
       cell.innerHTML = _fnGetCellData( settings, rowIdx, col, 'display' );
     };
 
->>>>>>> hotfix-5338-not-working
     // Are we reading last data from DOM or the data object?
     if ( src === 'dom' || ((! src || src === 'auto') && row.src === 'dom') ) {
       // Read the data from the DOM
@@ -1755,11 +1572,7 @@
     else {
       // Reading from data object, update the DOM
       var cells = row.anCells;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( cells ) {
         if ( colIdx !== undefined ) {
           cellWrite( cells[colIdx], colIdx );
@@ -1771,20 +1584,12 @@
         }
       }
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // For both row and cell invalidation, the cached data for sorting and
     // filtering is nulled out
     row._aSortData = null;
     row._aFilterData = null;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Invalidate the type for a specific column (if given) or all columns since
     // the data might have changed
     var cols = settings.aoColumns;
@@ -1795,22 +1600,13 @@
       for ( i=0, ien=cols.length ; i<ien ; i++ ) {
         cols[i].sType = null;
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Update DataTables special `DT_*` attributes for the row
       _fnRowAttributes( settings, row );
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Build a data source object from an HTML row, reading the contents of the
    * cells that are in the row.
@@ -1836,30 +1632,18 @@
       name, col, o, i=0, contents,
       columns = settings.aoColumns,
       objectRead = settings._rowReadObject;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Allow the data object to be passed in, or construct
     d = d !== undefined ?
       d :
       objectRead ?
         {} :
         [];
-<<<<<<< HEAD
-  
-    var attr = function ( str, td  ) {
-      if ( typeof str === 'string' ) {
-        var idx = str.indexOf('@');
-  
-=======
 
     var attr = function ( str, td  ) {
       if ( typeof str === 'string' ) {
         var idx = str.indexOf('@');
 
->>>>>>> hotfix-5338-not-working
         if ( idx !== -1 ) {
           var attr = str.substring( idx+1 );
           var setter = _fnSetObjectDataFn( str );
@@ -1867,29 +1651,17 @@
         }
       }
     };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Read data from a cell and store into the data object
     var cellProcess = function ( cell ) {
       if ( colIdx === undefined || colIdx === i ) {
         col = columns[i];
         contents = $.trim(cell.innerHTML);
-<<<<<<< HEAD
-  
-        if ( col && col._bAttrSrc ) {
-          var setter = _fnSetObjectDataFn( col.mData._ );
-          setter( d, contents );
-  
-=======
 
         if ( col && col._bAttrSrc ) {
           var setter = _fnSetObjectDataFn( col.mData._ );
           setter( d, contents );
 
->>>>>>> hotfix-5338-not-working
           attr( col.mData.sort, cell );
           attr( col.mData.type, cell );
           attr( col.mData.filter, cell );
@@ -1909,59 +1681,31 @@
           }
         }
       }
-<<<<<<< HEAD
-  
-      i++;
-    };
-  
-=======
 
       i++;
     };
 
->>>>>>> hotfix-5338-not-working
     if ( td ) {
       // `tr` element was passed in
       while ( td ) {
         name = td.nodeName.toUpperCase();
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( name == "TD" || name == "TH" ) {
           cellProcess( td );
           tds.push( td );
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         td = td.nextSibling;
       }
     }
     else {
       // Existing row object passed in
       tds = row.anCells;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       for ( var j=0, jen=tds.length ; j<jen ; j++ ) {
         cellProcess( tds[j] );
       }
     }
-<<<<<<< HEAD
-  
-    // Read the ID from the DOM if present
-    var rowNode = row.firstChild ? row : row.nTr;
-  
-    if ( rowNode ) {
-      var id = rowNode.getAttribute( 'id' );
-  
-=======
 
     // Read the ID from the DOM if present
     var rowNode = row.firstChild ? row : row.nTr;
@@ -1969,16 +1713,11 @@
     if ( rowNode ) {
       var id = rowNode.getAttribute( 'id' );
 
->>>>>>> hotfix-5338-not-working
       if ( id ) {
         _fnSetObjectDataFn( settings.rowId )( d, id );
       }
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return {
       data: d,
       cells: tds
@@ -2002,16 +1741,6 @@
       cells = [],
       nTr, nTd, oCol,
       i, iLen;
-<<<<<<< HEAD
-  
-    if ( row.nTr === null )
-    {
-      nTr = nTrIn || document.createElement('tr');
-  
-      row.nTr = nTr;
-      row.anCells = cells;
-  
-=======
 
     if ( row.nTr === null )
     {
@@ -2020,41 +1749,25 @@
       row.nTr = nTr;
       row.anCells = cells;
 
->>>>>>> hotfix-5338-not-working
       /* Use a private property on the node to allow reserve mapping from the node
        * to the aoData array for fast look up
        */
       nTr._DT_RowIndex = iRow;
-<<<<<<< HEAD
-  
-      /* Special parameters can be given by the data source to be used on the row */
-      _fnRowAttributes( oSettings, row );
-  
-=======
 
       /* Special parameters can be given by the data source to be used on the row */
       _fnRowAttributes( oSettings, row );
 
->>>>>>> hotfix-5338-not-working
       /* Process each column */
       for ( i=0, iLen=oSettings.aoColumns.length ; i<iLen ; i++ )
       {
         oCol = oSettings.aoColumns[i];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         nTd = nTrIn ? anTds[i] : document.createElement( oCol.sCellType );
         nTd._DT_CellIndex = {
           row: iRow,
           column: i
         };
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> hotfix-5338-not-working
         cells.push( nTd );
 
         // Need to create the HTML if new, or if a rendering function is defined
@@ -2062,21 +1775,13 @@
         {
           nTd.innerHTML = _fnGetCellData( oSettings, iRow, i, 'display' );
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         /* Add user defined class */
         if ( oCol.sClass )
         {
           nTd.className += ' '+oCol.sClass;
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Visibility - add or remove as required
         if ( oCol.bVisible && ! nTrIn )
         {
@@ -2086,11 +1791,7 @@
         {
           nTd.parentNode.removeChild( nTd );
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( oCol.fnCreatedCell )
         {
           oCol.fnCreatedCell.call( oSettings.oInstance,
@@ -2098,28 +1799,16 @@
           );
         }
       }
-<<<<<<< HEAD
-  
-      _fnCallbackFire( oSettings, 'aoRowCreatedCallback', null, [nTr, rowData, iRow] );
-    }
-  
-=======
 
       _fnCallbackFire( oSettings, 'aoRowCreatedCallback', null, [nTr, rowData, iRow] );
     }
 
->>>>>>> hotfix-5338-not-working
     // Remove once webkit bug 131819 and Chromium bug 365619 have been resolved
     // and deployed
     row.nTr.setAttribute( 'role', 'row' );
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Add attributes to a row based on the special `DT_*` parameters in a data
    * source object.
@@ -2131,16 +1820,6 @@
   {
     var tr = row.nTr;
     var data = row._aData;
-<<<<<<< HEAD
-  
-    if ( tr ) {
-      var id = settings.rowIdFn( data );
-  
-      if ( id ) {
-        tr.id = id;
-      }
-  
-=======
 
     if ( tr ) {
       var id = settings.rowIdFn( data );
@@ -2149,47 +1828,29 @@
         tr.id = id;
       }
 
->>>>>>> hotfix-5338-not-working
       if ( data.DT_RowClass ) {
         // Remove any classes added by DT_RowClass before
         var a = data.DT_RowClass.split(' ');
         row.__rowc = row.__rowc ?
           _unique( row.__rowc.concat( a ) ) :
           a;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         $(tr)
           .removeClass( row.__rowc.join(' ') )
           .addClass( data.DT_RowClass );
       }
-<<<<<<< HEAD
-  
-      if ( data.DT_RowAttr ) {
-        $(tr).attr( data.DT_RowAttr );
-      }
-  
-=======
 
       if ( data.DT_RowAttr ) {
         $(tr).attr( data.DT_RowAttr );
       }
 
->>>>>>> hotfix-5338-not-working
       if ( data.DT_RowData ) {
         $(tr).data( data.DT_RowData );
       }
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Create the HTML header for the table
    *  @param {object} oSettings dataTables settings object
@@ -2203,25 +1864,6 @@
     var createHeader = $('th, td', thead).length === 0;
     var classes = oSettings.oClasses;
     var columns = oSettings.aoColumns;
-<<<<<<< HEAD
-  
-    if ( createHeader ) {
-      row = $('<tr/>').appendTo( thead );
-    }
-  
-    for ( i=0, ien=columns.length ; i<ien ; i++ ) {
-      column = columns[i];
-      cell = $( column.nTh ).addClass( column.sClass );
-  
-      if ( createHeader ) {
-        cell.appendTo( row );
-      }
-  
-      // 1.11 move into sorting
-      if ( oSettings.oFeatures.bSort ) {
-        cell.addClass( column.sSortingClass );
-  
-=======
 
     if ( createHeader ) {
       row = $('<tr/>').appendTo( thead );
@@ -2239,22 +1881,10 @@
       if ( oSettings.oFeatures.bSort ) {
         cell.addClass( column.sSortingClass );
 
->>>>>>> hotfix-5338-not-working
         if ( column.bSortable !== false ) {
           cell
             .attr( 'tabindex', oSettings.iTabIndex )
             .attr( 'aria-controls', oSettings.sTableId );
-<<<<<<< HEAD
-  
-          _fnSortAttachListener( oSettings, column.nTh, i );
-        }
-      }
-  
-      if ( column.sTitle != cell[0].innerHTML ) {
-        cell.html( column.sTitle );
-      }
-  
-=======
 
           _fnSortAttachListener( oSettings, column.nTh, i );
         }
@@ -2264,25 +1894,10 @@
         cell.html( column.sTitle );
       }
 
->>>>>>> hotfix-5338-not-working
       _fnRenderer( oSettings, 'header' )(
         oSettings, cell, column, classes
       );
     }
-<<<<<<< HEAD
-  
-    if ( createHeader ) {
-      _fnDetectHeader( oSettings.aoHeader, thead );
-    }
-    
-    /* ARIA role for the rows */
-    $(thead).find('>tr').attr('role', 'row');
-  
-    /* Deal with the footer - add classes if required */
-    $(thead).find('>tr>th, >tr>td').addClass( classes.sHeaderTH );
-    $(tfoot).find('>tr>th, >tr>td').addClass( classes.sFooterTH );
-  
-=======
 
     if ( createHeader ) {
       _fnDetectHeader( oSettings.aoHeader, thead );
@@ -2295,39 +1910,25 @@
     $(thead).find('>tr>th, >tr>td').addClass( classes.sHeaderTH );
     $(tfoot).find('>tr>th, >tr>td').addClass( classes.sFooterTH );
 
->>>>>>> hotfix-5338-not-working
     // Cache the footer cells. Note that we only take the cells from the first
     // row in the footer. If there is more than one row the user wants to
     // interact with, they need to use the table().foot() method. Note also this
     // allows cells to be used for multiple columns using colspan
     if ( tfoot !== null ) {
       var cells = oSettings.aoFooter[0];
-<<<<<<< HEAD
-  
-      for ( i=0, ien=cells.length ; i<ien ; i++ ) {
-        column = columns[i];
-        column.nTf = cells[i].cell;
-  
-=======
 
       for ( i=0, ien=cells.length ; i<ien ; i++ ) {
         column = columns[i];
         column.nTf = cells[i].cell;
 
->>>>>>> hotfix-5338-not-working
         if ( column.sClass ) {
           $(column.nTf).addClass( column.sClass );
         }
       }
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Draw the header (or footer) element based on the column visibility states. The
    * methodology here is to use the layout array from _fnDetectHeader, modified for
@@ -2348,39 +1949,23 @@
     var aApplied = [];
     var iColumns = oSettings.aoColumns.length;
     var iRowspan, iColspan;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( ! aoSource )
     {
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if (  bIncludeHidden === undefined )
     {
       bIncludeHidden = false;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Make a copy of the master layout array, but without the visible columns in it */
     for ( i=0, iLen=aoSource.length ; i<iLen ; i++ )
     {
       aoLocal[i] = aoSource[i].slice();
       aoLocal[i].nTr = aoSource[i].nTr;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Remove any columns which are currently hidden */
       for ( j=iColumns-1 ; j>=0 ; j-- )
       {
@@ -2389,17 +1974,6 @@
           aoLocal[i].splice( j, 1 );
         }
       }
-<<<<<<< HEAD
-  
-      /* Prep the applied array - it needs an element for each row */
-      aApplied.push( [] );
-    }
-  
-    for ( i=0, iLen=aoLocal.length ; i<iLen ; i++ )
-    {
-      nLocalTr = aoLocal[i].nTr;
-  
-=======
 
       /* Prep the applied array - it needs an element for each row */
       aApplied.push( [] );
@@ -2409,7 +1983,6 @@
     {
       nLocalTr = aoLocal[i].nTr;
 
->>>>>>> hotfix-5338-not-working
       /* All cells are going to be replaced, so empty out the row */
       if ( nLocalTr )
       {
@@ -2418,20 +1991,12 @@
           nLocalTr.removeChild( n );
         }
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       for ( j=0, jLen=aoLocal[i].length ; j<jLen ; j++ )
       {
         iRowspan = 1;
         iColspan = 1;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         /* Check to see if there is already a cell (row/colspan) covering our target
          * insert point. If there is, then there is nothing to do.
          */
@@ -2439,11 +2004,7 @@
         {
           nLocalTr.appendChild( aoLocal[i][j].cell );
           aApplied[i][j] = 1;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           /* Expand the cell to cover as many rows as needed */
           while ( aoLocal[i+iRowspan] !== undefined &&
                   aoLocal[i][j].cell == aoLocal[i+iRowspan][j].cell )
@@ -2451,11 +2012,7 @@
             aApplied[i+iRowspan][j] = 1;
             iRowspan++;
           }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           /* Expand the cell to cover as many columns as needed */
           while ( aoLocal[i][j+iColspan] !== undefined &&
                   aoLocal[i][j].cell == aoLocal[i][j+iColspan].cell )
@@ -2467,11 +2024,7 @@
             }
             iColspan++;
           }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           /* Do the actual expansion in the DOM */
           $(aoLocal[i][j].cell)
             .attr('rowspan', iRowspan)
@@ -2480,13 +2033,8 @@
       }
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Insert the required TR nodes into the table for display
    *  @param {object} oSettings dataTables settings object
@@ -2501,11 +2049,7 @@
       _fnProcessingDisplay( oSettings, false );
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var i, iLen, n;
     var anRows = [];
     var iRowCount = 0;
@@ -2516,15 +2060,9 @@
     var iInitDisplayStart = oSettings.iInitDisplayStart;
     var bServerSide = _fnDataSource( oSettings ) == 'ssp';
     var aiDisplay = oSettings.aiDisplay;
-<<<<<<< HEAD
-  
-    oSettings.bDrawing = true;
-  
-=======
 
     oSettings.bDrawing = true;
 
->>>>>>> hotfix-5338-not-working
     /* Check and see if we have an initial draw position from state saving */
     if ( iInitDisplayStart !== undefined && iInitDisplayStart !== -1 )
     {
@@ -2533,15 +2071,6 @@
         iInitDisplayStart >= oSettings.fnRecordsDisplay() ?
           0 :
           iInitDisplayStart;
-<<<<<<< HEAD
-  
-      oSettings.iInitDisplayStart = -1;
-    }
-  
-    var iDisplayStart = oSettings._iDisplayStart;
-    var iDisplayEnd = oSettings.fnDisplayEnd();
-  
-=======
 
       oSettings.iInitDisplayStart = -1;
     }
@@ -2549,7 +2078,6 @@
     var iDisplayStart = oSettings._iDisplayStart;
     var iDisplayEnd = oSettings.fnDisplayEnd();
 
->>>>>>> hotfix-5338-not-working
     /* Server-side processing draw intercept */
     if ( oSettings.bDeferLoading )
     {
@@ -2565,20 +2093,12 @@
     {
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( aiDisplay.length !== 0 )
     {
       var iStart = bServerSide ? 0 : iDisplayStart;
       var iEnd = bServerSide ? oSettings.aoData.length : iDisplayEnd;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       for ( var j=iStart ; j<iEnd ; j++ )
       {
         var iDataIndex = aiDisplay[j];
@@ -2587,15 +2107,9 @@
         {
           _fnCreateTr( oSettings, iDataIndex );
         }
-<<<<<<< HEAD
-  
-        var nRow = aoData.nTr;
-  
-=======
 
         var nRow = aoData.nTr;
 
->>>>>>> hotfix-5338-not-working
         /* Remove the old striping classes and then add the new one */
         if ( iStripes !== 0 )
         {
@@ -2612,11 +2126,7 @@
         // useful?
         _fnCallbackFire( oSettings, 'aoRowCallback', null,
           [nRow, aoData._aData, iRowCount, j] );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         anRows.push( nRow );
         iRowCount++;
       }
@@ -2633,11 +2143,7 @@
       {
         sZero = oLang.sEmptyTable;
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       anRows[ 0 ] = $( '<tr/>', { 'class': iStripes ? asStripeClasses[0] : '' } )
         .append( $('<td />', {
           'valign':  'top',
@@ -2645,24 +2151,6 @@
           'class':   oSettings.oClasses.sRowEmpty
         } ).html( sZero ) )[0];
     }
-<<<<<<< HEAD
-  
-    /* Header and footer callbacks */
-    _fnCallbackFire( oSettings, 'aoHeaderCallback', 'header', [ $(oSettings.nTHead).children('tr')[0],
-      _fnGetDataMaster( oSettings ), iDisplayStart, iDisplayEnd, aiDisplay ] );
-  
-    _fnCallbackFire( oSettings, 'aoFooterCallback', 'footer', [ $(oSettings.nTFoot).children('tr')[0],
-      _fnGetDataMaster( oSettings ), iDisplayStart, iDisplayEnd, aiDisplay ] );
-  
-    var body = $(oSettings.nTBody);
-  
-    body.children().detach();
-    body.append( $(anRows) );
-  
-    /* Call all required callback functions for the end of a draw */
-    _fnCallbackFire( oSettings, 'aoDrawCallback', 'draw', [oSettings] );
-  
-=======
 
     /* Header and footer callbacks */
     _fnCallbackFire( oSettings, 'aoHeaderCallback', 'header', [ $(oSettings.nTHead).children('tr')[0],
@@ -2679,19 +2167,13 @@
     /* Call all required callback functions for the end of a draw */
     _fnCallbackFire( oSettings, 'aoDrawCallback', 'draw', [oSettings] );
 
->>>>>>> hotfix-5338-not-working
     /* Draw is complete, sorting and filtering must be as well */
     oSettings.bSorted = false;
     oSettings.bFiltered = false;
     oSettings.bDrawing = false;
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Redraw the table - taking account of the various features which are enabled
    *  @param {object} oSettings dataTables settings object
@@ -2705,19 +2187,11 @@
       features = settings.oFeatures,
       sort     = features.bSort,
       filter   = features.bFilter;
-<<<<<<< HEAD
-  
-    if ( sort ) {
-      _fnSort( settings );
-    }
-  
-=======
 
     if ( sort ) {
       _fnSort( settings );
     }
 
->>>>>>> hotfix-5338-not-working
     if ( filter ) {
       _fnFilterComplete( settings, settings.oPreviousSearch );
     }
@@ -2725,23 +2199,6 @@
       // No filtering, so we want to just use the display master
       settings.aiDisplay = settings.aiDisplayMaster.slice();
     }
-<<<<<<< HEAD
-  
-    if ( holdPosition !== true ) {
-      settings._iDisplayStart = 0;
-    }
-  
-    // Let any modules know about the draw hold position state (used by
-    // scrolling internally)
-    settings._drawHold = holdPosition;
-  
-    _fnDraw( settings );
-  
-    settings._drawHold = false;
-  }
-  
-  
-=======
 
     if ( holdPosition !== true ) {
       settings._iDisplayStart = 0;
@@ -2757,7 +2214,6 @@
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Add the options to the page HTML for the table
    *  @param {object} oSettings dataTables settings object
@@ -2769,29 +2225,17 @@
     var table = $(oSettings.nTable);
     var holding = $('<div/>').insertBefore( table ); // Holding element for speed
     var features = oSettings.oFeatures;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // All DataTables are wrapped in a div
     var insert = $('<div/>', {
       id:      oSettings.sTableId+'_wrapper',
       'class': classes.sWrapper + (oSettings.nTFoot ? '' : ' '+classes.sNoFooter)
     } );
-<<<<<<< HEAD
-  
-    oSettings.nHolding = holding[0];
-    oSettings.nTableWrapper = insert[0];
-    oSettings.nTableReinsertBefore = oSettings.nTable.nextSibling;
-  
-=======
 
     oSettings.nHolding = holding[0];
     oSettings.nTableWrapper = insert[0];
     oSettings.nTableReinsertBefore = oSettings.nTable.nextSibling;
 
->>>>>>> hotfix-5338-not-working
     /* Loop over the user set positioning and place the elements as needed */
     var aDom = oSettings.sDom.split('');
     var featureNode, cOption, nNewNode, cNext, sAttr, j;
@@ -2799,20 +2243,12 @@
     {
       featureNode = null;
       cOption = aDom[i];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( cOption == '<' )
       {
         /* New container div */
         nNewNode = $('<div/>')[0];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         /* Check to see if we should append an id and/or a class name to the container */
         cNext = aDom[i+1];
         if ( cNext == "'" || cNext == '"' )
@@ -2824,11 +2260,7 @@
             sAttr += aDom[i+j];
             j++;
           }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           /* Replace jQuery UI constants @todo depreciated */
           if ( sAttr == "H" )
           {
@@ -2838,11 +2270,7 @@
           {
             sAttr = classes.sJUIFooter;
           }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           /* The attribute can be in the format of "#id.class", "#id" or "class" This logic
            * breaks the string into parts and applies them as needed
            */
@@ -2860,17 +2288,10 @@
           {
             nNewNode.className = sAttr;
           }
-<<<<<<< HEAD
-  
-          i += j; /* Move along the position array */
-        }
-  
-=======
 
           i += j; /* Move along the position array */
         }
 
->>>>>>> hotfix-5338-not-working
         insert.append( nNewNode );
         insert = $(nNewNode);
       }
@@ -2923,49 +2344,28 @@
           }
         }
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Add to the 2D features array */
       if ( featureNode )
       {
         var aanFeatures = oSettings.aanFeatures;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( ! aanFeatures[cOption] )
         {
           aanFeatures[cOption] = [];
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         aanFeatures[cOption].push( featureNode );
         insert.append( featureNode );
       }
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Built our DOM structure - replace the holding div with what we want */
     holding.replaceWith( insert );
     oSettings.nHolding = null;
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Use the DOM source to create up an array of header cells. The idea here is to
    * create a layout grid (array) of rows x columns, which contains a reference
@@ -2988,35 +2388,21 @@
       }
       return j;
     };
-<<<<<<< HEAD
-  
-    aLayout.splice( 0, aLayout.length );
-  
-=======
 
     aLayout.splice( 0, aLayout.length );
 
->>>>>>> hotfix-5338-not-working
     /* We know how many rows there are in the layout - so prep it */
     for ( i=0, iLen=nTrs.length ; i<iLen ; i++ )
     {
       aLayout.push( [] );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Calculate a layout array */
     for ( i=0, iLen=nTrs.length ; i<iLen ; i++ )
     {
       nTr = nTrs[i];
       iColumn = 0;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /* For every cell in the row... */
       nCell = nTr.firstChild;
       while ( nCell ) {
@@ -3028,26 +2414,15 @@
           iRowspan = nCell.getAttribute('rowspan') * 1;
           iColspan = (!iColspan || iColspan===0 || iColspan===1) ? 1 : iColspan;
           iRowspan = (!iRowspan || iRowspan===0 || iRowspan===1) ? 1 : iRowspan;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           /* There might be colspan cells already in this row, so shift our target
            * accordingly
            */
           iColShifted = fnShiftCol( aLayout, i, iColumn );
-<<<<<<< HEAD
-  
-          /* Cache calculation for unique columns */
-          bUnique = iColspan === 1 ? true : false;
-  
-=======
 
           /* Cache calculation for unique columns */
           bUnique = iColspan === 1 ? true : false;
 
->>>>>>> hotfix-5338-not-working
           /* If there is col / rowspan, copy the information into the layout grid */
           for ( l=0 ; l<iColspan ; l++ )
           {
@@ -3065,13 +2440,8 @@
       }
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get an array of unique th elements, one for each column
    *  @param {object} oSettings dataTables settings object
@@ -3092,11 +2462,7 @@
         _fnDetectHeader( aLayout, nHeader );
       }
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     for ( var i=0, iLen=aLayout.length ; i<iLen ; i++ )
     {
       for ( var j=0, jLen=aLayout[i].length ; j<jLen ; j++ )
@@ -3108,17 +2474,10 @@
         }
       }
     }
-<<<<<<< HEAD
-  
-    return aReturn;
-  }
-  
-=======
 
     return aReturn;
   }
 
->>>>>>> hotfix-5338-not-working
   /**
    * Create an Ajax call based on the table's settings, taking into account that
    * parameters can have multiple forms, and backwards compatibility.
@@ -3132,26 +2491,12 @@
   {
     // Compatibility with 1.9-, allow fnServerData and event to manipulate
     _fnCallbackFire( oSettings, 'aoServerParams', 'serverParams', [data] );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Convert to object based for 1.10+ if using the old array scheme which can
     // come from server-side processing or serverParams
     if ( data && $.isArray(data) ) {
       var tmp = {};
       var rbracket = /(.*?)\[\]$/;
-<<<<<<< HEAD
-  
-      $.each( data, function (key, val) {
-        var match = val.name.match(rbracket);
-  
-        if ( match ) {
-          // Support for arrays
-          var name = match[0];
-  
-=======
 
       $.each( data, function (key, val) {
         var match = val.name.match(rbracket);
@@ -3160,7 +2505,6 @@
           // Support for arrays
           var name = match[0];
 
->>>>>>> hotfix-5338-not-working
           if ( ! tmp[ name ] ) {
             tmp[ name ] = [];
           }
@@ -3172,11 +2516,7 @@
       } );
       data = tmp;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var ajaxData;
     var ajax = oSettings.ajax;
     var instance = oSettings.oInstance;
@@ -3184,17 +2524,6 @@
       _fnCallbackFire( oSettings, null, 'xhr', [oSettings, json, oSettings.jqXHR] );
       fn( json );
     };
-<<<<<<< HEAD
-  
-    if ( $.isPlainObject( ajax ) && ajax.data )
-    {
-      ajaxData = ajax.data;
-  
-      var newData = $.isFunction( ajaxData ) ?
-        ajaxData( data, oSettings ) :  // fn can manipulate data or return
-        ajaxData;                      // an object object or array to merge
-  
-=======
 
     if ( $.isPlainObject( ajax ) && ajax.data )
     {
@@ -3204,25 +2533,16 @@
         ajaxData( data, oSettings ) :  // fn can manipulate data or return
         ajaxData;                      // an object object or array to merge
 
->>>>>>> hotfix-5338-not-working
       // If the function returned something, use that alone
       data = $.isFunction( ajaxData ) && newData ?
         newData :
         $.extend( true, data, newData );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Remove the data property as we've resolved it already and don't want
       // jQuery to do it again (it is restored at the end of the function)
       delete ajax.data;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var baseAjax = {
       "data": data,
       "success": function (json) {
@@ -3230,11 +2550,7 @@
         if ( error ) {
           _fnLog( oSettings, 0, error );
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         oSettings.json = json;
         callback( json );
       },
@@ -3243,11 +2559,7 @@
       "type": oSettings.sServerMethod,
       "error": function (xhr, error, thrown) {
         var ret = _fnCallbackFire( oSettings, null, 'xhr', [oSettings, null, oSettings.jqXHR] );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( $.inArray( true, ret ) === -1 ) {
           if ( error == "parsererror" ) {
             _fnLog( oSettings, 0, 'Invalid JSON response', 1 );
@@ -3256,19 +2568,6 @@
             _fnLog( oSettings, 0, 'Ajax error', 7 );
           }
         }
-<<<<<<< HEAD
-  
-        _fnProcessingDisplay( oSettings, false );
-      }
-    };
-  
-    // Store the data submitted for the API
-    oSettings.oAjaxData = data;
-  
-    // Allow plug-ins and external processes to modify the data
-    _fnCallbackFire( oSettings, null, 'preXhr', [oSettings, data] );
-  
-=======
 
         _fnProcessingDisplay( oSettings, false );
       }
@@ -3280,7 +2579,6 @@
     // Allow plug-ins and external processes to modify the data
     _fnCallbackFire( oSettings, null, 'preXhr', [oSettings, data] );
 
->>>>>>> hotfix-5338-not-working
     if ( oSettings.fnServerData )
     {
       // DataTables 1.9- compatibility
@@ -3309,22 +2607,13 @@
     {
       // Object to extend the base settings
       oSettings.jqXHR = $.ajax( $.extend( baseAjax, ajax ) );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Restore for next time around
       ajax.data = ajaxData;
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Update the table using an Ajax call
    *  @param {object} settings dataTables settings object
@@ -3336,11 +2625,7 @@
     if ( settings.bAjaxDataGet ) {
       settings.iDraw++;
       _fnProcessingDisplay( settings, true );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       _fnBuildAjax(
         settings,
         _fnAjaxParameters( settings ),
@@ -3348,22 +2633,13 @@
           _fnAjaxUpdateDraw( settings, json );
         }
       );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       return false;
     }
     return true;
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Build up the parameters in an object needed for a server-side processing
    * request. Note that this is basically done twice, is different ways - a modern
@@ -3389,30 +2665,18 @@
       displayLength = features.bPaginate !== false ?
         settings._iDisplayLength :
         -1;
-<<<<<<< HEAD
-  
-    var param = function ( name, value ) {
-      data.push( { 'name': name, 'value': value } );
-    };
-  
-=======
 
     var param = function ( name, value ) {
       data.push( { 'name': name, 'value': value } );
     };
 
->>>>>>> hotfix-5338-not-working
     // DataTables 1.9- compatible method
     param( 'sEcho',          settings.iDraw );
     param( 'iColumns',       columnCount );
     param( 'sColumns',       _pluck( columns, 'sName' ).join(',') );
     param( 'iDisplayStart',  displayStart );
     param( 'iDisplayLength', displayLength );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // DataTables 1.10+ method
     var d = {
       draw:    settings.iDraw,
@@ -3425,20 +2689,12 @@
         regex: preSearch.bRegex
       }
     };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     for ( i=0 ; i<columnCount ; i++ ) {
       column = columns[i];
       columnSearch = preColSearch[i];
       dataProp = typeof column.mData=="function" ? 'function' : column.mData ;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       d.columns.push( {
         data:       dataProp,
         name:       column.sName,
@@ -3449,52 +2705,24 @@
           regex: columnSearch.bRegex
         }
       } );
-<<<<<<< HEAD
-  
-      param( "mDataProp_"+i, dataProp );
-  
-=======
 
       param( "mDataProp_"+i, dataProp );
 
->>>>>>> hotfix-5338-not-working
       if ( features.bFilter ) {
         param( 'sSearch_'+i,     columnSearch.sSearch );
         param( 'bRegex_'+i,      columnSearch.bRegex );
         param( 'bSearchable_'+i, column.bSearchable );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( features.bSort ) {
         param( 'bSortable_'+i, column.bSortable );
       }
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( features.bFilter ) {
       param( 'sSearch', preSearch.sSearch );
       param( 'bRegex', preSearch.bRegex );
     }
-<<<<<<< HEAD
-  
-    if ( features.bSort ) {
-      $.each( sort, function ( i, val ) {
-        d.order.push( { column: val.col, dir: val.dir } );
-  
-        param( 'iSortCol_'+i, val.col );
-        param( 'sSortDir_'+i, val.dir );
-      } );
-  
-      param( 'iSortingCols', sort.length );
-    }
-  
-=======
 
     if ( features.bSort ) {
       $.each( sort, function ( i, val ) {
@@ -3507,29 +2735,19 @@
       param( 'iSortingCols', sort.length );
     }
 
->>>>>>> hotfix-5338-not-working
     // If the legacy.ajax parameter is null, then we automatically decide which
     // form to use, based on sAjaxSource
     var legacy = DataTable.ext.legacy.ajax;
     if ( legacy === null ) {
       return settings.sAjaxSource ? data : d;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Otherwise, if legacy has been specified then we use that to decide on the
     // form
     return legacy ? data : d;
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Data the data from the server (nuking the old) and redraw the table
    *  @param {object} oSettings dataTables settings object
@@ -3548,20 +2766,12 @@
     var compat = function ( old, modern ) {
       return json[old] !== undefined ? json[old] : json[modern];
     };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var data = _fnAjaxDataSrc( settings, json );
     var draw            = compat( 'sEcho',                'draw' );
     var recordsTotal    = compat( 'iTotalRecords',        'recordsTotal' );
     var recordsFiltered = compat( 'iTotalDisplayRecords', 'recordsFiltered' );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( draw ) {
       // Protect against out of sequence returns
       if ( draw*1 < settings.iDraw ) {
@@ -3569,38 +2779,15 @@
       }
       settings.iDraw = draw * 1;
     }
-<<<<<<< HEAD
-  
-    _fnClearTable( settings );
-    settings._iRecordsTotal   = parseInt(recordsTotal, 10);
-    settings._iRecordsDisplay = parseInt(recordsFiltered, 10);
-  
-=======
 
     _fnClearTable( settings );
     settings._iRecordsTotal   = parseInt(recordsTotal, 10);
     settings._iRecordsDisplay = parseInt(recordsFiltered, 10);
 
->>>>>>> hotfix-5338-not-working
     for ( var i=0, ien=data.length ; i<ien ; i++ ) {
       _fnAddData( settings, data[i] );
     }
     settings.aiDisplay = settings.aiDisplayMaster.slice();
-<<<<<<< HEAD
-  
-    settings.bAjaxDataGet = false;
-    _fnDraw( settings );
-  
-    if ( ! settings._bInitComplete ) {
-      _fnInitComplete( settings, json );
-    }
-  
-    settings.bAjaxDataGet = true;
-    _fnProcessingDisplay( settings, false );
-  }
-  
-  
-=======
 
     settings.bAjaxDataGet = false;
     _fnDraw( settings );
@@ -3614,7 +2801,6 @@
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get the data from the JSON data source to use for drawing a table. Using
    * `_fnGetObjectDataFn` allows the data to be sourced from a property of the
@@ -3628,30 +2814,18 @@
     var dataSrc = $.isPlainObject( oSettings.ajax ) && oSettings.ajax.dataSrc !== undefined ?
       oSettings.ajax.dataSrc :
       oSettings.sAjaxDataProp; // Compatibility with 1.9-.
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Compatibility with 1.9-. In order to read from aaData, check if the
     // default has been changed, if not, check for aaData
     if ( dataSrc === 'data' ) {
       return json.aaData || json[dataSrc];
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return dataSrc !== "" ?
       _fnGetObjectDataFn( dataSrc )( json ) :
       json;
   }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   /**
    * Generate the node required for filtering text
    *  @returns {node} Filter control element
@@ -3666,39 +2840,23 @@
     var previousSearch = settings.oPreviousSearch;
     var features = settings.aanFeatures;
     var input = '<input type="search" class="'+classes.sFilterInput+'"/>';
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var str = language.sSearch;
     str = str.match(/_INPUT_/) ?
       str.replace('_INPUT_', input) :
       str+input;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var filter = $('<div/>', {
         'id': ! features.f ? tableId+'_filter' : null,
         'class': classes.sFilter
       } )
       .append( $('<label/>' ).append( str ) );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var searchFn = function() {
       /* Update all other filter input elements for the new display */
       var n = features.f;
       var val = !this.value ? "" : this.value; // mental IE8 fix :-(
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Now do the filter */
       if ( val != previousSearch.sSearch ) {
         _fnFilterComplete( settings, {
@@ -3707,31 +2865,19 @@
           "bSmart": previousSearch.bSmart ,
           "bCaseInsensitive": previousSearch.bCaseInsensitive
         } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Need to redraw, without resorting
         settings._iDisplayStart = 0;
         _fnDraw( settings );
       }
     };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var searchDelay = settings.searchDelay !== null ?
       settings.searchDelay :
       _fnDataSource( settings ) === 'ssp' ?
         400 :
         0;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   var jqFilter = $('input', filter)
       .val( previousSearch.sSearch )
       .attr( 'placeholder', language.sSearchPlaceholder )
@@ -3748,11 +2894,7 @@
         }
       } )
       .attr('aria-controls', tableId);
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Update the input elements whenever the table is filtered
     $(settings.nTable).on( 'search.dt.DT', function ( ev, s ) {
       if ( settings === s ) {
@@ -3766,19 +2908,11 @@
         catch ( e ) {}
       }
     } );
-<<<<<<< HEAD
-  
-    return filter[0];
-  }
-  
-  
-=======
 
     return filter[0];
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Filter the table using both the global filter and column based filtering
    *  @param {object} oSettings dataTables settings object
@@ -3801,41 +2935,25 @@
       // Backwards compatibility with the bEscapeRegex option
       return o.bEscapeRegex !== undefined ? !o.bEscapeRegex : o.bRegex;
     };
-<<<<<<< HEAD
-  
-    // Resolve any column types that are unknown due to addition or invalidation
-    // @todo As per sort - can this be moved into an event handler?
-    _fnColumnTypes( oSettings );
-  
-=======
 
     // Resolve any column types that are unknown due to addition or invalidation
     // @todo As per sort - can this be moved into an event handler?
     _fnColumnTypes( oSettings );
 
->>>>>>> hotfix-5338-not-working
     /* In server-side processing all filtering is done by the server, so no point hanging around here */
     if ( _fnDataSource( oSettings ) != 'ssp' )
     {
       /* Global filter */
       _fnFilter( oSettings, oInput.sSearch, iForce, fnRegex(oInput), oInput.bSmart, oInput.bCaseInsensitive );
       fnSaveFilter( oInput );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Now do the individual column filter */
       for ( var i=0 ; i<aoPrevSearch.length ; i++ )
       {
         _fnFilterColumn( oSettings, aoPrevSearch[i].sSearch, i, fnRegex(aoPrevSearch[i]),
           aoPrevSearch[i].bSmart, aoPrevSearch[i].bCaseInsensitive );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Custom filtering */
       _fnFilterCustom( oSettings );
     }
@@ -3843,22 +2961,13 @@
     {
       fnSaveFilter( oInput );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Tell the draw function we have been filtering */
     oSettings.bFiltered = true;
     _fnCallbackFire( oSettings, null, 'search', [oSettings] );
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Apply custom filtering functions
    *  @param {object} oSettings dataTables settings object
@@ -3869,48 +2978,28 @@
     var filters = DataTable.ext.search;
     var displayRows = settings.aiDisplay;
     var row, rowIdx;
-<<<<<<< HEAD
-  
-    for ( var i=0, ien=filters.length ; i<ien ; i++ ) {
-      var rows = [];
-  
-=======
 
     for ( var i=0, ien=filters.length ; i<ien ; i++ ) {
       var rows = [];
 
->>>>>>> hotfix-5338-not-working
       // Loop over each row and see if it should be included
       for ( var j=0, jen=displayRows.length ; j<jen ; j++ ) {
         rowIdx = displayRows[ j ];
         row = settings.aoData[ rowIdx ];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( filters[i]( settings, row._aFilterData, rowIdx, row._aData, j ) ) {
           rows.push( rowIdx );
         }
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // So the array reference doesn't break set the results into the
       // existing array
       displayRows.length = 0;
       $.merge( displayRows, rows );
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Filter the table on a per-column basis
    *  @param {object} oSettings dataTables settings object
@@ -3926,16 +3015,6 @@
     if ( searchStr === '' ) {
       return;
     }
-<<<<<<< HEAD
-  
-    var data;
-    var display = settings.aiDisplay;
-    var rpSearch = _fnFilterCreateSearch( searchStr, regex, smart, caseInsensitive );
-  
-    for ( var i=display.length-1 ; i>=0 ; i-- ) {
-      data = settings.aoData[ display[i] ]._aFilterData[ colIdx ];
-  
-=======
 
     var data;
     var display = settings.aiDisplay;
@@ -3944,19 +3023,13 @@
     for ( var i=display.length-1 ; i>=0 ; i-- ) {
       data = settings.aoData[ display[i] ]._aFilterData[ colIdx ];
 
->>>>>>> hotfix-5338-not-working
       if ( ! rpSearch.test( data ) ) {
         display.splice( i, 1 );
       }
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Filter the data table based on user input and draw the table
    *  @param {object} settings dataTables settings object
@@ -3973,26 +3046,15 @@
     var prevSearch = settings.oPreviousSearch.sSearch;
     var displayMaster = settings.aiDisplayMaster;
     var display, invalidated, i;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Need to take account of custom filtering functions - always filter
     if ( DataTable.ext.search.length !== 0 ) {
       force = true;
     }
-<<<<<<< HEAD
-  
-    // Check if any of the rows were invalidated
-    invalidated = _fnFilterData( settings );
-  
-=======
 
     // Check if any of the rows were invalidated
     invalidated = _fnFilterData( settings );
 
->>>>>>> hotfix-5338-not-working
     // If the input is blank - we just want the full data set
     if ( input.length <= 0 ) {
       settings.aiDisplay = displayMaster.slice();
@@ -4008,17 +3070,10 @@
       ) {
         settings.aiDisplay = displayMaster.slice();
       }
-<<<<<<< HEAD
-  
-      // Search the display array
-      display = settings.aiDisplay;
-  
-=======
 
       // Search the display array
       display = settings.aiDisplay;
 
->>>>>>> hotfix-5338-not-working
       for ( i=display.length-1 ; i>=0 ; i-- ) {
         if ( ! rpSearch.test( settings.aoData[ display[i] ]._sFilterRow ) ) {
           display.splice( i, 1 );
@@ -4026,13 +3081,8 @@
       }
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Build a regular expression object suitable for searching a table
    *  @param {string} sSearch string to search for
@@ -4047,21 +3097,13 @@
     search = regex ?
       search :
       _fnEscapeRegex( search );
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( smart ) {
       /* For smart filtering we want to allow the search to work regardless of
        * word order. We also want double quoted text to be preserved, so word
        * order is important - a la google. So this is what we want to
        * generate:
-<<<<<<< HEAD
-       * 
-=======
        *
->>>>>>> hotfix-5338-not-working
        * ^(?=.*?\bone\b)(?=.*?\btwo three\b)(?=.*?\bfour\b).*$
        */
       var a = $.map( search.match( /"[^"]+"|[^ ]+/g ) || [''], function ( word ) {
@@ -4069,19 +3111,6 @@
           var m = word.match( /^"(.*)"$/ );
           word = m ? m[1] : word;
         }
-<<<<<<< HEAD
-  
-        return word.replace('"', '');
-      } );
-  
-      search = '^(?=.*?'+a.join( ')(?=.*?' )+').*$';
-    }
-  
-    return new RegExp( search, caseInsensitive ? 'i' : '' );
-  }
-  
-  
-=======
 
         return word.replace('"', '');
       } );
@@ -4093,7 +3122,6 @@
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Escape a string such that it can be used in a regular expression
    *  @param {string} sVal string to escape
@@ -4104,21 +3132,12 @@
   {
     return sVal.replace( _re_escape_regex, '\\$1' );
   }
-<<<<<<< HEAD
-  
-  
-  
-  var __filter_div = $('<div>')[0];
-  var __filter_div_textContent = __filter_div.textContent !== undefined;
-  
-=======
 
 
 
   var __filter_div = $('<div>')[0];
   var __filter_div_textContent = __filter_div.textContent !== undefined;
 
->>>>>>> hotfix-5338-not-working
   // Update the filtering data for each row if needed (by invalidation or first run)
   function _fnFilterData ( settings )
   {
@@ -4127,25 +3146,6 @@
     var i, j, ien, jen, filterData, cellData, row;
     var fomatters = DataTable.ext.type.search;
     var wasInvalidated = false;
-<<<<<<< HEAD
-  
-    for ( i=0, ien=settings.aoData.length ; i<ien ; i++ ) {
-      row = settings.aoData[i];
-  
-      if ( ! row._aFilterData ) {
-        filterData = [];
-  
-        for ( j=0, jen=columns.length ; j<jen ; j++ ) {
-          column = columns[j];
-  
-          if ( column.bSearchable ) {
-            cellData = _fnGetCellData( settings, i, j, 'filter' );
-  
-            if ( fomatters[ column.sType ] ) {
-              cellData = fomatters[ column.sType ]( cellData );
-            }
-  
-=======
 
     for ( i=0, ien=settings.aoData.length ; i<ien ; i++ ) {
       row = settings.aoData[i];
@@ -4163,17 +3163,12 @@
               cellData = fomatters[ column.sType ]( cellData );
             }
 
->>>>>>> hotfix-5338-not-working
             // Search in DataTables 1.10 is string based. In 1.11 this
             // should be altered to also allow strict type checking.
             if ( cellData === null ) {
               cellData = '';
             }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
             if ( typeof cellData !== 'string' && cellData.toString ) {
               cellData = cellData.toString();
             }
@@ -4181,11 +3176,7 @@
           else {
             cellData = '';
           }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           // If it looks like there is an HTML entity in the string,
           // attempt to decode it so sorting works as expected. Note that
           // we could use a single line of jQuery to do this, but the DOM
@@ -4196,16 +3187,6 @@
               __filter_div.textContent :
               __filter_div.innerText;
           }
-<<<<<<< HEAD
-  
-          if ( cellData.replace ) {
-            cellData = cellData.replace(/[\r\n]/g, '');
-          }
-  
-          filterData.push( cellData );
-        }
-  
-=======
 
           if ( cellData.replace ) {
             cellData = cellData.replace(/[\r\n]/g, '');
@@ -4214,25 +3195,16 @@
           filterData.push( cellData );
         }
 
->>>>>>> hotfix-5338-not-working
         row._aFilterData = filterData;
         row._sFilterRow = filterData.join('  ');
         wasInvalidated = true;
       }
     }
-<<<<<<< HEAD
-  
-    return wasInvalidated;
-  }
-  
-  
-=======
 
     return wasInvalidated;
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Convert from the internal Hungarian notation to camelCase for external
    * interaction
@@ -4249,15 +3221,9 @@
       caseInsensitive: obj.bCaseInsensitive
     };
   }
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Convert from camelCase notation to the internal Hungarian. We could use the
    * Hungarian convert function here, but this is cleaner
@@ -4274,11 +3240,7 @@
       bCaseInsensitive: obj.caseInsensitive
     };
   }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   /**
    * Generate the node required for the info display
    *  @param {object} oSettings dataTables settings object
@@ -4294,32 +3256,13 @@
         'class': settings.oClasses.sInfo,
         'id': ! nodes ? tid+'_info' : null
       } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( ! nodes ) {
       // Update display on each draw
       settings.aoDrawCallback.push( {
         "fn": _fnUpdateInfo,
         "sName": "information"
       } );
-<<<<<<< HEAD
-  
-      n
-        .attr( 'role', 'status' )
-        .attr( 'aria-live', 'polite' );
-  
-      // Table is described by our info div
-      $(settings.nTable).attr( 'aria-describedby', tid+'_info' );
-    }
-  
-    return n[0];
-  }
-  
-  
-=======
 
       n
         .attr( 'role', 'status' )
@@ -4333,7 +3276,6 @@
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Update the information elements in the display
    *  @param {object} settings dataTables settings object
@@ -4346,11 +3288,7 @@
     if ( nodes.length === 0 ) {
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var
       lang  = settings.oLanguage,
       start = settings._iDisplayStart+1,
@@ -4360,47 +3298,27 @@
       out   = total ?
         lang.sInfo :
         lang.sInfoEmpty;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( total !== max ) {
       /* Record set after filtering */
       out += ' ' + lang.sInfoFiltered;
     }
-<<<<<<< HEAD
-  
-    // Convert the macros
-    out += lang.sInfoPostFix;
-    out = _fnInfoMacros( settings, out );
-  
-=======
 
     // Convert the macros
     out += lang.sInfoPostFix;
     out = _fnInfoMacros( settings, out );
 
->>>>>>> hotfix-5338-not-working
     var callback = lang.fnInfoCallback;
     if ( callback !== null ) {
       out = callback.call( settings.oInstance,
         settings, start, end, max, total, out
       );
     }
-<<<<<<< HEAD
-  
-    $(nodes).html( out );
-  }
-  
-  
-=======
 
     $(nodes).html( out );
   }
 
 
->>>>>>> hotfix-5338-not-working
   function _fnInfoMacros ( settings, str )
   {
     // When infinite scrolling, we are always starting at 1. _iDisplayStart is used only
@@ -4411,11 +3329,7 @@
       len        = settings._iDisplayLength,
       vis        = settings.fnRecordsDisplay(),
       all        = len === -1;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return str.
       replace(/_START_/g, formatter.call( settings, start ) ).
       replace(/_END_/g,   formatter.call( settings, settings.fnDisplayEnd() ) ).
@@ -4424,15 +3338,9 @@
       replace(/_PAGE_/g,  formatter.call( settings, all ? 1 : Math.ceil( start / len ) ) ).
       replace(/_PAGES_/g, formatter.call( settings, all ? 1 : Math.ceil( vis / len ) ) );
   }
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Draw the table for the first time, adding all required features
    *  @param {object} settings dataTables settings object
@@ -4444,80 +3352,45 @@
     var columns = settings.aoColumns, column;
     var features = settings.oFeatures;
     var deferLoading = settings.bDeferLoading; // value modified by the draw
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Ensure that the table data is fully initialised */
     if ( ! settings.bInitialised ) {
       setTimeout( function(){ _fnInitialise( settings ); }, 200 );
       return;
     }
-<<<<<<< HEAD
-  
-    /* Show the display HTML options */
-    _fnAddOptionsHtml( settings );
-  
-=======
 
     /* Show the display HTML options */
     _fnAddOptionsHtml( settings );
 
->>>>>>> hotfix-5338-not-working
     /* Build and draw the header / footer for the table */
     _fnBuildHead( settings );
     _fnDrawHead( settings, settings.aoHeader );
     _fnDrawHead( settings, settings.aoFooter );
-<<<<<<< HEAD
-  
-    /* Okay to show that something is going on now */
-    _fnProcessingDisplay( settings, true );
-  
-=======
 
     /* Okay to show that something is going on now */
     _fnProcessingDisplay( settings, true );
 
->>>>>>> hotfix-5338-not-working
     /* Calculate sizes for columns */
     if ( features.bAutoWidth ) {
       _fnCalculateColumnWidths( settings );
     }
-<<<<<<< HEAD
-  
-    for ( i=0, iLen=columns.length ; i<iLen ; i++ ) {
-      column = columns[i];
-  
-=======
 
     for ( i=0, iLen=columns.length ; i<iLen ; i++ ) {
       column = columns[i];
 
->>>>>>> hotfix-5338-not-working
       if ( column.sWidth ) {
         column.nTh.style.width = _fnStringToCss( column.sWidth );
       }
     }
-<<<<<<< HEAD
-  
-    _fnCallbackFire( settings, null, 'preInit', [settings] );
-  
-=======
 
     _fnCallbackFire( settings, null, 'preInit', [settings] );
 
->>>>>>> hotfix-5338-not-working
     // If there is default sorting required - let's do it. The sort function
     // will do the drawing for us. Otherwise we draw the table regardless of the
     // Ajax source - this allows the table to look initialised for Ajax sourcing
     // data (show 'loading' message possibly)
     _fnReDraw( settings );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Server-side processing init complete is done by _fnAjaxUpdateDraw
     var dataSrc = _fnDataSource( settings );
     if ( dataSrc != 'ssp' || deferLoading ) {
@@ -4525,33 +3398,19 @@
       if ( dataSrc == 'ajax' ) {
         _fnBuildAjax( settings, [], function(json) {
           var aData = _fnAjaxDataSrc( settings, json );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           // Got the data - add it to the table
           for ( i=0 ; i<aData.length ; i++ ) {
             _fnAddData( settings, aData[i] );
           }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           // Reset the init display for cookie saving. We've already done
           // a filter, and therefore cleared it before. So we need to make
           // it appear 'fresh'
           settings.iInitDisplayStart = iAjaxStart;
-<<<<<<< HEAD
-  
-          _fnReDraw( settings );
-  
-=======
 
           _fnReDraw( settings );
 
->>>>>>> hotfix-5338-not-working
           _fnProcessingDisplay( settings, false );
           _fnInitComplete( settings, json );
         }, settings );
@@ -4562,13 +3421,8 @@
       }
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Draw the table for the first time, adding all required features
    *  @param {object} oSettings dataTables settings object
@@ -4579,45 +3433,22 @@
   function _fnInitComplete ( settings, json )
   {
     settings._bInitComplete = true;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // When data was added after the initialisation (data or Ajax) we need to
     // calculate the column sizing
     if ( json || settings.oInit.aaData ) {
       _fnAdjustColumnSizing( settings );
     }
-<<<<<<< HEAD
-  
-    _fnCallbackFire( settings, null, 'plugin-init', [settings, json] );
-    _fnCallbackFire( settings, 'aoInitComplete', 'init', [settings, json] );
-  }
-  
-  
-=======
 
     _fnCallbackFire( settings, null, 'plugin-init', [settings, json] );
     _fnCallbackFire( settings, 'aoInitComplete', 'init', [settings, json] );
   }
 
 
->>>>>>> hotfix-5338-not-working
   function _fnLengthChange ( settings, val )
   {
     var len = parseInt( val, 10 );
     settings._iDisplayLength = len;
-<<<<<<< HEAD
-  
-    _fnLengthOverflow( settings );
-  
-    // Fire length change event
-    _fnCallbackFire( settings, null, 'length', [settings, len] );
-  }
-  
-  
-=======
 
     _fnLengthOverflow( settings );
 
@@ -4626,7 +3457,6 @@
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Generate the node required for user display length changing
    *  @param {object} settings dataTables settings object
@@ -4642,46 +3472,26 @@
       d2       = $.isArray( menu[0] ),
       lengths  = d2 ? menu[0] : menu,
       language = d2 ? menu[1] : menu;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var select = $('<select/>', {
       'name':          tableId+'_length',
       'aria-controls': tableId,
       'class':         classes.sLengthSelect
     } );
-<<<<<<< HEAD
-  
-    for ( var i=0, ien=lengths.length ; i<ien ; i++ ) {
-      select[0][ i ] = new Option( language[i], lengths[i] );
-    }
-  
-=======
 
     for ( var i=0, ien=lengths.length ; i<ien ; i++ ) {
       select[0][ i ] = new Option( language[i], lengths[i] );
     }
 
->>>>>>> hotfix-5338-not-working
     var div = $('<div><label/></div>').addClass( classes.sLength );
     if ( ! settings.aanFeatures.l ) {
       div[0].id = tableId+'_length';
     }
-<<<<<<< HEAD
-  
-    div.children().append(
-      settings.oLanguage.sLengthMenu.replace( '_MENU_', select[0].outerHTML )
-    );
-  
-=======
 
     div.children().append(
       settings.oLanguage.sLengthMenu.replace( '_MENU_', select[0].outerHTML )
     );
 
->>>>>>> hotfix-5338-not-working
     // Can't use `select` variable as user might provide their own and the
     // reference is broken by the use of outerHTML
     $('select', div)
@@ -4690,41 +3500,24 @@
         _fnLengthChange( settings, $(this).val() );
         _fnDraw( settings );
       } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Update node value whenever anything changes the table's length
     $(settings.nTable).bind( 'length.dt.DT', function (e, s, len) {
       if ( settings === s ) {
         $('select', div).val( len );
       }
     } );
-<<<<<<< HEAD
-  
-    return div[0];
-  }
-  
-  
-  
-=======
 
     return div[0];
   }
 
 
 
->>>>>>> hotfix-5338-not-working
   /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Note that most of the paging logic is done in
    * DataTable.ext.pager
    */
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   /**
    * Generate the node required for default pagination
    *  @param {object} oSettings dataTables settings object
@@ -4742,28 +3535,16 @@
       },
       node = $('<div/>').addClass( settings.oClasses.sPaging + type )[0],
       features = settings.aanFeatures;
-<<<<<<< HEAD
-  
-    if ( ! modern ) {
-      plugin.fnInit( settings, node, redraw );
-    }
-  
-=======
 
     if ( ! modern ) {
       plugin.fnInit( settings, node, redraw );
     }
 
->>>>>>> hotfix-5338-not-working
     /* Add a draw callback for the pagination on first instance, to update the paging display */
     if ( ! features.p )
     {
       node.id = settings.sTableId+'_paginate';
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       settings.aoDrawCallback.push( {
         "fn": function( settings ) {
           if ( modern ) {
@@ -4776,11 +3557,7 @@
               pages = all ? 1 : Math.ceil( visRecords / len ),
               buttons = plugin(page, pages),
               i, ien;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
             for ( i=0, ien=features.p.length ; i<ien ; i++ ) {
               _fnRenderer( settings, 'pageButton' )(
                 settings, features.p[i], i, buttons, page, pages
@@ -4794,19 +3571,11 @@
         "sName": "pagination"
       } );
     }
-<<<<<<< HEAD
-  
-    return node;
-  }
-  
-  
-=======
 
     return node;
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Alter the display settings to change the page
    *  @param {object} settings DataTables settings object
@@ -4822,11 +3591,7 @@
       start     = settings._iDisplayStart,
       len       = settings._iDisplayLength,
       records   = settings.fnRecordsDisplay();
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( records === 0 || len === -1 )
     {
       start = 0;
@@ -4834,11 +3599,7 @@
     else if ( typeof action === "number" )
     {
       start = action * len;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( start > records )
       {
         start = 0;
@@ -4853,11 +3614,7 @@
       start = len >= 0 ?
         start - len :
         0;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( start < 0 )
       {
         start = 0;
@@ -4878,15 +3635,6 @@
     {
       _fnLog( settings, 0, "Unknown paging action: "+action, 5 );
     }
-<<<<<<< HEAD
-  
-    var changed = settings._iDisplayStart !== start;
-    settings._iDisplayStart = start;
-  
-    if ( changed ) {
-      _fnCallbackFire( settings, null, 'page', [settings] );
-  
-=======
 
     var changed = settings._iDisplayStart !== start;
     settings._iDisplayStart = start;
@@ -4894,26 +3642,16 @@
     if ( changed ) {
       _fnCallbackFire( settings, null, 'page', [settings] );
 
->>>>>>> hotfix-5338-not-working
       if ( redraw ) {
         _fnDraw( settings );
       }
     }
-<<<<<<< HEAD
-  
-    return changed;
-  }
-  
-  
-  
-=======
 
     return changed;
   }
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Generate the node required for the processing node
    *  @param {object} settings dataTables settings object
@@ -4929,13 +3667,8 @@
       .html( settings.oLanguage.sProcessing )
       .insertBefore( settings.nTable )[0];
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Display or hide the processing indicator
    *  @param {object} settings dataTables settings object
@@ -4947,17 +3680,10 @@
     if ( settings.oFeatures.bProcessing ) {
       $(settings.aanFeatures.r).css( 'display', show ? 'block' : 'none' );
     }
-<<<<<<< HEAD
-  
-    _fnCallbackFire( settings, null, 'processing', [settings, show] );
-  }
-  
-=======
 
     _fnCallbackFire( settings, null, 'processing', [settings, show] );
   }
 
->>>>>>> hotfix-5338-not-working
   /**
    * Add any control elements for the table - specifically scrolling
    *  @param {object} settings dataTables settings object
@@ -4967,19 +3693,6 @@
   function _fnFeatureHtmlTable ( settings )
   {
     var table = $(settings.nTable);
-<<<<<<< HEAD
-  
-    // Add the ARIA grid role to the table
-    table.attr( 'role', 'grid' );
-  
-    // Scrolling from here on in
-    var scroll = settings.oScroll;
-  
-    if ( scroll.sX === '' && scroll.sY === '' ) {
-      return settings.nTable;
-    }
-  
-=======
 
     // Add the ARIA grid role to the table
     table.attr( 'role', 'grid' );
@@ -4991,7 +3704,6 @@
       return settings.nTable;
     }
 
->>>>>>> hotfix-5338-not-working
     var scrollX = scroll.sX;
     var scrollY = scroll.sY;
     var classes = settings.oClasses;
@@ -5004,19 +3716,11 @@
     var size = function ( s ) {
       return !s ? null : _fnStringToCss( s );
     };
-<<<<<<< HEAD
-  
-    if ( ! footer.length ) {
-      footer = null;
-    }
-  
-=======
 
     if ( ! footer.length ) {
       footer = null;
     }
 
->>>>>>> hotfix-5338-not-working
     /*
      * The HTML structure that we want to generate in this function is:
      *  div - scroller
@@ -5068,11 +3772,7 @@
           } )
           .append( table )
       );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( footer ) {
       scroller.append(
         $(_div, { 'class': classes.sScrollFoot } )
@@ -5095,50 +3795,24 @@
           )
       );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var children = scroller.children();
     var scrollHead = children[0];
     var scrollBody = children[1];
     var scrollFoot = footer ? children[2] : null;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // When the body is scrolled, then we also want to scroll the headers
     if ( scrollX ) {
       $(scrollBody).on( 'scroll.DT', function (e) {
         var scrollLeft = this.scrollLeft;
-<<<<<<< HEAD
-  
-        scrollHead.scrollLeft = scrollLeft;
-  
-=======
 
         scrollHead.scrollLeft = scrollLeft;
 
->>>>>>> hotfix-5338-not-working
         if ( footer ) {
           scrollFoot.scrollLeft = scrollLeft;
         }
       } );
     }
-<<<<<<< HEAD
-  
-    $(scrollBody).css(
-      scrollY && scroll.bCollapse ? 'max-height' : 'height', 
-      scrollY
-    );
-  
-    settings.nScrollHead = scrollHead;
-    settings.nScrollBody = scrollBody;
-    settings.nScrollFoot = scrollFoot;
-  
-=======
 
     $(scrollBody).css(
       scrollY && scroll.bCollapse ? 'max-height' : 'height',
@@ -5149,27 +3823,17 @@
     settings.nScrollBody = scrollBody;
     settings.nScrollFoot = scrollFoot;
 
->>>>>>> hotfix-5338-not-working
     // On redraw - align columns
     settings.aoDrawCallback.push( {
       "fn": _fnScrollDraw,
       "sName": "scrolling"
     } );
-<<<<<<< HEAD
-  
-    return scroller[0];
-  }
-  
-  
-  
-=======
 
     return scroller[0];
   }
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Update the header, footer and body tables for resizing - i.e. column
    * alignment.
@@ -5226,20 +3890,12 @@
         style.borderBottomWidth = "0";
         style.height = 0;
       };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // If the scrollbar visibility has changed from the last draw, we need to
     // adjust the column sizes as the table width will have changed to account
     // for the scrollbar
     var scrollBarVis = divBodyEl.scrollHeight > divBodyEl.clientHeight;
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( settings.scrollBarVis !== scrollBarVis && settings.scrollBarVis !== undefined ) {
       settings.scrollBarVis = scrollBarVis;
       _fnAdjustColumnSizing( settings );
@@ -5248,16 +3904,6 @@
     else {
       settings.scrollBarVis = scrollBarVis;
     }
-<<<<<<< HEAD
-  
-    /*
-     * 1. Re-create the table inside the scrolling div
-     */
-  
-    // Remove the old minimised thead and tfoot elements in the inner table
-    table.children('thead, tfoot').remove();
-  
-=======
 
     /*
      * 1. Re-create the table inside the scrolling div
@@ -5266,37 +3912,23 @@
     // Remove the old minimised thead and tfoot elements in the inner table
     table.children('thead, tfoot').remove();
 
->>>>>>> hotfix-5338-not-working
     // Clone the current header and footer elements and then place it into the inner table
     headerCopy = header.clone().prependTo( table );
     headerTrgEls = header.find('tr'); // original header is in its own table
     headerSrcEls = headerCopy.find('tr');
     headerCopy.find('th, td').removeAttr('tabindex');
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( footer ) {
       footerCopy = footer.clone().prependTo( table );
       footerTrgEls = footer.find('tr'); // the original tfoot is in its own table and must be sized
       footerSrcEls = footerCopy.find('tr');
     }
-<<<<<<< HEAD
-  
-  
-    /*
-     * 2. Take live measurements from the DOM - do not alter the DOM itself!
-     */
-  
-=======
 
 
     /*
      * 2. Take live measurements from the DOM - do not alter the DOM itself!
      */
 
->>>>>>> hotfix-5338-not-working
     // Remove old sizing and apply the calculated column widths
     // Get the unique column headers in the newly created (cloned) header. We want to apply the
     // calculated sizes to this header
@@ -5305,40 +3937,24 @@
       divBodyStyle.width = '100%';
       divHeader[0].style.width = '100%';
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     $.each( _fnGetUniqueThs( settings, headerCopy ), function ( i, el ) {
       idx = _fnVisibleToColumnIndex( settings, i );
       el.style.width = settings.aoColumns[idx].sWidth;
     } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( footer ) {
       _fnApplyToChildren( function(n) {
         n.style.width = "";
       }, footerSrcEls );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   // Size the table as a whole
     sanityWidth = table.outerWidth();
     if ( scrollX === "" ) {
       // No x scrolling
       tableStyle.width = "100%";
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // IE7 will make the width of the table when 100% include the scrollbar
       // - which is shouldn't. When there is a scrollbar we need to take this
       // into account.
@@ -5347,30 +3963,13 @@
       ) {
         tableStyle.width = _fnStringToCss( table.outerWidth() - barWidth);
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Recalculate the sanity width
       sanityWidth = table.outerWidth();
     }
     else if ( scrollXInner !== "" ) {
       // legacy x scroll inner has been given - use it
       tableStyle.width = _fnStringToCss(scrollXInner);
-<<<<<<< HEAD
-  
-      // Recalculate the sanity width
-      sanityWidth = table.outerWidth();
-    }
-  
-    // Hidden header should have zero height, so remove padding and borders. Then
-    // set the width based on the real headers
-  
-    // Apply all styles in one pass
-    _fnApplyToChildren( zeroOut, headerSrcEls );
-  
-=======
 
       // Recalculate the sanity width
       sanityWidth = table.outerWidth();
@@ -5382,53 +3981,23 @@
     // Apply all styles in one pass
     _fnApplyToChildren( zeroOut, headerSrcEls );
 
->>>>>>> hotfix-5338-not-working
     // Read all widths in next pass
     _fnApplyToChildren( function(nSizer) {
       headerContent.push( nSizer.innerHTML );
       headerWidths.push( _fnStringToCss( $(nSizer).css('width') ) );
     }, headerSrcEls );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Apply all widths in final pass
     _fnApplyToChildren( function(nToSize, i) {
       nToSize.style.width = headerWidths[i];
     }, headerTrgEls );
-<<<<<<< HEAD
-  
-    $(headerSrcEls).height(0);
-  
-=======
 
     $(headerSrcEls).height(0);
 
->>>>>>> hotfix-5338-not-working
     /* Same again with the footer if we have one */
     if ( footer )
     {
       _fnApplyToChildren( zeroOut, footerSrcEls );
-<<<<<<< HEAD
-  
-      _fnApplyToChildren( function(nSizer) {
-        footerWidths.push( _fnStringToCss( $(nSizer).css('width') ) );
-      }, footerSrcEls );
-  
-      _fnApplyToChildren( function(nToSize, i) {
-        nToSize.style.width = footerWidths[i];
-      }, footerTrgEls );
-  
-      $(footerSrcEls).height(0);
-    }
-  
-  
-    /*
-     * 3. Apply the measurements
-     */
-  
-=======
 
       _fnApplyToChildren( function(nSizer) {
         footerWidths.push( _fnStringToCss( $(nSizer).css('width') ) );
@@ -5446,7 +4015,6 @@
      * 3. Apply the measurements
      */
 
->>>>>>> hotfix-5338-not-working
     // "Hide" the header and footer that we used for the sizing. We need to keep
     // the content of the cell so that the width applied to the header and body
     // both match, but we want to hide it completely. We want to also fix their
@@ -5455,11 +4023,7 @@
       nSizer.innerHTML = '<div class="dataTables_sizing" style="height:0;overflow:hidden;">'+headerContent[i]+'</div>';
       nSizer.style.width = headerWidths[i];
     }, headerSrcEls );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( footer )
     {
       _fnApplyToChildren( function(nSizer, i) {
@@ -5467,11 +4031,7 @@
         nSizer.style.width = footerWidths[i];
       }, footerSrcEls );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Sanity check that the table is of a sensible width. If not then we are going to get
     // misalignment - try to prevent this by not allowing the table to shrink below its min width
     if ( table.outerWidth() < sanityWidth )
@@ -5481,22 +4041,14 @@
         divBody.css('overflow-y') == "scroll")) ?
           sanityWidth+barWidth :
           sanityWidth;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // IE6/7 are a law unto themselves...
       if ( ie67 && (divBodyEl.scrollHeight >
         divBodyEl.offsetHeight || divBody.css('overflow-y') == "scroll")
       ) {
         tableStyle.width = _fnStringToCss( correction-barWidth );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // And give the user a warning that we've stopped the table getting too small
       if ( scrollX === "" || scrollXInner !== "" ) {
         _fnLog( settings, 1, 'Possible column misalignment', 6 );
@@ -5506,18 +4058,6 @@
     {
       correction = '100%';
     }
-<<<<<<< HEAD
-  
-    // Apply to the container elements
-    divBodyStyle.width = _fnStringToCss( correction );
-    divHeaderStyle.width = _fnStringToCss( correction );
-  
-    if ( footer ) {
-      settings.nScrollFoot.style.width = _fnStringToCss( correction );
-    }
-  
-  
-=======
 
     // Apply to the container elements
     divBodyStyle.width = _fnStringToCss( correction );
@@ -5528,7 +4068,6 @@
     }
 
 
->>>>>>> hotfix-5338-not-working
     /*
      * 4. Clean up
      */
@@ -5541,61 +4080,36 @@
         divBodyStyle.height = _fnStringToCss( tableEl.offsetHeight+barWidth );
       }
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Finally set the width's of the header and footer tables */
     var iOuterWidth = table.outerWidth();
     divHeaderTable[0].style.width = _fnStringToCss( iOuterWidth );
     divHeaderInnerStyle.width = _fnStringToCss( iOuterWidth );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Figure out if there are scrollbar present - if so then we need a the header and footer to
     // provide a bit more space to allow "overflow" scrolling (i.e. past the scrollbar)
     var bScrolling = table.height() > divBodyEl.clientHeight || divBody.css('overflow-y') == "scroll";
     var padding = 'padding' + (browser.bScrollbarLeft ? 'Left' : 'Right' );
     divHeaderInnerStyle[ padding ] = bScrolling ? barWidth+"px" : "0px";
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( footer ) {
       divFooterTable[0].style.width = _fnStringToCss( iOuterWidth );
       divFooterInner[0].style.width = _fnStringToCss( iOuterWidth );
       divFooterInner[0].style[padding] = bScrolling ? barWidth+"px" : "0px";
     }
-<<<<<<< HEAD
-  
-    /* Adjust the position of the header in case we loose the y-scrollbar */
-    divBody.scroll();
-  
-=======
 
     /* Adjust the position of the header in case we loose the y-scrollbar */
     divBody.scroll();
 
->>>>>>> hotfix-5338-not-working
     // If sorting or filtering has occurred, jump the scrolling back to the top
     // only if we aren't holding the position
     if ( (settings.bSorted || settings.bFiltered) && ! settings._drawHold ) {
       divBodyEl.scrollTop = 0;
     }
   }
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Apply a given function to the display child nodes of an element array (typically
    * TD children of TR rows
@@ -5608,19 +4122,11 @@
   {
     var index=0, i=0, iLen=an1.length;
     var nNode1, nNode2;
-<<<<<<< HEAD
-  
-    while ( i < iLen ) {
-      nNode1 = an1[i].firstChild;
-      nNode2 = an2 ? an2[i].firstChild : null;
-  
-=======
 
     while ( i < iLen ) {
       nNode1 = an1[i].firstChild;
       nNode2 = an2 ? an2[i].firstChild : null;
 
->>>>>>> hotfix-5338-not-working
       while ( nNode1 ) {
         if ( nNode1.nodeType === 1 ) {
           if ( an2 ) {
@@ -5629,25 +4135,6 @@
           else {
             fn( nNode1, index );
           }
-<<<<<<< HEAD
-  
-          index++;
-        }
-  
-        nNode1 = nNode1.nextSibling;
-        nNode2 = an2 ? nNode2.nextSibling : null;
-      }
-  
-      i++;
-    }
-  }
-  
-  
-  
-  var __re_html_remove = /<.*?>/g;
-  
-  
-=======
 
           index++;
         }
@@ -5665,7 +4152,6 @@
   var __re_html_remove = /<.*?>/g;
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Calculate the width of columns for the table
    *  @param {object} oSettings dataTables settings object
@@ -5683,39 +4169,17 @@
       columnCount = columns.length,
       visibleColumns = _fnGetColumns( oSettings, 'bVisible' ),
       headerCells = $('th', oSettings.nTHead),
-<<<<<<< HEAD
-      tableWidthAttr = table.getAttribute('width'), // from DOM element
-=======
       tableWidthAttr = '100%', // from DOM element
->>>>>>> hotfix-5338-not-working
       tableContainer = table.parentNode,
       userInputs = false,
       i, column, columnIdx, width, outerWidth,
       browser = oSettings.oBrowser,
       ie67 = browser.bScrollOversize;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var styleWidth = table.style.width;
     if ( styleWidth && styleWidth.indexOf('%') !== -1 ) {
       tableWidthAttr = styleWidth;
     }
-<<<<<<< HEAD
-  
-    /* Convert any user input sizes into pixel sizes */
-    for ( i=0 ; i<visibleColumns.length ; i++ ) {
-      column = columns[ visibleColumns[i] ];
-  
-      if ( column.sWidth !== null ) {
-        column.sWidth = _fnConvertToWidth( column.sWidthOrig, tableContainer );
-  
-        userInputs = true;
-      }
-    }
-  
-=======
 
     /* Convert any user input sizes into pixel sizes */
     for ( i=0 ; i<visibleColumns.length ; i++ ) {
@@ -5728,7 +4192,6 @@
       }
     }
 
->>>>>>> hotfix-5338-not-working
     /* If the number of columns in the DOM equals the number that we have to
      * process in DataTables, then we can use the offsets that are created by
      * the web- browser. No custom sizes can be set in order for this to happen,
@@ -5740,11 +4203,7 @@
     ) {
       for ( i=0 ; i<columnCount ; i++ ) {
         var colIdx = _fnVisibleToColumnIndex( oSettings, i );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( colIdx !== null ) {
           columns[ colIdx ].sWidth = _fnStringToCss( headerCells.eq(i).width() );
         }
@@ -5759,19 +4218,11 @@
       var tmpTable = $(table).clone() // don't use cloneNode - IE8 will remove events on the main table
         .css( 'visibility', 'hidden' )
         .removeAttr( 'id' );
-<<<<<<< HEAD
-  
-      // Clean up the table body
-      tmpTable.find('tbody tr').remove();
-      var tr = $('<tr/>').appendTo( tmpTable.find('tbody') );
-  
-=======
 
       // Clean up the table body
       tmpTable.find('tbody tr').remove();
       var tr = $('<tr/>').appendTo( tmpTable.find('tbody') );
 
->>>>>>> hotfix-5338-not-working
       // Clone the table header and footer - we can't use the header / footer
       // from the cloned table, since if scrolling is active, the table's
       // real header and footer are contained in different table tags
@@ -5779,22 +4230,6 @@
       tmpTable
         .append( $(oSettings.nTHead).clone() )
         .append( $(oSettings.nTFoot).clone() );
-<<<<<<< HEAD
-  
-      // Remove any assigned widths from the footer (from scrolling)
-      tmpTable.find('tfoot th, tfoot td').css('width', '');
-  
-      // Apply custom sizing to the cloned header
-      headerCells = _fnGetUniqueThs( oSettings, tmpTable.find('thead')[0] );
-  
-      for ( i=0 ; i<visibleColumns.length ; i++ ) {
-        column = columns[ visibleColumns[i] ];
-  
-        headerCells[i].style.width = column.sWidthOrig !== null && column.sWidthOrig !== '' ?
-          _fnStringToCss( column.sWidthOrig ) :
-          '';
-  
-=======
 
       // Remove any assigned widths from the footer (from scrolling)
       tmpTable.find('tfoot th, tfoot td').css('width', '');
@@ -5809,7 +4244,6 @@
           _fnStringToCss( column.sWidthOrig ) :
           '';
 
->>>>>>> hotfix-5338-not-working
         // For scrollX we need to force the column width otherwise the
         // browser will collapse it. If this width is smaller than the
         // width the column requires, then it will have no effect
@@ -5823,32 +4257,20 @@
           } ) );
         }
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Find the widest cell for each column and put it into the table
       if ( oSettings.aoData.length ) {
         for ( i=0 ; i<visibleColumns.length ; i++ ) {
           columnIdx = visibleColumns[i];
           column = columns[ columnIdx ];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           $( _fnGetWidestNode( oSettings, columnIdx ) )
             .clone( false )
             .append( column.sContentPadding )
             .appendTo( tr );
         }
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Table has been built, attach to the document so we can work with it.
       // A holding element is used, positioned at the top of the container
       // with minimal height, so it has no effect on if the container scrolls
@@ -5867,13 +4289,8 @@
         )
         .append( tmpTable )
         .appendTo( tableContainer );
-<<<<<<< HEAD
-  
-      // When scrolling (X or Y) we want to set the width of the table as 
-=======
 
       // When scrolling (X or Y) we want to set the width of the table as
->>>>>>> hotfix-5338-not-working
       // appropriate. However, when not scrolling leave the table width as it
       // is. This results in slightly different, but I think correct behaviour
       if ( scrollX && scrollXInner ) {
@@ -5882,11 +4299,7 @@
       else if ( scrollX ) {
         tmpTable.css( 'width', 'auto' );
         tmpTable.removeAttr('width');
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // If there is no width attribute or style, then allow the table to
         // collapse
         if ( tmpTable.width() < tableContainer.clientWidth && tableWidthAttr ) {
@@ -5899,11 +4312,7 @@
       else if ( tableWidthAttr ) {
         tmpTable.width( tableWidthAttr );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   // Get the width of each column in the constructed table - we need to
       // know the inner width (so it can be assigned to the other table's
       // cells) and the outer width so we can calculate the full width of the
@@ -5914,33 +4323,12 @@
       for ( i=0 ; i<visibleColumns.length ; i++ ) {
         var cell = $(headerCells[i]);
         var border = cell.outerWidth() - cell.width();
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Use getBounding... where possible (not IE8-) because it can give
         // sub-pixel accuracy, which we then want to round up!
         var bounding = browser.bBounding ?
           Math.ceil( headerCells[i].getBoundingClientRect().width ) :
           cell.outerWidth();
-<<<<<<< HEAD
-  
-        // Total is tracked to remove any sub-pixel errors as the outerWidth
-        // of the table might not equal the total given here (IE!).
-        total += bounding;
-  
-        // Width for each column to use
-        columns[ visibleColumns[i] ].sWidth = _fnStringToCss( bounding - border );
-      }
-  
-      table.style.width = _fnStringToCss( total );
-  
-      // Finished with the table - ditch it
-      holder.remove();
-    }
-  
-=======
 
         // Total is tracked to remove any sub-pixel errors as the outerWidth
         // of the table might not equal the total given here (IE!).
@@ -5956,7 +4344,6 @@
       holder.remove();
     }
 
->>>>>>> hotfix-5338-not-working
     // If there is a width attr, we want to attach an event listener which
     // allows the table sizing to automatically adjust when the window is
     // resized. Use the width attr rather than CSS, since we can't know if the
@@ -5964,22 +4351,14 @@
     if ( tableWidthAttr ) {
       table.style.width = _fnStringToCss( tableWidthAttr );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( (tableWidthAttr || scrollX) && ! oSettings._reszEvt ) {
       var bindResize = function () {
         $(window).bind('resize.DT-'+oSettings.sInstance, _fnThrottle( function () {
           _fnAdjustColumnSizing( oSettings );
         } ) );
       };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // IE6/7 will crash if we bind a resize event handler on page load.
       // To be removed in 1.11 which drops IE6/7 support
       if ( ie67 ) {
@@ -5988,21 +4367,12 @@
       else {
         bindResize();
       }
-<<<<<<< HEAD
-  
-      oSettings._reszEvt = true;
-    }
-  }
-  
-  
-=======
 
       oSettings._reszEvt = true;
     }
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Throttle the calls to a function. Arguments and context are maintained for
    * the throttled function
@@ -6016,27 +4386,16 @@
       frequency = freq !== undefined ? freq : 200,
       last,
       timer;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return function () {
       var
         that = this,
         now  = +new Date(),
         args = arguments;
-<<<<<<< HEAD
-  
-      if ( last && now < last + frequency ) {
-        clearTimeout( timer );
-  
-=======
 
       if ( last && now < last + frequency ) {
         clearTimeout( timer );
 
->>>>>>> hotfix-5338-not-working
         timer = setTimeout( function () {
           last = undefined;
           fn.apply( that, args );
@@ -6048,13 +4407,8 @@
       }
     };
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Convert a CSS unit width to pixels (e.g. 2em)
    *  @param {string} width width to be converted
@@ -6067,20 +4421,6 @@
     if ( ! width ) {
       return 0;
     }
-<<<<<<< HEAD
-  
-    var n = $('<div/>')
-      .css( 'width', _fnStringToCss( width ) )
-      .appendTo( parent || document.body );
-  
-    var val = n[0].offsetWidth;
-    n.remove();
-  
-    return val;
-  }
-  
-  
-=======
 
     var n = $('<div/>')
       .css( 'width', _fnStringToCss( width ) )
@@ -6093,7 +4433,6 @@
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get the widest node
    *  @param {object} settings dataTables settings object
@@ -6107,23 +4446,14 @@
     if ( idx < 0 ) {
       return null;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var data = settings.aoData[ idx ];
     return ! data.nTr ? // Might not have been created when deferred rendering
       $('<td/>').html( _fnGetCellData( settings, idx, colIdx, 'display' ) )[0] :
       data.anCells[ colIdx ];
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get the maximum strlen for each data column
    *  @param {object} settings dataTables settings object
@@ -6134,38 +4464,22 @@
   function _fnGetMaxLenString( settings, colIdx )
   {
     var s, max=-1, maxIdx = -1;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     for ( var i=0, ien=settings.aoData.length ; i<ien ; i++ ) {
       s = _fnGetCellData( settings, i, colIdx, 'display' )+'';
       s = s.replace( __re_html_remove, '' );
       s = s.replace( /&nbsp;/g, ' ' );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( s.length > max ) {
         max = s.length;
         maxIdx = i;
       }
     }
-<<<<<<< HEAD
-  
-    return maxIdx;
-  }
-  
-  
-=======
 
     return maxIdx;
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Append a CSS unit (only if required) to a string
    *  @param {string} value to css-ify
@@ -6177,35 +4491,21 @@
     if ( s === null ) {
       return '0px';
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( typeof s == 'number' ) {
       return s < 0 ?
         '0px' :
         s+'px';
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Check it has a unit character already
     return s.match(/\d$/) ?
       s+'px' :
       s;
   }
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   function _fnSortFlatten ( settings )
   {
     var
@@ -6227,29 +4527,12 @@
           $.merge( nestedSort, a );
         }
       };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Build the sort array, with pre-fix and post-fix options if they have been
     // specified
     if ( $.isArray( fixed ) ) {
       add( fixed );
     }
-<<<<<<< HEAD
-  
-    if ( fixedObj && fixed.pre ) {
-      add( fixed.pre );
-    }
-  
-    add( settings.aaSorting );
-  
-    if (fixedObj && fixed.post ) {
-      add( fixed.post );
-    }
-  
-=======
 
     if ( fixedObj && fixed.pre ) {
       add( fixed.pre );
@@ -6261,33 +4544,20 @@
       add( fixed.post );
     }
 
->>>>>>> hotfix-5338-not-working
     for ( i=0 ; i<nestedSort.length ; i++ )
     {
       srcCol = nestedSort[i][0];
       aDataSort = aoColumns[ srcCol ].aDataSort;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       for ( k=0, kLen=aDataSort.length ; k<kLen ; k++ )
       {
         iCol = aDataSort[k];
         sType = aoColumns[ iCol ].sType || 'string';
-<<<<<<< HEAD
-  
-        if ( nestedSort[i]._idx === undefined ) {
-          nestedSort[i]._idx = $.inArray( nestedSort[i][1], aoColumns[iCol].asSorting );
-        }
-  
-=======
 
         if ( nestedSort[i]._idx === undefined ) {
           nestedSort[i]._idx = $.inArray( nestedSort[i][1], aoColumns[iCol].asSorting );
         }
 
->>>>>>> hotfix-5338-not-working
         aSort.push( {
           src:       srcCol,
           col:       iCol,
@@ -6298,17 +4568,10 @@
         } );
       }
     }
-<<<<<<< HEAD
-  
-    return aSort;
-  }
-  
-=======
 
     return aSort;
   }
 
->>>>>>> hotfix-5338-not-working
   /**
    * Change the order of the table
    *  @param {object} oSettings dataTables settings object
@@ -6329,47 +4592,26 @@
       sortCol,
       displayMaster = oSettings.aiDisplayMaster,
       aSort;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Resolve any column types that are unknown due to addition or invalidation
     // @todo Can this be moved into a 'data-ready' handler which is called when
     //   data is going to be used in the table?
     _fnColumnTypes( oSettings );
-<<<<<<< HEAD
-  
-    aSort = _fnSortFlatten( oSettings );
-  
-    for ( i=0, ien=aSort.length ; i<ien ; i++ ) {
-      sortCol = aSort[i];
-  
-=======
 
     aSort = _fnSortFlatten( oSettings );
 
     for ( i=0, ien=aSort.length ; i<ien ; i++ ) {
       sortCol = aSort[i];
 
->>>>>>> hotfix-5338-not-working
       // Track if we can use the fast sort algorithm
       if ( sortCol.formatter ) {
         formatters++;
       }
-<<<<<<< HEAD
-  
-      // Load the data needed for the sort, for each cell
-      _fnSortData( oSettings, sortCol.col );
-    }
-  
-=======
 
       // Load the data needed for the sort, for each cell
       _fnSortData( oSettings, sortCol.col );
     }
 
->>>>>>> hotfix-5338-not-working
     /* No sorting required if server-side or no sorting array */
     if ( _fnDataSource( oSettings ) != 'ssp' && aSort.length !== 0 )
     {
@@ -6378,11 +4620,7 @@
       for ( i=0, iLen=displayMaster.length ; i<iLen ; i++ ) {
         aiOrig[ displayMaster[i] ] = i;
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Do the sort - here we want multi-column sorting based on a given data source (column)
        * and sorting function (from oSort) in a certain direction. It's reasonably complex to
        * follow on it's own, but this is what we want (example two column sorting):
@@ -6412,15 +4650,6 @@
             len=aSort.length,
             dataA = aoData[a]._aSortData,
             dataB = aoData[b]._aSortData;
-<<<<<<< HEAD
-  
-          for ( k=0 ; k<len ; k++ ) {
-            sort = aSort[k];
-  
-            x = dataA[ sort.col ];
-            y = dataB[ sort.col ];
-  
-=======
 
           for ( k=0 ; k<len ; k++ ) {
             sort = aSort[k];
@@ -6428,17 +4657,12 @@
             x = dataA[ sort.col ];
             y = dataB[ sort.col ];
 
->>>>>>> hotfix-5338-not-working
             test = x<y ? -1 : x>y ? 1 : 0;
             if ( test !== 0 ) {
               return sort.dir === 'asc' ? test : -test;
             }
           }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           x = aiOrig[a];
           y = aiOrig[b];
           return x<y ? -1 : x>y ? 1 : 0;
@@ -6454,15 +4678,6 @@
             len=aSort.length,
             dataA = aoData[a]._aSortData,
             dataB = aoData[b]._aSortData;
-<<<<<<< HEAD
-  
-          for ( k=0 ; k<len ; k++ ) {
-            sort = aSort[k];
-  
-            x = dataA[ sort.col ];
-            y = dataB[ sort.col ];
-  
-=======
 
           for ( k=0 ; k<len ; k++ ) {
             sort = aSort[k];
@@ -6470,39 +4685,25 @@
             x = dataA[ sort.col ];
             y = dataB[ sort.col ];
 
->>>>>>> hotfix-5338-not-working
             fn = oExtSort[ sort.type+"-"+sort.dir ] || oExtSort[ "string-"+sort.dir ];
             test = fn( x, y );
             if ( test !== 0 ) {
               return test;
             }
           }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           x = aiOrig[a];
           y = aiOrig[b];
           return x<y ? -1 : x>y ? 1 : 0;
         } );
       }
     }
-<<<<<<< HEAD
-  
-    /* Tell the draw function that we have sorted the data */
-    oSettings.bSorted = true;
-  }
-  
-  
-=======
 
     /* Tell the draw function that we have sorted the data */
     oSettings.bSorted = true;
   }
 
 
->>>>>>> hotfix-5338-not-working
   function _fnSortAria ( settings )
   {
     var label;
@@ -6510,11 +4711,7 @@
     var columns = settings.aoColumns;
     var aSort = _fnSortFlatten( settings );
     var oAria = settings.oLanguage.oAria;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // ARIA attributes - need to loop all columns, to update all (removing old
     // attributes as needed)
     for ( var i=0, iLen=columns.length ; i<iLen ; i++ )
@@ -6523,19 +4720,11 @@
       var asSorting = col.asSorting;
       var sTitle = col.sTitle.replace( /<.*?>/g, "" );
       var th = col.nTh;
-<<<<<<< HEAD
-  
-      // IE7 is throwing an error when setting these properties with jQuery's
-      // attr() and removeAttr() methods...
-      th.removeAttribute('aria-sort');
-  
-=======
 
       // IE7 is throwing an error when setting these properties with jQuery's
       // attr() and removeAttr() methods...
       th.removeAttribute('aria-sort');
 
->>>>>>> hotfix-5338-not-working
       /* In ARIA only the first sorting column can be marked as sorting - no multi-sort option */
       if ( col.bSortable ) {
         if ( aSort.length > 0 && aSort[0].col == i ) {
@@ -6545,11 +4734,7 @@
         else {
           nextSort = asSorting[0];
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         label = sTitle + ( nextSort === "asc" ?
           oAria.sSortAscending :
           oAria.sSortDescending
@@ -6558,21 +4743,12 @@
       else {
         label = sTitle;
       }
-<<<<<<< HEAD
-  
-      th.setAttribute('aria-label', label);
-    }
-  }
-  
-  
-=======
 
       th.setAttribute('aria-label', label);
     }
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Function to run on user sort request
    *  @param {object} settings dataTables settings object
@@ -6594,46 +4770,23 @@
       if ( idx === undefined ) {
         idx = $.inArray( a[1], asSorting );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       return idx+1 < asSorting.length ?
         idx+1 :
         overflow ?
           null :
           0;
     };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Convert to 2D array if needed
     if ( typeof sorting[0] === 'number' ) {
       sorting = settings.aaSorting = [ sorting ];
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // If appending the sort then we are multi-column sorting
     if ( append && settings.oFeatures.bSortMulti ) {
       // Are we already doing some kind of sort on this column?
       var sortIdx = $.inArray( colIdx, _pluck(sorting, '0') );
-<<<<<<< HEAD
-  
-      if ( sortIdx !== -1 ) {
-        // Yes, modify the sort
-        nextSortIdx = next( sorting[sortIdx], true );
-  
-        if ( nextSortIdx === null && sorting.length === 1 ) {
-          nextSortIdx = 0; // can't remove sorting completely
-        }
-  
-=======
 
       if ( sortIdx !== -1 ) {
         // Yes, modify the sort
@@ -6643,7 +4796,6 @@
           nextSortIdx = 0; // can't remove sorting completely
         }
 
->>>>>>> hotfix-5338-not-working
         if ( nextSortIdx === null ) {
           sorting.splice( sortIdx, 1 );
         }
@@ -6661,11 +4813,7 @@
     else if ( sorting.length && sorting[0][0] == colIdx ) {
       // Single column - already sorting on this column, modify the sort
       nextSortIdx = next( sorting[0] );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       sorting.length = 1;
       sorting[0][1] = asSorting[ nextSortIdx ];
       sorting[0]._idx = nextSortIdx;
@@ -6676,29 +4824,17 @@
       sorting.push( [ colIdx, asSorting[0] ] );
       sorting[0]._idx = 0;
     }
-<<<<<<< HEAD
-  
-    // Run the sort by calling a full redraw
-    _fnReDraw( settings );
-  
-=======
 
     // Run the sort by calling a full redraw
     _fnReDraw( settings );
 
->>>>>>> hotfix-5338-not-working
     // callback used for async user interaction
     if ( typeof callback == 'function' ) {
       callback( settings );
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Attach a sort handler (click) to a node
    *  @param {object} settings dataTables settings object
@@ -6710,36 +4846,21 @@
   function _fnSortAttachListener ( settings, attachTo, colIdx, callback )
   {
     var col = settings.aoColumns[ colIdx ];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     _fnBindAction( attachTo, {}, function (e) {
       /* If the column is not sortable - don't to anything */
       if ( col.bSortable === false ) {
         return;
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // If processing is enabled use a timeout to allow the processing
       // display to be shown - otherwise to it synchronously
       if ( settings.oFeatures.bProcessing ) {
         _fnProcessingDisplay( settings, true );
-<<<<<<< HEAD
-  
-        setTimeout( function() {
-          _fnSortListener( settings, colIdx, e.shiftKey, callback );
-  
-=======
 
         setTimeout( function() {
           _fnSortListener( settings, colIdx, e.shiftKey, callback );
 
->>>>>>> hotfix-5338-not-working
           // In server-side processing, the draw callback will remove the
           // processing display
           if ( _fnDataSource( settings ) !== 'ssp' ) {
@@ -6752,13 +4873,8 @@
       }
     } );
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Set the sorting classes on table's body, Note: it is safe to call this function
    * when bSort and bSortClasses are false
@@ -6772,54 +4888,30 @@
     var sort = _fnSortFlatten( settings );
     var features = settings.oFeatures;
     var i, ien, colIdx;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( features.bSort && features.bSortClasses ) {
       // Remove old sorting classes
       for ( i=0, ien=oldSort.length ; i<ien ; i++ ) {
         colIdx = oldSort[i].src;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Remove column sorting
         $( _pluck( settings.aoData, 'anCells', colIdx ) )
           .removeClass( sortClass + (i<2 ? i+1 : 3) );
       }
-<<<<<<< HEAD
-  
-      // Add new column sorting
-      for ( i=0, ien=sort.length ; i<ien ; i++ ) {
-        colIdx = sort[i].src;
-  
-=======
 
       // Add new column sorting
       for ( i=0, ien=sort.length ; i<ien ; i++ ) {
         colIdx = sort[i].src;
 
->>>>>>> hotfix-5338-not-working
         $( _pluck( settings.aoData, 'anCells', colIdx ) )
           .addClass( sortClass + (i<2 ? i+1 : 3) );
       }
     }
-<<<<<<< HEAD
-  
-    settings.aLastSort = sort;
-  }
-  
-  
-=======
 
     settings.aLastSort = sort;
   }
 
 
->>>>>>> hotfix-5338-not-working
   // Get the data to sort a column, be it from cache, fresh (populating the
   // cache), or from a sort formatter
   function _fnSortData( settings, idx )
@@ -6828,30 +4920,12 @@
     var column = settings.aoColumns[ idx ];
     var customSort = DataTable.ext.order[ column.sSortDataType ];
     var customData;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( customSort ) {
       customData = customSort.call( settings.oInstance, settings, idx,
         _fnColumnIndexToVisible( settings, idx )
       );
     }
-<<<<<<< HEAD
-  
-    // Use / populate cache
-    var row, cellData;
-    var formatter = DataTable.ext.type.order[ column.sType+"-pre" ];
-  
-    for ( var i=0, ien=settings.aoData.length ; i<ien ; i++ ) {
-      row = settings.aoData[i];
-  
-      if ( ! row._aSortData ) {
-        row._aSortData = [];
-      }
-  
-=======
 
     // Use / populate cache
     var row, cellData;
@@ -6864,31 +4938,20 @@
         row._aSortData = [];
       }
 
->>>>>>> hotfix-5338-not-working
       if ( ! row._aSortData[idx] || customSort ) {
         cellData = customSort ?
           customData[i] : // If there was a custom sort function, use data from there
           _fnGetCellData( settings, i, idx, 'sort' );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         row._aSortData[ idx ] = formatter ?
           formatter( cellData ) :
           cellData;
       }
     }
   }
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Save the state of a table
    *  @param {object} oSettings dataTables settings object
@@ -6900,11 +4963,7 @@
     {
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Store the interesting variables */
     var state = {
       time:    +new Date(),
@@ -6919,16 +4978,6 @@
         };
       } )
     };
-<<<<<<< HEAD
-  
-    _fnCallbackFire( settings, "aoStateSaveParams", 'stateSaveParams', [settings, state] );
-  
-    settings.oSavedState = state;
-    settings.fnStateSaveCallback.call( settings.oInstance, settings, state );
-  }
-  
-  
-=======
 
     _fnCallbackFire( settings, "aoStateSaveParams", 'stateSaveParams', [settings, state] );
 
@@ -6937,7 +4986,6 @@
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Attempt to load a saved table state
    *  @param {object} oSettings dataTables settings object
@@ -6948,28 +4996,16 @@
   {
     var i, ien;
     var columns = settings.aoColumns;
-<<<<<<< HEAD
-  
-    if ( ! settings.oFeatures.bStateSave ) {
-      return;
-    }
-  
-=======
 
     if ( ! settings.oFeatures.bStateSave ) {
       return;
     }
 
->>>>>>> hotfix-5338-not-working
     var state = settings.fnStateLoadCallback.call( settings.oInstance, settings );
     if ( ! state || ! state.time ) {
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Allow custom and plug-in manipulation functions to alter the saved data set and
      * cancelling of loading by returning false
      */
@@ -6977,36 +5013,21 @@
     if ( $.inArray( false, abStateLoad ) !== -1 ) {
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Reject old data */
     var duration = settings.iStateDuration;
     if ( duration > 0 && state.time < +new Date() - (duration*1000) ) {
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Number of columns have changed - all bets are off, no restore of settings
     if ( columns.length !== state.columns.length ) {
       return;
     }
-<<<<<<< HEAD
-  
-    // Store the saved state so it might be accessed at any time
-    settings.oLoadedState = $.extend( true, {}, state );
-  
-=======
 
     // Store the saved state so it might be accessed at any time
     settings.oLoadedState = $.extend( true, {}, state );
 
->>>>>>> hotfix-5338-not-working
     // Restore key features - todo - for 1.11 this needs to be done by
     // subscribed events
     if ( state.start !== undefined ) {
@@ -7016,11 +5037,7 @@
     if ( state.length !== undefined ) {
       settings._iDisplayLength   = state.length;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Order
     if ( state.order !== undefined ) {
       settings.aaSorting = [];
@@ -7031,55 +5048,31 @@
         );
       } );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Search
     if ( state.search !== undefined ) {
       $.extend( settings.oPreviousSearch, _fnSearchToHung( state.search ) );
     }
-<<<<<<< HEAD
-  
-    // Columns
-    for ( i=0, ien=state.columns.length ; i<ien ; i++ ) {
-      var col = state.columns[i];
-  
-=======
 
     // Columns
     for ( i=0, ien=state.columns.length ; i<ien ; i++ ) {
       var col = state.columns[i];
 
->>>>>>> hotfix-5338-not-working
       // Visibility
       if ( col.visible !== undefined ) {
         columns[i].bVisible = col.visible;
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Search
       if ( col.search !== undefined ) {
         $.extend( settings.aoPreSearchCols[i], _fnSearchToHung( col.search ) );
       }
     }
-<<<<<<< HEAD
-  
-    _fnCallbackFire( settings, 'aoStateLoaded', 'stateLoaded', [settings, state] );
-  }
-  
-  
-=======
 
     _fnCallbackFire( settings, 'aoStateLoaded', 'stateLoaded', [settings, state] );
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Return the settings object for a particular table
    *  @param {node} table table we are using as a dataTable
@@ -7090,22 +5083,13 @@
   {
     var settings = DataTable.settings;
     var idx = $.inArray( table, _pluck( settings, 'nTable' ) );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return idx !== -1 ?
       settings[ idx ] :
       null;
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Log an error message
    *  @param {object} settings dataTables settings object
@@ -7118,37 +5102,21 @@
   {
     msg = 'DataTables warning: '+
       (settings ? 'table id='+settings.sTableId+' - ' : '')+msg;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( tn ) {
       msg += '. For more information about this error, please see '+
       'http://datatables.net/tn/'+tn;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( ! level  ) {
       // Backwards compatibility pre 1.10
       var ext = DataTable.ext;
       var type = ext.sErrMode || ext.errMode;
-<<<<<<< HEAD
-  
-      if ( settings ) {
-        _fnCallbackFire( settings, null, 'error', [ settings, tn, msg ] );
-      }
-  
-=======
 
       if ( settings ) {
         _fnCallbackFire( settings, null, 'error', [ settings, tn, msg ] );
       }
 
->>>>>>> hotfix-5338-not-working
       if ( type == 'alert' ) {
         alert( msg );
       }
@@ -7163,13 +5131,8 @@
       console.log( msg );
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * See if a property is defined on one object, if so assign it to the other object
    *  @param {object} ret target object
@@ -7189,16 +5152,6 @@
           _fnMap( ret, src, val );
         }
       } );
-<<<<<<< HEAD
-  
-      return;
-    }
-  
-    if ( mappedName === undefined ) {
-      mappedName = name;
-    }
-  
-=======
 
       return;
     }
@@ -7207,18 +5160,12 @@
       mappedName = name;
     }
 
->>>>>>> hotfix-5338-not-working
     if ( src[name] !== undefined ) {
       ret[mappedName] = src[name];
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Extend objects - very similar to jQuery.extend, but deep copy objects, and
    * shallow copy arrays. The reason we need to do this, is that we don't want to
@@ -7239,19 +5186,11 @@
   function _fnExtend( out, extender, breakRefs )
   {
     var val;
-<<<<<<< HEAD
-  
-    for ( var prop in extender ) {
-      if ( extender.hasOwnProperty(prop) ) {
-        val = extender[prop];
-  
-=======
 
     for ( var prop in extender ) {
       if ( extender.hasOwnProperty(prop) ) {
         val = extender[prop];
 
->>>>>>> hotfix-5338-not-working
         if ( $.isPlainObject( val ) ) {
           if ( ! $.isPlainObject( out[prop] ) ) {
             out[prop] = {};
@@ -7266,19 +5205,11 @@
         }
       }
     }
-<<<<<<< HEAD
-  
-    return out;
-  }
-  
-  
-=======
 
     return out;
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Bind an event handers to allow a click or return key to activate the callback.
    * This is good for accessibility since a return on the keyboard will have the
@@ -7306,13 +5237,8 @@
           return false;
         } );
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Register a callback function. Easily allows a callback function to be added to
    * an array store of callback functions that can then all be called together.
@@ -7332,13 +5258,8 @@
       } );
     }
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Fire callback functions and trigger events. Note that the loop over the
    * callback array store is done backwards! Further note that you do not want to
@@ -7356,31 +5277,12 @@
   function _fnCallbackFire( settings, callbackArr, eventName, args )
   {
     var ret = [];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( callbackArr ) {
       ret = $.map( settings[callbackArr].slice().reverse(), function (val, i) {
         return val.fn.apply( settings.oInstance, args );
       } );
     }
-<<<<<<< HEAD
-  
-    if ( eventName !== null ) {
-      var e = $.Event( eventName+'.dt' );
-  
-      $(settings.nTable).trigger( e, args );
-  
-      ret.push( e.result );
-    }
-  
-    return ret;
-  }
-  
-  
-=======
 
     if ( eventName !== null ) {
       var e = $.Event( eventName+'.dt' );
@@ -7394,60 +5296,36 @@
   }
 
 
->>>>>>> hotfix-5338-not-working
   function _fnLengthOverflow ( settings )
   {
     var
       start = settings._iDisplayStart,
       end = settings.fnDisplayEnd(),
       len = settings._iDisplayLength;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* If we have space to show extra rows (backing up from the end point - then do so */
     if ( start >= end )
     {
       start = end - len;
     }
-<<<<<<< HEAD
-  
-    // Keep the start record on the current page
-    start -= (start % len);
-  
-=======
 
     // Keep the start record on the current page
     start -= (start % len);
 
->>>>>>> hotfix-5338-not-working
     if ( len === -1 || start < 0 )
     {
       start = 0;
     }
-<<<<<<< HEAD
-  
-    settings._iDisplayStart = start;
-  }
-  
-  
-=======
 
     settings._iDisplayStart = start;
   }
 
 
->>>>>>> hotfix-5338-not-working
   function _fnRenderer( settings, type )
   {
     var renderer = settings.renderer;
     var host = DataTable.ext.renderer[type];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( $.isPlainObject( renderer ) && renderer[type] ) {
       // Specific renderer for this type. If available use it, otherwise use
       // the default.
@@ -7458,21 +5336,12 @@
       // otherwise use the default
       return host[renderer] || host._;
     }
-<<<<<<< HEAD
-  
-    // Use the default
-    return host._;
-  }
-  
-  
-=======
 
     // Use the default
     return host._;
   }
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Detect the data source being used for the table. Used to simplify the code
    * a little (ajax) and to make it compress a little smaller.
@@ -7491,11 +5360,7 @@
     }
     return 'dom';
   }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
 
   DataTable = function( options )
   {
@@ -7539,13 +5404,8 @@
     {
       return this.api(true).$( sSelector, oOpts );
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Almost identical to $ in operation, but in this case returns the data for the matched
      * rows - as such, the jQuery selector used should match TR row nodes or TD/TH cell nodes
@@ -7598,13 +5458,8 @@
     {
       return this.api(true).rows( sSelector, oOpts ).data();
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Create a DataTables Api instance, with the currently selected tables for
      * the Api's context.
@@ -7622,13 +5477,8 @@
         ) :
         new _Api( this );
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Add a single new row or multiple rows of data to the table. Please note
      * that this is suitable for client-side processing only - if you are using
@@ -7670,26 +5520,11 @@
      this.fnAddData = function( data, redraw )
     {
       var api = this.api( true );
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Check if we want to add multiple rows or not */
       var rows = $.isArray(data) && ( $.isArray(data[0]) || $.isPlainObject(data[0]) ) ?
         api.rows.add( data ) :
         api.row.add( data );
-<<<<<<< HEAD
-    
-      if ( redraw === undefined || redraw ) {
-        api.draw();
-      }
-    
-      return rows.flatten().toArray();
-    };
-    
-    
-=======
 
       if ( redraw === undefined || redraw ) {
         api.draw();
@@ -7699,7 +5534,6 @@
     };
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This function will make DataTables recalculate the column sizes, based on the data
      * contained in the table and the sizes applied to the columns (in the DOM, CSS or
@@ -7726,11 +5560,7 @@
       var api = this.api( true ).columns.adjust();
       var settings = api.settings()[0];
       var scroll = settings.oScroll;
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( bRedraw === undefined || bRedraw ) {
         api.draw( false );
       }
@@ -7739,13 +5569,8 @@
         _fnScrollDraw( settings );
       }
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Quickly and simply clear a table
      *  @param {bool} [bRedraw=true] redraw the table or not
@@ -7763,22 +5588,13 @@
     this.fnClearTable = function( bRedraw )
     {
       var api = this.api( true ).clear();
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( bRedraw === undefined || bRedraw ) {
         api.draw();
       }
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * The exact opposite of 'opening' a row, this function will close any rows which
      * are currently 'open'.
@@ -7807,13 +5623,8 @@
     {
       this.api( true ).row( nTr ).child.hide();
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Remove a row for the table
      *  @param {mixed} target The index of the row from aoData to be deleted, or
@@ -7838,23 +5649,6 @@
       var rows = api.rows( target );
       var settings = rows.settings()[0];
       var data = settings.aoData[ rows[0][0] ];
-<<<<<<< HEAD
-    
-      rows.remove();
-    
-      if ( callback ) {
-        callback.call( this, settings, data );
-      }
-    
-      if ( redraw === undefined || redraw ) {
-        api.draw();
-      }
-    
-      return data;
-    };
-    
-    
-=======
 
       rows.remove();
 
@@ -7870,7 +5664,6 @@
     };
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Restore the table to it's original state in the DOM by removing all of DataTables
      * enhancements, alterations to the DOM structure of the table and event listeners.
@@ -7889,13 +5682,8 @@
     {
       this.api( true ).destroy( remove );
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Redraw the table
      *  @param {bool} [complete=true] Re-filter and resort (if enabled) the table before the draw.
@@ -7916,13 +5704,8 @@
       // into account the new data, but can hold position.
       this.api( true ).draw( complete );
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Filter the input based on data
      *  @param {string} sInput String to filter the table on
@@ -7945,30 +5728,18 @@
     this.fnFilter = function( sInput, iColumn, bRegex, bSmart, bShowGlobal, bCaseInsensitive )
     {
       var api = this.api( true );
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( iColumn === null || iColumn === undefined ) {
         api.search( sInput, bRegex, bSmart, bCaseInsensitive );
       }
       else {
         api.column( iColumn ).search( sInput, bRegex, bSmart, bCaseInsensitive );
       }
-<<<<<<< HEAD
-    
-      api.draw();
-    };
-    
-    
-=======
 
       api.draw();
     };
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Get the data for the whole table, an individual row or an individual cell based on the
      * provided parameters.
@@ -8009,34 +5780,19 @@
     this.fnGetData = function( src, col )
     {
       var api = this.api( true );
-<<<<<<< HEAD
-    
-      if ( src !== undefined ) {
-        var type = src.nodeName ? src.nodeName.toLowerCase() : '';
-    
-=======
 
       if ( src !== undefined ) {
         var type = src.nodeName ? src.nodeName.toLowerCase() : '';
 
->>>>>>> hotfix-5338-not-working
         return col !== undefined || type == 'td' || type == 'th' ?
           api.cell( src, col ).data() :
           api.row( src ).data() || null;
       }
-<<<<<<< HEAD
-    
-      return api.data().toArray();
-    };
-    
-    
-=======
 
       return api.data().toArray();
     };
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Get an array of the TR nodes that are used in the table's body. Note that you will
      * typically want to use the '$' API method in preference to this as it is more
@@ -8058,22 +5814,13 @@
     this.fnGetNodes = function( iRow )
     {
       var api = this.api( true );
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
       return iRow !== undefined ?
         api.row( iRow ).node() :
         api.rows().nodes().flatten().toArray();
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Get the array indexes of a particular cell from it's DOM element
      * and column index including hidden columns
@@ -8106,21 +5853,13 @@
     {
       var api = this.api( true );
       var nodeName = node.nodeName.toUpperCase();
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( nodeName == 'TR' ) {
         return api.row( node ).index();
       }
       else if ( nodeName == 'TD' || nodeName == 'TH' ) {
         var cell = api.cell( node ).index();
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
         return [
           cell.row,
           cell.columnVisible,
@@ -8129,13 +5868,8 @@
       }
       return null;
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Check to see if a row is 'open' or not.
      *  @param {node} nTr the table row to check
@@ -8163,13 +5897,8 @@
     {
       return this.api( true ).row( nTr ).child.isShown();
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This function will place a new row directly after a row which is currently
      * on display on the page, with the HTML contents that is passed into the
@@ -8208,13 +5937,8 @@
         .show()
         .child()[0];
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Change the pagination - provides the internal logic for pagination in a simple API
      * function. With this function you can have a DataTables table go to the next,
@@ -8234,22 +5958,13 @@
     this.fnPageChange = function ( mAction, bRedraw )
     {
       var api = this.api( true ).page( mAction );
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( bRedraw === undefined || bRedraw ) {
         api.draw(false);
       }
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Show a particular column
      *  @param {int} iCol The column whose display should be changed
@@ -8269,22 +5984,13 @@
     this.fnSetColumnVis = function ( iCol, bShow, bRedraw )
     {
       var api = this.api( true ).column( iCol ).visible( bShow );
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( bRedraw === undefined || bRedraw ) {
         api.columns.adjust().draw();
       }
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Get the settings for a particular table for external manipulation
      *  @returns {object} DataTables settings object. See
@@ -8305,13 +6011,8 @@
     {
       return _fnSettingsFromNode( this[_ext.iApiIndex] );
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Sort the table by a particular column
      *  @param {int} iCol the data index to sort on. Note that this will not match the
@@ -8331,13 +6032,8 @@
     {
       this.api( true ).order( aaSort ).draw();
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Attach a sort listener to an element for a given column
      *  @param {node} nNode the element to attach the sort listener to
@@ -8358,13 +6054,8 @@
     {
       this.api( true ).order.listener( nNode, iColumn, fnCallback );
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Update a table cell or row - this method will accept either a single value to
      * update the cell with, an array of values with one element for each column or
@@ -8390,42 +6081,25 @@
     this.fnUpdate = function( mData, mRow, iColumn, bRedraw, bAction )
     {
       var api = this.api( true );
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( iColumn === undefined || iColumn === null ) {
         api.row( mRow ).data( mData );
       }
       else {
         api.cell( mRow, iColumn ).data( mData );
       }
-<<<<<<< HEAD
-    
-      if ( bAction === undefined || bAction ) {
-        api.columns.adjust();
-      }
-    
-=======
 
       if ( bAction === undefined || bAction ) {
         api.columns.adjust();
       }
 
->>>>>>> hotfix-5338-not-working
       if ( bRedraw === undefined || bRedraw ) {
         api.draw();
       }
       return 0;
     };
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Provide a common method for plug-ins to check the version of DataTables being used, in order
      * to ensure compatibility.
@@ -8444,11 +6118,7 @@
      *    } );
      */
     this.fnVersionCheck = _ext.fnVersionCheck;
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> hotfix-5338-not-working
 
     var _that = this;
     var emptyInit = options === undefined;
@@ -8481,35 +6151,14 @@
       var bInitHandedOff = false;
       var defaults = DataTable.defaults;
       var $this = $(this);
-<<<<<<< HEAD
-      
-      
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /* Sanity check */
       if ( this.nodeName.toLowerCase() != 'table' )
       {
         _fnLog( null, 0, 'Non-table node initialisation ('+this.nodeName+')', 2 );
         return;
       }
-<<<<<<< HEAD
-      
-      /* Backwards compatibility for the defaults */
-      _fnCompatOpts( defaults );
-      _fnCompatCols( defaults.column );
-      
-      /* Convert the camel-case defaults to Hungarian */
-      _fnCamelToHungarian( defaults, defaults, true );
-      _fnCamelToHungarian( defaults.column, defaults.column, true );
-      
-      /* Setting up the initialisation object */
-      _fnCamelToHungarian( defaults, $.extend( oInit, $this.data() ) );
-      
-      
-      
-=======
 
       /* Backwards compatibility for the defaults */
       _fnCompatOpts( defaults );
@@ -8524,27 +6173,18 @@
 
 
 
->>>>>>> hotfix-5338-not-working
       /* Check to see if we are re-initialising a table */
       var allSettings = DataTable.settings;
       for ( i=0, iLen=allSettings.length ; i<iLen ; i++ )
       {
         var s = allSettings[i];
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
         /* Base check on table node */
         if ( s.nTable == this || s.nTHead.parentNode == this || (s.nTFoot && s.nTFoot.parentNode == this) )
         {
           var bRetrieve = oInit.bRetrieve !== undefined ? oInit.bRetrieve : defaults.bRetrieve;
           var bDestroy = oInit.bDestroy !== undefined ? oInit.bDestroy : defaults.bDestroy;
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
           if ( emptyInit || bRetrieve )
           {
             return s.oInstance;
@@ -8560,11 +6200,7 @@
             return;
           }
         }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
         /* If the element we are initialising has the same ID as a table which was previously
          * initialised, but the table nodes don't match (from before) then we destroy the old
          * instance by simply deleting it. This is under the assumption that the table has been
@@ -8576,22 +6212,14 @@
           break;
         }
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Ensure the table has an ID - required for accessibility */
       if ( sId === null || sId === "" )
       {
         sId = "DataTables_Table_"+(DataTable.ext._unique++);
         this.id = sId;
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Create the settings object for this table and set some of the default parameters */
       var oSettings = $.extend( true, {}, DataTable.models.oSettings, {
         "sDestroyWidth": $this[0].style.width,
@@ -8601,18 +6229,6 @@
       oSettings.nTable = this;
       oSettings.oApi   = _that.internal;
       oSettings.oInit  = oInit;
-<<<<<<< HEAD
-      
-      allSettings.push( oSettings );
-      
-      // Need to add the instance after the instance after the settings object has been added
-      // to the settings array, so we can self reference the table instance if more than one
-      oSettings.oInstance = (_that.length===1) ? _that : $this.dataTable();
-      
-      // Backwards compatibility, before we apply all the defaults
-      _fnCompatOpts( oInit );
-      
-=======
 
       allSettings.push( oSettings );
 
@@ -8623,37 +6239,23 @@
       // Backwards compatibility, before we apply all the defaults
       _fnCompatOpts( oInit );
 
->>>>>>> hotfix-5338-not-working
       if ( oInit.oLanguage )
       {
         _fnLanguageCompat( oInit.oLanguage );
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       // If the length menu is given, but the init display length is not, use the length menu
       if ( oInit.aLengthMenu && ! oInit.iDisplayLength )
       {
         oInit.iDisplayLength = $.isArray( oInit.aLengthMenu[0] ) ?
           oInit.aLengthMenu[0][0] : oInit.aLengthMenu[0];
       }
-<<<<<<< HEAD
-      
-      // Apply the defaults and init options to make a single init object will all
-      // options defined from defaults and instance options.
-      oInit = _fnExtend( $.extend( true, {}, defaults ), oInit );
-      
-      
-=======
 
       // Apply the defaults and init options to make a single init object will all
       // options defined from defaults and instance options.
       oInit = _fnExtend( $.extend( true, {}, defaults ), oInit );
 
 
->>>>>>> hotfix-5338-not-working
       // Map the initialisation options onto the settings object
       _fnMap( oSettings.oFeatures, oInit, [
         "bPaginate",
@@ -8702,11 +6304,7 @@
         [ "bScrollCollapse", "bCollapse" ]
       ] );
       _fnMap( oSettings.oLanguage, oInit, "fnInfoCallback" );
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Callback functions which are array driven */
       _fnCallbackReg( oSettings, 'aoDrawCallback',       oInit.fnDrawCallback,      'user' );
       _fnCallbackReg( oSettings, 'aoServerParams',       oInit.fnServerParams,      'user' );
@@ -8719,16 +6317,6 @@
       _fnCallbackReg( oSettings, 'aoFooterCallback',     oInit.fnFooterCallback,    'user' );
       _fnCallbackReg( oSettings, 'aoInitComplete',       oInit.fnInitComplete,      'user' );
       _fnCallbackReg( oSettings, 'aoPreDrawCallback',    oInit.fnPreDrawCallback,   'user' );
-<<<<<<< HEAD
-      
-      oSettings.rowIdFn = _fnGetObjectDataFn( oInit.rowId );
-      
-      /* Browser support detection */
-      _fnBrowserDetect( oSettings );
-      
-      var oClasses = oSettings.oClasses;
-      
-=======
 
       oSettings.rowIdFn = _fnGetObjectDataFn( oInit.rowId );
 
@@ -8737,7 +6325,6 @@
 
       var oClasses = oSettings.oClasses;
 
->>>>>>> hotfix-5338-not-working
       // @todo Remove in 1.11
       if ( oInit.bJQueryUI )
       {
@@ -8745,21 +6332,13 @@
          * you want to have multiple tables with multiple independent classes
          */
         $.extend( oClasses, DataTable.ext.oJUIClasses, oInit.oClasses );
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( oInit.sDom === defaults.sDom && defaults.sDom === "lfrtip" )
         {
           /* Set the DOM to use a layout suitable for jQuery UI's theming */
           oSettings.sDom = '<"H"lfr>t<"F"ip>';
         }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( ! oSettings.renderer ) {
           oSettings.renderer = 'jqueryui';
         }
@@ -8772,24 +6351,15 @@
         $.extend( oClasses, DataTable.ext.classes, oInit.oClasses );
       }
       $this.addClass( oClasses.sTable );
-<<<<<<< HEAD
-      
-      
-=======
 
 
->>>>>>> hotfix-5338-not-working
       if ( oSettings.iInitDisplayStart === undefined )
       {
         /* Display start point, taking into account the save saving */
         oSettings.iInitDisplayStart = oInit.iDisplayStart;
         oSettings._iDisplayStart = oInit.iDisplayStart;
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( oInit.iDeferLoading !== null )
       {
         oSettings.bDeferLoading = true;
@@ -8797,19 +6367,11 @@
         oSettings._iRecordsDisplay = tmp ? oInit.iDeferLoading[0] : oInit.iDeferLoading;
         oSettings._iRecordsTotal = tmp ? oInit.iDeferLoading[1] : oInit.iDeferLoading;
       }
-<<<<<<< HEAD
-      
-      /* Language definitions */
-      var oLanguage = oSettings.oLanguage;
-      $.extend( true, oLanguage, oInit.oLanguage );
-      
-=======
 
       /* Language definitions */
       var oLanguage = oSettings.oLanguage;
       $.extend( true, oLanguage, oInit.oLanguage );
 
->>>>>>> hotfix-5338-not-working
       if ( oLanguage.sUrl !== "" )
       {
         /* Get the language definitions from a file - because this Ajax call makes the language
@@ -8832,11 +6394,7 @@
         } );
         bInitHandedOff = true;
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /*
        * Stripes
        */
@@ -8847,11 +6405,7 @@
           oClasses.sStripeEven
         ];
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Remove row stripe classes if they are already on the table row */
       var stripeClasses = oSettings.asStripeClasses;
       var rowOne = $this.children('tbody').find('tr').eq(0);
@@ -8861,11 +6415,7 @@
         $('tbody tr', this).removeClass( stripeClasses.join(' ') );
         oSettings.asDestroyStripes = stripeClasses.slice();
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /*
        * Columns
        * See if we should load columns automatically or use defined ones
@@ -8878,11 +6428,7 @@
         _fnDetectHeader( oSettings.aoHeader, nThead[0] );
         anThs = _fnGetUniqueThs( oSettings );
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* If not given a column array, generate one with nulls */
       if ( oInit.aoColumns === null )
       {
@@ -8896,30 +6442,18 @@
       {
         aoColumnsInit = oInit.aoColumns;
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Add the columns */
       for ( i=0, iLen=aoColumnsInit.length ; i<iLen ; i++ )
       {
         _fnAddColumn( oSettings, anThs ? anThs[i] : null );
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Apply the column definitions */
       _fnApplyColumnDefs( oSettings, oInit.aoColumnDefs, aoColumnsInit, function (iCol, oDef) {
         _fnColumnOptions( oSettings, iCol, oDef );
       } );
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* HTML5 attribute detection - build an mData object automatically if the
        * attributes are found
        */
@@ -8927,16 +6461,6 @@
         var a = function ( cell, name ) {
           return cell.getAttribute( 'data-'+name ) !== null ? name : null;
         };
-<<<<<<< HEAD
-      
-        $( rowOne[0] ).children('th, td').each( function (i, cell) {
-          var col = oSettings.aoColumns[i];
-      
-          if ( col.mData === i ) {
-            var sort = a( cell, 'sort' ) || a( cell, 'order' );
-            var filter = a( cell, 'filter' ) || a( cell, 'search' );
-      
-=======
 
         $( rowOne[0] ).children('th, td').each( function (i, cell) {
           var col = oSettings.aoColumns[i];
@@ -8945,7 +6469,6 @@
             var sort = a( cell, 'sort' ) || a( cell, 'order' );
             var filter = a( cell, 'filter' ) || a( cell, 'search' );
 
->>>>>>> hotfix-5338-not-working
             if ( sort !== null || filter !== null ) {
               col.mData = {
                 _:      i+'.display',
@@ -8953,25 +6476,15 @@
                 type:   sort !== null   ? i+'.@data-'+sort   : undefined,
                 filter: filter !== null ? i+'.@data-'+filter : undefined
               };
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
               _fnColumnOptions( oSettings, i );
             }
           }
         } );
       }
-<<<<<<< HEAD
-      
-      var features = oSettings.oFeatures;
-      
-=======
 
       var features = oSettings.oFeatures;
 
->>>>>>> hotfix-5338-not-working
       /* Must be done after everything which can be overridden by the state saving! */
       if ( oInit.bStateSave )
       {
@@ -8979,22 +6492,13 @@
         _fnLoadState( oSettings, oInit );
         _fnCallbackReg( oSettings, 'aoDrawCallback', _fnSaveState, 'state_save' );
       }
-<<<<<<< HEAD
-      
-      
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /*
        * Sorting
        * @todo For modularisation (1.11) this needs to do into a sort start up handler
        */
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       // If aaSorting is not defined, then we use the first indicator in asSorting
       // in case that has been altered, so the default sort reflects that option
       if ( oInit.aaSorting === undefined )
@@ -9005,101 +6509,60 @@
           sorting[i][1] = oSettings.aoColumns[ i ].asSorting[0];
         }
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Do a first pass on the sorting classes (allows any size changes to be taken into
        * account, and also will apply sorting disabled classes if disabled
        */
       _fnSortingClasses( oSettings );
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( features.bSort )
       {
         _fnCallbackReg( oSettings, 'aoDrawCallback', function () {
           if ( oSettings.bSorted ) {
             var aSort = _fnSortFlatten( oSettings );
             var sortedColumns = {};
-<<<<<<< HEAD
-      
-            $.each( aSort, function (i, val) {
-              sortedColumns[ val.src ] = val.dir;
-            } );
-      
-=======
 
             $.each( aSort, function (i, val) {
               sortedColumns[ val.src ] = val.dir;
             } );
 
->>>>>>> hotfix-5338-not-working
             _fnCallbackFire( oSettings, null, 'order', [oSettings, aSort, sortedColumns] );
             _fnSortAria( oSettings );
           }
         } );
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       _fnCallbackReg( oSettings, 'aoDrawCallback', function () {
         if ( oSettings.bSorted || _fnDataSource( oSettings ) === 'ssp' || features.bDeferRender ) {
           _fnSortingClasses( oSettings );
         }
       }, 'sc' );
-<<<<<<< HEAD
-      
-      
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /*
        * Final init
        * Cache the header, body and footer as required, creating them if needed
        */
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       // Work around for Webkit bug 83867 - store the caption-side before removing from doc
       var captions = $this.children('caption').each( function () {
         this._captionSide = $this.css('caption-side');
       } );
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       var thead = $this.children('thead');
       if ( thead.length === 0 )
       {
         thead = $('<thead/>').appendTo(this);
       }
       oSettings.nTHead = thead[0];
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       var tbody = $this.children('tbody');
       if ( tbody.length === 0 )
       {
         tbody = $('<tbody/>').appendTo(this);
       }
       oSettings.nTBody = tbody[0];
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       var tfoot = $this.children('tfoot');
       if ( tfoot.length === 0 && captions.length > 0 && (oSettings.oScroll.sX !== "" || oSettings.oScroll.sY !== "") )
       {
@@ -9107,11 +6570,7 @@
         // a tfoot element for the caption element to be appended to
         tfoot = $('<tfoot/>').appendTo(this);
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( tfoot.length === 0 || tfoot.children().length === 0 ) {
         $this.addClass( oClasses.sNoFooter );
       }
@@ -9119,11 +6578,7 @@
         oSettings.nTFoot = tfoot[0];
         _fnDetectHeader( oSettings.aoFooter, oSettings.nTFoot );
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Check if there is data passing into the constructor */
       if ( oInit.aaData )
       {
@@ -9140,15 +6595,6 @@
          */
         _fnAddTr( oSettings, $(oSettings.nTBody).children('tr') );
       }
-<<<<<<< HEAD
-      
-      /* Copy the data index array */
-      oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
-      
-      /* Initialisation complete - table can be drawn */
-      oSettings.bInitialised = true;
-      
-=======
 
       /* Copy the data index array */
       oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
@@ -9156,7 +6602,6 @@
       /* Initialisation complete - table can be drawn */
       oSettings.bInitialised = true;
 
->>>>>>> hotfix-5338-not-working
       /* Check if we need to initialise the table (it might not have been handed off to the
        * language processor)
        */
@@ -9169,13 +6614,8 @@
     return this;
   };
 
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Computed structure of the DataTables API, defined by the options passed to
    * `DataTable.Api.register()` when building the API.
@@ -9213,13 +6653,8 @@
    * @ignore
    */
   var __apiStruct = [];
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * `Array.prototype` reference.
    *
@@ -9227,13 +6662,8 @@
    * @ignore
    */
   var __arrayProto = Array.prototype;
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Abstraction for `context` parameter of the `Api` constructor to allow it to
    * take several different forms for ease of use.
@@ -9261,11 +6691,7 @@
     var tables = $.map( settings, function (el, i) {
       return el.nTable;
     } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( ! mixed ) {
       return [];
     }
@@ -9289,11 +6715,7 @@
       // jQuery object (also DataTables instance)
       jq = mixed;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( jq ) {
       return jq.map( function(i) {
         idx = $.inArray( this, tables );
@@ -9301,13 +6723,8 @@
       } ).toArray();
     }
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * DataTables API class - used to control and interface with  one or more
    * DataTables enhanced tables.
@@ -9367,11 +6784,7 @@
     if ( ! (this instanceof _Api) ) {
       return new _Api( context, data );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var settings = [];
     var ctxSettings = function ( o ) {
       var a = _toSettings( o );
@@ -9379,11 +6792,7 @@
         settings = settings.concat( a );
       }
     };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( $.isArray( context ) ) {
       for ( var i=0, ien=context.length ; i<ien ; i++ ) {
         ctxSettings( context[i] );
@@ -9392,47 +6801,27 @@
     else {
       ctxSettings( context );
     }
-<<<<<<< HEAD
-  
-    // Remove duplicates
-    this.context = _unique( settings );
-  
-=======
 
     // Remove duplicates
     this.context = _unique( settings );
 
->>>>>>> hotfix-5338-not-working
     // Initial data
     if ( data ) {
       $.merge( this, data );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // selector
     this.selector = {
       rows: null,
       cols: null,
       opts: null
     };
-<<<<<<< HEAD
-  
-    _Api.extend( this, this, __apiStruct );
-  };
-  
-  DataTable.Api = _Api;
-  
-=======
 
     _Api.extend( this, this, __apiStruct );
   };
 
   DataTable.Api = _Api;
 
->>>>>>> hotfix-5338-not-working
   // Don't destroy the existing prototype, just extend it. Required for jQuery 2's
   // isPlainObject.
   $.extend( _Api.prototype, {
@@ -9440,16 +6829,6 @@
     {
       return this.count() !== 0;
     },
-<<<<<<< HEAD
-  
-  
-    concat:  __arrayProto.concat,
-  
-  
-    context: [], // array of table settings objects
-  
-  
-=======
 
 
     concat:  __arrayProto.concat,
@@ -9458,34 +6837,17 @@
     context: [], // array of table settings objects
 
 
->>>>>>> hotfix-5338-not-working
     count: function ()
     {
       return this.flatten().length;
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     each: function ( fn )
     {
       for ( var i=0, ien=this.length ; i<ien; i++ ) {
         fn.call( this, this[i], i, this );
       }
-<<<<<<< HEAD
-  
-      return this;
-    },
-  
-  
-    eq: function ( idx )
-    {
-      var ctx = this.context;
-  
-=======
 
       return this;
     },
@@ -9495,26 +6857,16 @@
     {
       var ctx = this.context;
 
->>>>>>> hotfix-5338-not-working
       return ctx.length > idx ?
         new _Api( ctx[idx], this[idx] ) :
         null;
     },
-<<<<<<< HEAD
-  
-  
-    filter: function ( fn )
-    {
-      var a = [];
-  
-=======
 
 
     filter: function ( fn )
     {
       var a = [];
 
->>>>>>> hotfix-5338-not-working
       if ( __arrayProto.filter ) {
         a = __arrayProto.filter.call( this, fn, this );
       }
@@ -9526,37 +6878,21 @@
           }
         }
       }
-<<<<<<< HEAD
-  
-      return new _Api( this.context, a );
-    },
-  
-  
-=======
 
       return new _Api( this.context, a );
     },
 
 
->>>>>>> hotfix-5338-not-working
     flatten: function ()
     {
       var a = [];
       return new _Api( this.context, a.concat.apply( a, this.toArray() ) );
     },
-<<<<<<< HEAD
-  
-  
-    join:    __arrayProto.join,
-  
-  
-=======
 
 
     join:    __arrayProto.join,
 
 
->>>>>>> hotfix-5338-not-working
     indexOf: __arrayProto.indexOf || function (obj, start)
     {
       for ( var i=(start || 0), ien=this.length ; i<ien ; i++ ) {
@@ -9566,11 +6902,7 @@
       }
       return -1;
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   iterator: function ( flatten, type, fn, alwaysNew ) {
       var
         a = [], ret,
@@ -9578,11 +6910,7 @@
         context = this.context,
         rows, items, item,
         selector = this.selector;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Argument shifting
       if ( typeof flatten === 'string' ) {
         alwaysNew = fn;
@@ -9590,15 +6918,6 @@
         type = flatten;
         flatten = false;
       }
-<<<<<<< HEAD
-  
-      for ( i=0, ien=context.length ; i<ien ; i++ ) {
-        var apiInst = new _Api( context[i] );
-  
-        if ( type === 'table' ) {
-          ret = fn.call( apiInst, context[i], i );
-  
-=======
 
       for ( i=0, ien=context.length ; i<ien ; i++ ) {
         var apiInst = new _Api( context[i] );
@@ -9606,7 +6925,6 @@
         if ( type === 'table' ) {
           ret = fn.call( apiInst, context[i], i );
 
->>>>>>> hotfix-5338-not-working
           if ( ret !== undefined ) {
             a.push( ret );
           }
@@ -9614,11 +6932,7 @@
         else if ( type === 'columns' || type === 'rows' ) {
           // this has same length as context - one entry for each table
           ret = fn.call( apiInst, context[i], this[i], i );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           if ( ret !== undefined ) {
             a.push( ret );
           }
@@ -9627,16 +6941,6 @@
           // columns and rows share the same structure.
           // 'this' is an array of column indexes for each context
           items = this[i];
-<<<<<<< HEAD
-  
-          if ( type === 'column-rows' ) {
-            rows = _selector_row_indexes( context[i], selector.opts );
-          }
-  
-          for ( j=0, jen=items.length ; j<jen ; j++ ) {
-            item = items[j];
-  
-=======
 
           if ( type === 'column-rows' ) {
             rows = _selector_row_indexes( context[i], selector.opts );
@@ -9645,29 +6949,20 @@
           for ( j=0, jen=items.length ; j<jen ; j++ ) {
             item = items[j];
 
->>>>>>> hotfix-5338-not-working
             if ( type === 'cell' ) {
               ret = fn.call( apiInst, context[i], item.row, item.column, i, j );
             }
             else {
               ret = fn.call( apiInst, context[i], item, i, j, rows );
             }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
             if ( ret !== undefined ) {
               a.push( ret );
             }
           }
         }
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( a.length || alwaysNew ) {
         var api = new _Api( context, flatten ? a.concat.apply( [], a ) : a );
         var apiSelector = api.selector;
@@ -9678,29 +6973,13 @@
       }
       return this;
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     lastIndexOf: __arrayProto.lastIndexOf || function (obj, start)
     {
       // Bit cheeky...
       return this.indexOf.apply( this.toArray.reverse(), arguments );
     },
-<<<<<<< HEAD
-  
-  
-    length:  0,
-  
-  
-    map: function ( fn )
-    {
-      var a = [];
-  
-=======
 
 
     length:  0,
@@ -9710,7 +6989,6 @@
     {
       var a = [];
 
->>>>>>> hotfix-5338-not-working
       if ( __arrayProto.map ) {
         a = __arrayProto.map.call( this, fn, this );
       }
@@ -9720,34 +6998,17 @@
           a.push( fn.call( this, this[i], i ) );
         }
       }
-<<<<<<< HEAD
-  
-      return new _Api( this.context, a );
-    },
-  
-  
-=======
 
       return new _Api( this.context, a );
     },
 
 
->>>>>>> hotfix-5338-not-working
     pluck: function ( prop )
     {
       return this.map( function ( el ) {
         return el[ prop ];
       } );
     },
-<<<<<<< HEAD
-  
-    pop:     __arrayProto.pop,
-  
-  
-    push:    __arrayProto.push,
-  
-  
-=======
 
     pop:     __arrayProto.pop,
 
@@ -9755,43 +7016,17 @@
     push:    __arrayProto.push,
 
 
->>>>>>> hotfix-5338-not-working
     // Does not return an API instance
     reduce: __arrayProto.reduce || function ( fn, init )
     {
       return _fnReduce( this, fn, init, 0, this.length, 1 );
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     reduceRight: __arrayProto.reduceRight || function ( fn, init )
     {
       return _fnReduce( this, fn, init, this.length-1, -1, -1 );
     },
-<<<<<<< HEAD
-  
-  
-    reverse: __arrayProto.reverse,
-  
-  
-    // Object with rows, columns and opts
-    selector: null,
-  
-  
-    shift:   __arrayProto.shift,
-  
-  
-    sort:    __arrayProto.sort, // ? name - order?
-  
-  
-    splice:  __arrayProto.splice,
-  
-  
-=======
 
 
     reverse: __arrayProto.reverse,
@@ -9810,70 +7045,41 @@
     splice:  __arrayProto.splice,
 
 
->>>>>>> hotfix-5338-not-working
     toArray: function ()
     {
       return __arrayProto.slice.call( this );
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     to$: function ()
     {
       return $( this );
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     toJQuery: function ()
     {
       return $( this );
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     unique: function ()
     {
       return new _Api( this.context, _unique(this) );
     },
-<<<<<<< HEAD
-  
-  
-    unshift: __arrayProto.unshift
-  } );
-  
-  
-=======
 
 
     unshift: __arrayProto.unshift
   } );
 
 
->>>>>>> hotfix-5338-not-working
   _Api.extend = function ( scope, obj, ext )
   {
     // Only extend API instances and static properties of the API
     if ( ! ext.length || ! obj || ( ! (obj instanceof _Api) && ! obj.__dt_wrapper ) ) {
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var
       i, ien,
       j, jen,
@@ -9881,71 +7087,41 @@
       methodScoping = function ( scope, fn, struc ) {
         return function () {
           var ret = fn.apply( scope, arguments );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           // Method extension
           _Api.extend( ret, ret, struc.methodExt );
           return ret;
         };
       };
-<<<<<<< HEAD
-  
-    for ( i=0, ien=ext.length ; i<ien ; i++ ) {
-      struct = ext[i];
-  
-=======
 
     for ( i=0, ien=ext.length ; i<ien ; i++ ) {
       struct = ext[i];
 
->>>>>>> hotfix-5338-not-working
       // Value
       obj[ struct.name ] = typeof struct.val === 'function' ?
         methodScoping( scope, struct.val, struct ) :
         $.isPlainObject( struct.val ) ?
           {} :
           struct.val;
-<<<<<<< HEAD
-  
-      obj[ struct.name ].__dt_wrapper = true;
-  
-=======
 
       obj[ struct.name ].__dt_wrapper = true;
 
->>>>>>> hotfix-5338-not-working
       // Property extension
       _Api.extend( scope, obj[ struct.name ], struct.propExt );
     }
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   // @todo - Is there need for an augment function?
   // _Api.augment = function ( inst, name )
   // {
   //  // Find src object in the structure from the name
   //  var parts = name.split('.');
-<<<<<<< HEAD
-  
-  //  _Api.extend( inst, obj );
-  // };
-  
-  
-=======
 
   //  _Api.extend( inst, obj );
   // };
 
 
->>>>>>> hotfix-5338-not-working
   //     [
   //       {
   //         name:      'data'                -- string   - Property name
@@ -9968,11 +7144,7 @@
   //         ]
   //       }
   //     ]
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _Api.register = _api_register = function ( name, val )
   {
     if ( $.isArray( name ) ) {
@@ -9981,21 +7153,13 @@
       }
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var
       i, ien,
       heir = name.split('.'),
       struct = __apiStruct,
       key, method;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var find = function ( src, name ) {
       for ( var i=0, ien=src.length ; i<ien ; i++ ) {
         if ( src[i].name === name ) {
@@ -10004,21 +7168,13 @@
       }
       return null;
     };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     for ( i=0, ien=heir.length ; i<ien ; i++ ) {
       method = heir[i].indexOf('()') !== -1;
       key = method ?
         heir[i].replace('()', '') :
         heir[i];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       var src = find( struct, key );
       if ( ! src ) {
         src = {
@@ -10029,11 +7185,7 @@
         };
         struct.push( src );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( i === ien-1 ) {
         src.val = val;
       }
@@ -10044,16 +7196,6 @@
       }
     }
   };
-<<<<<<< HEAD
-  
-  
-  _Api.registerPlural = _api_registerPlural = function ( pluralName, singularName, val ) {
-    _Api.register( pluralName, val );
-  
-    _Api.register( singularName, function () {
-      var ret = val.apply( this, arguments );
-  
-=======
 
 
   _Api.registerPlural = _api_registerPlural = function ( pluralName, singularName, val ) {
@@ -10062,7 +7204,6 @@
     _Api.register( singularName, function () {
       var ret = val.apply( this, arguments );
 
->>>>>>> hotfix-5338-not-working
       if ( ret === this ) {
         // Returned item is the API instance that was passed in, return it
         return this;
@@ -10076,22 +7217,13 @@
             ret[0] :
           undefined;
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Non-API return - just fire it back
       return ret;
     } );
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Selector for HTML tables. Apply the given selector to the give array of
    * DataTables settings objects.
@@ -10107,20 +7239,12 @@
     if ( typeof selector === 'number' ) {
       return [ a[ selector ] ];
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Perform a jQuery selector on the table nodes
     var nodes = $.map( a, function (el, i) {
       return el.nTable;
     } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return $(nodes)
       .filter( selector )
       .map( function (i) {
@@ -10130,15 +7254,9 @@
       } )
       .toArray();
   };
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Context selector for the API's context (i.e. the tables the API instance
    * refers to.
@@ -10156,95 +7274,55 @@
       new _Api( __table_selector( selector, this.context ) ) :
       this;
   } );
-<<<<<<< HEAD
-  
-  
-  _api_register( 'table()', function ( selector ) {
-    var tables = this.tables( selector );
-    var ctx = tables.context;
-  
-=======
 
 
   _api_register( 'table()', function ( selector ) {
     var tables = this.tables( selector );
     var ctx = tables.context;
 
->>>>>>> hotfix-5338-not-working
     // Truncate to the first matched table
     return ctx.length ?
       new _Api( ctx[0] ) :
       tables;
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'tables().nodes()', 'table().node()' , function () {
     return this.iterator( 'table', function ( ctx ) {
       return ctx.nTable;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'tables().body()', 'table().body()' , function () {
     return this.iterator( 'table', function ( ctx ) {
       return ctx.nTBody;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'tables().header()', 'table().header()' , function () {
     return this.iterator( 'table', function ( ctx ) {
       return ctx.nTHead;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'tables().footer()', 'table().footer()' , function () {
     return this.iterator( 'table', function ( ctx ) {
       return ctx.nTFoot;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'tables().containers()', 'table().container()' , function () {
     return this.iterator( 'table', function ( ctx ) {
       return ctx.nTableWrapper;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Redraw the tables in the current context.
    */
@@ -10259,24 +7337,14 @@
             false :
             true;
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         _fnReDraw( settings, paging===false );
       }
     } );
   } );
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get the current page index.
    *
@@ -10300,23 +7368,14 @@
     if ( action === undefined ) {
       return this.page.info().page; // not an expensive call
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   // else, have an action to take on all tables
     return this.iterator( 'table', function ( settings ) {
       _fnPageChange( settings, action );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Paging information for the first table in the current context.
    *
@@ -10339,22 +7398,14 @@
     if ( this.context.length === 0 ) {
       return undefined;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var
       settings   = this.context[0],
       start      = settings._iDisplayStart,
       len        = settings.oFeatures.bPaginate ? settings._iDisplayLength : -1,
       visRecords = settings.fnRecordsDisplay(),
       all        = len === -1;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return {
       "page":           all ? 0 : Math.floor( start / len ),
       "pages":          all ? 1 : Math.ceil( visRecords / len ),
@@ -10366,13 +7417,8 @@
       "serverSide":     _fnDataSource( settings ) === 'ssp'
     };
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get the current page length.
    *
@@ -10393,92 +7439,53 @@
         this.context[0]._iDisplayLength :
         undefined;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // else, set the page length
     return this.iterator( 'table', function ( settings ) {
       _fnLengthChange( settings, len );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   var __reload = function ( settings, holdPosition, callback ) {
     // Use the draw event to trigger a callback
     if ( callback ) {
       var api = new _Api( settings );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       api.one( 'draw', function () {
         callback( api.ajax.json() );
       } );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( _fnDataSource( settings ) == 'ssp' ) {
       _fnReDraw( settings, holdPosition );
     }
     else {
       _fnProcessingDisplay( settings, true );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Cancel an existing request
       var xhr = settings.jqXHR;
       if ( xhr && xhr.readyState !== 4 ) {
         xhr.abort();
       }
-<<<<<<< HEAD
-  
-      // Trigger xhr
-      _fnBuildAjax( settings, [], function( json ) {
-        _fnClearTable( settings );
-  
-=======
 
       // Trigger xhr
       _fnBuildAjax( settings, [], function( json ) {
         _fnClearTable( settings );
 
->>>>>>> hotfix-5338-not-working
         var data = _fnAjaxDataSrc( settings, json );
         for ( var i=0, ien=data.length ; i<ien ; i++ ) {
           _fnAddData( settings, data[i] );
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         _fnReDraw( settings, holdPosition );
         _fnProcessingDisplay( settings, false );
       } );
     }
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get the JSON response from the last Ajax request that DataTables made to the
    * server. Note that this returns the JSON from the first table in the current
@@ -10488,17 +7495,6 @@
    */
   _api_register( 'ajax.json()', function () {
     var ctx = this.context;
-<<<<<<< HEAD
-  
-    if ( ctx.length > 0 ) {
-      return ctx[0].json;
-    }
-  
-    // else return undefined;
-  } );
-  
-  
-=======
 
     if ( ctx.length > 0 ) {
       return ctx[0].json;
@@ -10508,23 +7504,11 @@
   } );
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get the data submitted in the last Ajax request
    */
   _api_register( 'ajax.params()', function () {
     var ctx = this.context;
-<<<<<<< HEAD
-  
-    if ( ctx.length > 0 ) {
-      return ctx[0].oAjaxData;
-    }
-  
-    // else return undefined;
-  } );
-  
-  
-=======
 
     if ( ctx.length > 0 ) {
       return ctx[0].oAjaxData;
@@ -10534,7 +7518,6 @@
   } );
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Reload tables from the Ajax data source. Note that this function will
    * automatically re-draw the table when the remote data has been loaded.
@@ -10549,13 +7532,8 @@
       __reload( settings, resetPaging===false, callback );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get the current Ajax URL. Note that this returns the URL from the first
    * table in the current context.
@@ -10570,33 +7548,21 @@
    */
   _api_register( 'ajax.url()', function ( url ) {
     var ctx = this.context;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( url === undefined ) {
       // get
       if ( ctx.length === 0 ) {
         return undefined;
       }
       ctx = ctx[0];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       return ctx.ajax ?
         $.isPlainObject( ctx.ajax ) ?
           ctx.ajax.url :
           ctx.ajax :
         ctx.sAjaxSource;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // set
     return this.iterator( 'table', function ( settings ) {
       if ( $.isPlainObject( settings.ajax ) ) {
@@ -10610,13 +7576,8 @@
       // value of `sAjaxSource` redundant.
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Load data from the newly set Ajax URL. Note that this method is only
    * available when `ajax.url()` is used to set a URL. Additionally, this method
@@ -10633,63 +7594,37 @@
       __reload( ctx, resetPaging===false, callback );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-  
-  
-=======
 
 
 
 
->>>>>>> hotfix-5338-not-working
   var _selector_run = function ( type, selector, selectFn, settings, opts )
   {
     var
       out = [], res,
       a, i, ien, j, jen,
       selectorType = typeof selector;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Can't just check for isArray here, as an API or jQuery instance might be
     // given with their array like look
     if ( ! selector || selectorType === 'string' || selectorType === 'function' || selector.length === undefined ) {
       selector = [ selector ];
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     for ( i=0, ien=selector.length ; i<ien ; i++ ) {
       a = selector[i] && selector[i].split ?
         selector[i].split(',') :
         [ selector[i] ];
-<<<<<<< HEAD
-  
-      for ( j=0, jen=a.length ; j<jen ; j++ ) {
-        res = selectFn( typeof a[j] === 'string' ? $.trim(a[j]) : a[j] );
-  
-=======
 
       for ( j=0, jen=a.length ; j<jen ; j++ ) {
         res = selectFn( typeof a[j] === 'string' ? $.trim(a[j]) : a[j] );
 
->>>>>>> hotfix-5338-not-working
         if ( res && res.length ) {
           out = out.concat( res );
         }
       }
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // selector extensions
     var ext = _ext.selector[ type ];
     if ( ext.length ) {
@@ -10697,52 +7632,31 @@
         out = ext[i]( settings, opts, out );
       }
     }
-<<<<<<< HEAD
-  
-    return _unique( out );
-  };
-  
-  
-=======
 
     return _unique( out );
   };
 
 
->>>>>>> hotfix-5338-not-working
   var _selector_opts = function ( opts )
   {
     if ( ! opts ) {
       opts = {};
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Backwards compatibility for 1.9- which used the terminology filter rather
     // than search
     if ( opts.filter && opts.search === undefined ) {
       opts.search = opts.filter;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return $.extend( {
       search: 'none',
       order: 'current',
       page: 'all'
     }, opts );
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   var _selector_first = function ( inst )
   {
     // Reduce the API instance to the first item found
@@ -10754,50 +7668,29 @@
         inst[0].length = 1;
         inst.length = 1;
         inst.context = [ inst.context[i] ];
-<<<<<<< HEAD
-  
-        return inst;
-      }
-    }
-  
-=======
 
         return inst;
       }
     }
 
->>>>>>> hotfix-5338-not-working
     // Not found - return an empty instance
     inst.length = 0;
     return inst;
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   var _selector_row_indexes = function ( settings, opts )
   {
     var
       i, ien, tmp, a=[],
       displayFiltered = settings.aiDisplay,
       displayMaster = settings.aiDisplayMaster;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var
       search = opts.search,  // none, applied, removed
       order  = opts.order,   // applied, current, index (original - compatibility with 1.9)
       page   = opts.page;    // all, current
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( _fnDataSource( settings ) == 'ssp' ) {
       // In server-side processing mode, most options are irrelevant since
       // rows not shown don't exist and the index order is the applied order
@@ -10831,11 +7724,7 @@
         }
         else { // applied | removed
           tmp = $.inArray( i, displayFiltered );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           if ((tmp === -1 && search == 'removed') ||
             (tmp >= 0   && search == 'applied') )
           {
@@ -10844,19 +7733,11 @@
         }
       }
     }
-<<<<<<< HEAD
-  
-    return a;
-  };
-  
-  
-=======
 
     return a;
   };
 
 
->>>>>>> hotfix-5338-not-working
   /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Rows
    *
@@ -10867,38 +7748,23 @@
    * {array}     - jQuery array of nodes, or simply an array of TR nodes
    *
    */
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   var __row_selector = function ( settings, selector, opts )
   {
     var run = function ( sel ) {
       var selInt = _intVal( sel );
       var i, ien;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Short cut - selector is a number and no options provided (default is
       // all records, so no need to check if the index is in there, since it
       // must be - dev error if the index doesn't exist).
       if ( selInt !== null && ! opts ) {
         return [ selInt ];
       }
-<<<<<<< HEAD
-  
-      var rows = _selector_row_indexes( settings, opts );
-  
-=======
 
       var rows = _selector_row_indexes( settings, opts );
 
->>>>>>> hotfix-5338-not-working
       if ( selInt !== null && $.inArray( selInt, rows ) !== -1 ) {
         // Selector - integer
         return [ selInt ];
@@ -10907,11 +7773,7 @@
         // Selector - none
         return rows;
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Selector - function
       if ( typeof sel === 'function' ) {
         return $.map( rows, function (idx) {
@@ -10919,20 +7781,12 @@
           return sel( idx, row._aData, row.nTr ) ? idx : null;
         } );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Get nodes in the order from the `rows` array with null values removed
       var nodes = _removeEmpty(
         _pluck_order( settings.aoData, rows, 'nTr' )
       );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Selector - node
       if ( sel.nodeName ) {
         if ( $.inArray( sel, nodes ) !== -1 ) {
@@ -10940,11 +7794,7 @@
                                        // and DataTables adds a prop for fast lookup
         }
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // ID selector. Want to always be able to select rows by id, regardless
       // of if the tr element has been created or not, so can't rely upon
       // jQuery here - hence a custom implementation. This does not match
@@ -10960,19 +7810,11 @@
         if ( rowObj !== undefined ) {
           return [ rowObj.idx ];
         }
-<<<<<<< HEAD
-  
-        // need to fall through to jQuery in case there is DOM id that
-        // matches
-      }
-  
-=======
 
         // need to fall through to jQuery in case there is DOM id that
         // matches
       }
 
->>>>>>> hotfix-5338-not-working
       // Selector - jQuery selector string, array of nodes or jQuery object/
       // As jQuery's .filter() allows jQuery objects to be passed in filter,
       // it also allows arrays, so this will cope with all three options
@@ -10983,19 +7825,11 @@
         } )
         .toArray();
     };
-<<<<<<< HEAD
-  
-    return _selector_run( 'row', selector, run, settings, opts );
-  };
-  
-  
-=======
 
     return _selector_run( 'row', selector, run, settings, opts );
   };
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'rows()', function ( selector, opts ) {
     // argument shifting
     if ( selector === undefined ) {
@@ -11005,22 +7839,6 @@
       opts = selector;
       selector = '';
     }
-<<<<<<< HEAD
-  
-    opts = _selector_opts( opts );
-  
-    var inst = this.iterator( 'table', function ( settings ) {
-      return __row_selector( settings, selector, opts );
-    }, 1 );
-  
-    // Want argument shifting here and in __row_selector?
-    inst.selector.rows = selector;
-    inst.selector.opts = opts;
-  
-    return inst;
-  } );
-  
-=======
 
     opts = _selector_opts( opts );
 
@@ -11035,38 +7853,25 @@
     return inst;
   } );
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'rows().nodes()', function () {
     return this.iterator( 'row', function ( settings, row ) {
       return settings.aoData[ row ].nTr || undefined;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'rows().data()', function () {
     return this.iterator( true, 'rows', function ( settings, rows ) {
       return _pluck_order( settings.aoData, rows, '_aData' );
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'rows().cache()', 'row().cache()', function ( type ) {
     return this.iterator( 'row', function ( settings, row ) {
       var r = settings.aoData[ row ];
       return type === 'search' ? r._aFilterData : r._aSortData;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'rows().invalidate()', 'row().invalidate()', function ( src ) {
     return this.iterator( 'row', function ( settings, row ) {
       _fnInvalidate( settings, row, src );
@@ -11078,19 +7883,11 @@
       return row;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  _api_registerPlural( 'rows().ids()', 'row().id()', function ( hash ) {
-    var a = [];
-    var context = this.context;
-  
-=======
 
   _api_registerPlural( 'rows().ids()', 'row().id()', function ( hash ) {
     var a = [];
     var context = this.context;
 
->>>>>>> hotfix-5338-not-working
     // `iterator` will drop undefined values, but in this case we want them
     for ( var i=0, ien=context.length ; i<ien ; i++ ) {
       for ( var j=0, jen=this[i].length ; j<jen ; j++ ) {
@@ -11098,15 +7895,6 @@
         a.push( (hash === true ? '#' : '' )+ id );
       }
     }
-<<<<<<< HEAD
-  
-    return new _Api( context, a );
-  } );
-  
-  _api_registerPlural( 'rows().remove()', 'row().remove()', function () {
-    var that = this;
-  
-=======
 
     return new _Api( context, a );
   } );
@@ -11114,39 +7902,24 @@
   _api_registerPlural( 'rows().remove()', 'row().remove()', function () {
     var that = this;
 
->>>>>>> hotfix-5338-not-working
     this.iterator( 'row', function ( settings, row, thatIdx ) {
       var data = settings.aoData;
       var rowData = data[ row ];
       var i, ien, j, jen;
       var loopRow, loopCells;
-<<<<<<< HEAD
-  
-      data.splice( row, 1 );
-  
-=======
 
       data.splice( row, 1 );
 
->>>>>>> hotfix-5338-not-working
       // Update the cached indexes
       for ( i=0, ien=data.length ; i<ien ; i++ ) {
         loopRow = data[i];
         loopCells = loopRow.anCells;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Rows
         if ( loopRow.nTr !== null ) {
           loopRow.nTr._DT_RowIndex = i;
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Cells
         if ( loopCells !== null ) {
           for ( j=0, jen=loopCells.length ; j<jen ; j++ ) {
@@ -11154,70 +7927,40 @@
           }
         }
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Delete from the display arrays
       _fnDeleteIndex( settings.aiDisplayMaster, row );
       _fnDeleteIndex( settings.aiDisplay, row );
       _fnDeleteIndex( that[ thatIdx ], row, false ); // maintain local indexes
-<<<<<<< HEAD
-  
-      // Check for an 'overflow' they case for displaying the table
-      _fnLengthOverflow( settings );
-  
-=======
 
       // Check for an 'overflow' they case for displaying the table
       _fnLengthOverflow( settings );
 
->>>>>>> hotfix-5338-not-working
       // Remove the row's ID reference if there is one
       var id = settings.rowIdFn( rowData._aData );
       if ( id !== undefined ) {
         delete settings.aIds[ id ];
       }
     } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     this.iterator( 'table', function ( settings ) {
       for ( var i=0, ien=settings.aoData.length ; i<ien ; i++ ) {
         settings.aoData[i].idx = i;
       }
     } );
-<<<<<<< HEAD
-  
-    return this;
-  } );
-  
-  
-=======
 
     return this;
   } );
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'rows.add()', function ( rows ) {
     var newRows = this.iterator( 'table', function ( settings ) {
         var row, i, ien;
         var out = [];
-<<<<<<< HEAD
-  
-        for ( i=0, ien=rows.length ; i<ien ; i++ ) {
-          row = rows[i];
-  
-=======
 
         for ( i=0, ien=rows.length ; i<ien ; i++ ) {
           row = rows[i];
 
->>>>>>> hotfix-5338-not-working
           if ( row.nodeName && row.nodeName.toUpperCase() === 'TR' ) {
             out.push( _fnAddTr( settings, row )[0] );
           }
@@ -11225,31 +7968,14 @@
             out.push( _fnAddData( settings, row ) );
           }
         }
-<<<<<<< HEAD
-  
-        return out;
-      }, 1 );
-  
-=======
 
         return out;
       }, 1 );
 
->>>>>>> hotfix-5338-not-working
     // Return an Api.rows() extended instance, so rows().nodes() etc can be used
     var modRows = this.rows( -1 );
     modRows.pop();
     $.merge( modRows, newRows );
-<<<<<<< HEAD
-  
-    return modRows;
-  } );
-  
-  
-  
-  
-  
-=======
 
     return modRows;
   } );
@@ -11258,48 +7984,23 @@
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    *
    */
   _api_register( 'row()', function ( selector, opts ) {
     return _selector_first( this.rows( selector, opts ) );
   } );
-<<<<<<< HEAD
-  
-  
-  _api_register( 'row().data()', function ( data ) {
-    var ctx = this.context;
-  
-=======
 
 
   _api_register( 'row().data()', function ( data ) {
     var ctx = this.context;
 
->>>>>>> hotfix-5338-not-working
     if ( data === undefined ) {
       // Get
       return ctx.length && this.length ?
         ctx[0].aoData[ this[0] ]._aData :
         undefined;
     }
-<<<<<<< HEAD
-  
-    // Set
-    ctx[0].aoData[ this[0] ]._aData = data;
-  
-    // Automatically invalidate
-    _fnInvalidate( ctx[0], this[0], 'data' );
-  
-    return this;
-  } );
-  
-  
-  _api_register( 'row().node()', function () {
-    var ctx = this.context;
-  
-=======
 
     // Set
     ctx[0].aoData[ this[0] ]._aData = data;
@@ -11314,44 +8015,25 @@
   _api_register( 'row().node()', function () {
     var ctx = this.context;
 
->>>>>>> hotfix-5338-not-working
     return ctx.length && this.length ?
       ctx[0].aoData[ this[0] ].nTr || null :
       null;
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'row.add()', function ( row ) {
     // Allow a jQuery object to be passed in - only a single row is added from
     // it though - the first element in the set
     if ( row instanceof $ && row.length ) {
       row = row[0];
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var rows = this.iterator( 'table', function ( settings ) {
       if ( row.nodeName && row.nodeName.toUpperCase() === 'TR' ) {
         return _fnAddTr( settings, row )[0];
       }
       return _fnAddData( settings, row );
     } );
-<<<<<<< HEAD
-  
-    // Return an Api.rows() extended instance, with the newly added row selected
-    return this.row( rows[0] );
-  } );
-  
-  
-  
-=======
 
     // Return an Api.rows() extended instance, with the newly added row selected
     return this.row( rows[0] );
@@ -11359,7 +8041,6 @@
 
 
 
->>>>>>> hotfix-5338-not-working
   var __details_add = function ( ctx, row, data, klass )
   {
     // Convert to array of TR elements
@@ -11372,11 +8053,7 @@
         }
         return;
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // If we get a TR element, then just add it directly - up to the dev
       // to add the correct number of columns etc
       if ( r.nodeName && r.nodeName.toLowerCase() === 'tr' ) {
@@ -11389,21 +8066,6 @@
           .addClass( k )
           .html( r )
           [0].colSpan = _fnVisbleColumns( ctx );
-<<<<<<< HEAD
-  
-        rows.push( created[0] );
-      }
-    };
-  
-    addRow( data, klass );
-  
-    if ( row._details ) {
-      row._details.remove();
-    }
-  
-    row._details = $(rows);
-  
-=======
 
         rows.push( created[0] );
       }
@@ -11417,26 +8079,11 @@
 
     row._details = $(rows);
 
->>>>>>> hotfix-5338-not-working
     // If the children were already shown, that state should be retained
     if ( row._detailsShow ) {
       row._details.insertAfter( row.nTr );
     }
   };
-<<<<<<< HEAD
-  
-  
-  var __details_remove = function ( api, idx )
-  {
-    var ctx = api.context;
-  
-    if ( ctx.length ) {
-      var row = ctx[0].aoData[ idx !== undefined ? idx : api[0] ];
-  
-      if ( row && row._details ) {
-        row._details.remove();
-  
-=======
 
 
   var __details_remove = function ( api, idx )
@@ -11449,25 +8096,11 @@
       if ( row && row._details ) {
         row._details.remove();
 
->>>>>>> hotfix-5338-not-working
         row._detailsShow = undefined;
         row._details = undefined;
       }
     }
   };
-<<<<<<< HEAD
-  
-  
-  var __details_display = function ( api, show ) {
-    var ctx = api.context;
-  
-    if ( ctx.length && api.length ) {
-      var row = ctx[0].aoData[ api[0] ];
-  
-      if ( row._details ) {
-        row._detailsShow = show;
-  
-=======
 
 
   var __details_display = function ( api, show ) {
@@ -11479,29 +8112,19 @@
       if ( row._details ) {
         row._detailsShow = show;
 
->>>>>>> hotfix-5338-not-working
         if ( show ) {
           row._details.insertAfter( row.nTr );
         }
         else {
           row._details.detach();
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         __details_events( ctx[0] );
       }
     }
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   var __details_events = function ( settings )
   {
     var api = new _Api( settings );
@@ -11510,59 +8133,31 @@
     var colvisEvent = 'column-visibility'+namespace;
     var destroyEvent = 'destroy'+namespace;
     var data = settings.aoData;
-<<<<<<< HEAD
-  
-    api.off( drawEvent +' '+ colvisEvent +' '+ destroyEvent );
-  
-=======
 
     api.off( drawEvent +' '+ colvisEvent +' '+ destroyEvent );
 
->>>>>>> hotfix-5338-not-working
     if ( _pluck( data, '_details' ).length > 0 ) {
       // On each draw, insert the required elements into the document
       api.on( drawEvent, function ( e, ctx ) {
         if ( settings !== ctx ) {
           return;
         }
-<<<<<<< HEAD
-  
-        api.rows( {page:'current'} ).eq(0).each( function (idx) {
-          // Internal data grab
-          var row = data[ idx ];
-  
-=======
 
         api.rows( {page:'current'} ).eq(0).each( function (idx) {
           // Internal data grab
           var row = data[ idx ];
 
->>>>>>> hotfix-5338-not-working
           if ( row._detailsShow ) {
             row._details.insertAfter( row.nTr );
           }
         } );
       } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Column visibility change - update the colspan
       api.on( colvisEvent, function ( e, ctx, idx, vis ) {
         if ( settings !== ctx ) {
           return;
         }
-<<<<<<< HEAD
-  
-        // Update the colspan for the details rows (note, only if it already has
-        // a colspan)
-        var row, visible = _fnVisbleColumns( ctx );
-  
-        for ( var i=0, ien=data.length ; i<ien ; i++ ) {
-          row = data[i];
-  
-=======
 
         // Update the colspan for the details rows (note, only if it already has
         // a colspan)
@@ -11571,27 +8166,18 @@
         for ( var i=0, ien=data.length ; i<ien ; i++ ) {
           row = data[i];
 
->>>>>>> hotfix-5338-not-working
           if ( row._details ) {
             row._details.children('td[colspan]').attr('colspan', visible );
           }
         }
       } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Table destroyed - nuke any child rows
       api.on( destroyEvent, function ( e, ctx ) {
         if ( settings !== ctx ) {
           return;
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         for ( var i=0, ien=data.length ; i<ien ; i++ ) {
           if ( data[i]._details ) {
             __details_remove( api, i );
@@ -11600,31 +8186,19 @@
       } );
     }
   };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   // Strings for the method names to help minification
   var _emp = '';
   var _child_obj = _emp+'row().child';
   var _child_mth = _child_obj+'()';
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   // data can be:
   //  tr
   //  string
   //  jQuery or array of any of the above
   _api_register( _child_mth, function ( data, klass ) {
     var ctx = this.context;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( data === undefined ) {
       // get
       return ctx.length && this.length ?
@@ -11643,19 +8217,11 @@
       // set
       __details_add( ctx[0], ctx[0].aoData[ this[0] ], data, klass );
     }
-<<<<<<< HEAD
-  
-    return this;
-  } );
-  
-  
-=======
 
     return this;
   } );
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( [
     _child_obj+'.show()',
     _child_mth+'.show()' // only when `child()` was called with parameters (without
@@ -11663,13 +8229,8 @@
     __details_display( this, true );
     return this;
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( [
     _child_obj+'.hide()',
     _child_mth+'.hide()' // only when `child()` was called with parameters (without
@@ -11677,13 +8238,8 @@
     __details_display( this, false );
     return this;
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( [
     _child_obj+'.remove()',
     _child_mth+'.remove()' // only when `child()` was called with parameters (without
@@ -11691,34 +8247,20 @@
     __details_remove( this );
     return this;
   } );
-<<<<<<< HEAD
-  
-  
-  _api_register( _child_obj+'.isShown()', function () {
-    var ctx = this.context;
-  
-=======
 
 
   _api_register( _child_obj+'.isShown()', function () {
     var ctx = this.context;
 
->>>>>>> hotfix-5338-not-working
     if ( ctx.length && this.length ) {
       // _detailsShown as false or undefined will fall through to return false
       return ctx[0].aoData[ this[0] ]._detailsShow || false;
     }
     return false;
   } );
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
    * Columns
    *
@@ -11729,15 +8271,6 @@
    * "{string}"          - jQuery selector on column header nodes
    *
    */
-<<<<<<< HEAD
-  
-  // can be an array of these items, comma separated list, or an array of comma
-  // separated lists
-  
-  var __re_column_selector = /^(.+):(name|visIdx|visible)$/;
-  
-  
-=======
 
   // can be an array of these items, comma separated list, or an array of comma
   // separated lists
@@ -11745,7 +8278,6 @@
   var __re_column_selector = /^(.+):(name|visIdx|visible)$/;
 
 
->>>>>>> hotfix-5338-not-working
   // r1 and r2 are redundant - but it means that the parameters match for the
   // iterator callback in columns().data()
   var __columnData = function ( settings, column, r1, r2, rows ) {
@@ -11755,39 +8287,23 @@
     }
     return a;
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   var __column_selector = function ( settings, selector, opts )
   {
     var
       columns = settings.aoColumns,
       names = _pluck( columns, 'sName' ),
       nodes = _pluck( columns, 'nTh' );
-<<<<<<< HEAD
-  
-    var run = function ( s ) {
-      var selInt = _intVal( s );
-  
-=======
 
     var run = function ( s ) {
       var selInt = _intVal( s );
 
->>>>>>> hotfix-5338-not-working
       // Selector - all
       if ( s === '' ) {
         return _range( columns.length );
       }
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> hotfix-5338-not-working
       // Selector - index
       if ( selInt !== null ) {
         return [ selInt >= 0 ?
@@ -11795,19 +8311,11 @@
           columns.length + selInt // Count from right (+ because its a negative value)
         ];
       }
-<<<<<<< HEAD
-      
-      // Selector = function
-      if ( typeof s === 'function' ) {
-        var rows = _selector_row_indexes( settings, opts );
-  
-=======
 
       // Selector = function
       if ( typeof s === 'function' ) {
         var rows = _selector_row_indexes( settings, opts );
 
->>>>>>> hotfix-5338-not-working
         return $.map( columns, function (col, idx) {
           return s(
               idx,
@@ -11816,20 +8324,12 @@
             ) ? idx : null;
         } );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // jQuery or string selector
       var match = typeof s === 'string' ?
         s.match( __re_column_selector ) :
         '';
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( match ) {
         switch( match[2] ) {
           case 'visIdx':
@@ -11845,11 +8345,7 @@
             }
             // Counting from the left
             return [ _fnVisibleToColumnIndex( settings, idx ) ];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           case 'name':
             // match by name. `names` is column index complete and in order
             return $.map( names, function (name, i) {
@@ -11867,66 +8363,38 @@
           .toArray();
       }
     };
-<<<<<<< HEAD
-  
-    return _selector_run( 'column', selector, run, settings, opts );
-  };
-  
-  
-=======
 
     return _selector_run( 'column', selector, run, settings, opts );
   };
 
 
->>>>>>> hotfix-5338-not-working
   var __setColumnVis = function ( settings, column, vis, recalc ) {
     var
       cols = settings.aoColumns,
       col  = cols[ column ],
       data = settings.aoData,
       row, cells, i, ien, tr;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Get
     if ( vis === undefined ) {
       return col.bVisible;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Set
     // No change
     if ( col.bVisible === vis ) {
       return;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   if ( vis ) {
       // Insert column
       // Need to decide if we should use appendChild or insertBefore
       var insertBefore = $.inArray( true, _pluck(cols, 'bVisible'), column+1 );
-<<<<<<< HEAD
-  
-      for ( i=0, ien=data.length ; i<ien ; i++ ) {
-        tr = data[i].nTr;
-        cells = data[i].anCells;
-  
-=======
 
       for ( i=0, ien=data.length ; i<ien ; i++ ) {
         tr = data[i].nTr;
         cells = data[i].anCells;
 
->>>>>>> hotfix-5338-not-working
         if ( tr ) {
           // insertBefore can act like appendChild if 2nd arg is null
           tr.insertBefore( cells[ column ], cells[ insertBefore ] || null );
@@ -11937,42 +8405,21 @@
       // Remove column
       $( _pluck( settings.aoData, 'anCells', column ) ).detach();
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Common actions
     col.bVisible = vis;
     _fnDrawHead( settings, settings.aoHeader );
     _fnDrawHead( settings, settings.aoFooter );
-<<<<<<< HEAD
-  
-    if ( recalc === undefined || recalc ) {
-      // Automatically adjust column sizing
-      _fnAdjustColumnSizing( settings );
-  
-=======
 
     if ( recalc === undefined || recalc ) {
       // Automatically adjust column sizing
       _fnAdjustColumnSizing( settings );
 
->>>>>>> hotfix-5338-not-working
       // Realign columns for scrolling
       if ( settings.oScroll.sX || settings.oScroll.sY ) {
         _fnScrollDraw( settings );
       }
     }
-<<<<<<< HEAD
-  
-    _fnCallbackFire( settings, null, 'column-visibility', [settings, column, vis, recalc] );
-  
-    _fnSaveState( settings );
-  };
-  
-  
-=======
 
     _fnCallbackFire( settings, null, 'column-visibility', [settings, column, vis, recalc] );
 
@@ -11980,7 +8427,6 @@
   };
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'columns()', function ( selector, opts ) {
     // argument shifting
     if ( selector === undefined ) {
@@ -11990,22 +8436,6 @@
       opts = selector;
       selector = '';
     }
-<<<<<<< HEAD
-  
-    opts = _selector_opts( opts );
-  
-    var inst = this.iterator( 'table', function ( settings ) {
-      return __column_selector( settings, selector, opts );
-    }, 1 );
-  
-    // Want argument shifting here and in _row_selector?
-    inst.selector.cols = selector;
-    inst.selector.opts = opts;
-  
-    return inst;
-  } );
-  
-=======
 
     opts = _selector_opts( opts );
 
@@ -12020,45 +8450,28 @@
     return inst;
   } );
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'columns().header()', 'column().header()', function ( selector, opts ) {
     return this.iterator( 'column', function ( settings, column ) {
       return settings.aoColumns[column].nTh;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'columns().footer()', 'column().footer()', function ( selector, opts ) {
     return this.iterator( 'column', function ( settings, column ) {
       return settings.aoColumns[column].nTf;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  _api_registerPlural( 'columns().data()', 'column().data()', function () {
-    return this.iterator( 'column-rows', __columnData, 1 );
-  } );
-  
-=======
 
   _api_registerPlural( 'columns().data()', 'column().data()', function () {
     return this.iterator( 'column-rows', __columnData, 1 );
   } );
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'columns().dataSrc()', 'column().dataSrc()', function () {
     return this.iterator( 'column', function ( settings, column ) {
       return settings.aoColumns[column].mData;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'columns().cache()', 'column().cache()', function ( type ) {
     return this.iterator( 'column-rows', function ( settings, column, i, j, rows ) {
       return _pluck_order( settings.aoData, rows,
@@ -12066,21 +8479,13 @@
       );
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'columns().nodes()', 'column().nodes()', function () {
     return this.iterator( 'column-rows', function ( settings, column, i, j, rows ) {
       return _pluck_order( settings.aoData, rows, 'anCells', column ) ;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'columns().visible()', 'column().visible()', function ( vis, calc ) {
     return this.iterator( 'column', function ( settings, column ) {
       if ( vis === undefined ) {
@@ -12089,11 +8494,7 @@
       __setColumnVis( settings, column, vis, calc );
     } );
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'columns().indexes()', 'column().index()', function ( type ) {
     return this.iterator( 'column', function ( settings, column ) {
       return type === 'visible' ?
@@ -12101,29 +8502,17 @@
         column;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'columns.adjust()', function () {
     return this.iterator( 'table', function ( settings ) {
       _fnAdjustColumnSizing( settings );
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  _api_register( 'column.index()', function ( type, idx ) {
-    if ( this.context.length !== 0 ) {
-      var ctx = this.context[0];
-  
-=======
 
   _api_register( 'column.index()', function ( type, idx ) {
     if ( this.context.length !== 0 ) {
       var ctx = this.context[0];
 
->>>>>>> hotfix-5338-not-working
       if ( type === 'fromVisible' || type === 'toData' ) {
         return _fnVisibleToColumnIndex( ctx, idx );
       }
@@ -12132,16 +8521,6 @@
       }
     }
   } );
-<<<<<<< HEAD
-  
-  _api_register( 'column()', function ( selector, opts ) {
-    return _selector_first( this.columns( selector, opts ) );
-  } );
-  
-  
-  
-  
-=======
 
   _api_register( 'column()', function ( selector, opts ) {
     return _selector_first( this.columns( selector, opts ) );
@@ -12150,7 +8529,6 @@
 
 
 
->>>>>>> hotfix-5338-not-working
   var __cell_selector = function ( settings, selector, opts )
   {
     var data = settings.aoData;
@@ -12160,19 +8538,6 @@
     var row;
     var columns = settings.aoColumns.length;
     var a, i, ien, j, o, host;
-<<<<<<< HEAD
-  
-    var run = function ( s ) {
-      var fnSelector = typeof s === 'function';
-  
-      if ( s === null || s === undefined || fnSelector ) {
-        // All cells and function selectors
-        a = [];
-  
-        for ( i=0, ien=rows.length ; i<ien ; i++ ) {
-          row = rows[i];
-  
-=======
 
     var run = function ( s ) {
       var fnSelector = typeof s === 'function';
@@ -12184,25 +8549,16 @@
         for ( i=0, ien=rows.length ; i<ien ; i++ ) {
           row = rows[i];
 
->>>>>>> hotfix-5338-not-working
           for ( j=0 ; j<columns ; j++ ) {
             o = {
               row: row,
               column: j
             };
-<<<<<<< HEAD
-  
-            if ( fnSelector ) {
-              // Selector - function
-              host = data[ row ];
-  
-=======
 
             if ( fnSelector ) {
               // Selector - function
               host = data[ row ];
 
->>>>>>> hotfix-5338-not-working
               if ( s( o, _fnGetCellData(settings, row, j), host.anCells ? host.anCells[j] : null ) ) {
                 a.push( o );
               }
@@ -12213,26 +8569,15 @@
             }
           }
         }
-<<<<<<< HEAD
-  
-        return a;
-      }
-      
-=======
 
         return a;
       }
 
->>>>>>> hotfix-5338-not-working
       // Selector - index
       if ( $.isPlainObject( s ) ) {
         return [s];
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Selector - jQuery filtered cells
       return allCells
         .filter( s )
@@ -12244,15 +8589,6 @@
         } )
         .toArray();
     };
-<<<<<<< HEAD
-  
-    return _selector_run( 'cell', selector, run, settings, opts );
-  };
-  
-  
-  
-  
-=======
 
     return _selector_run( 'cell', selector, run, settings, opts );
   };
@@ -12260,7 +8596,6 @@
 
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'cells()', function ( rowSelector, columnSelector, opts ) {
     // Argument shifting
     if ( $.isPlainObject( rowSelector ) ) {
@@ -12280,37 +8615,22 @@
       opts = columnSelector;
       columnSelector = null;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Cell selector
     if ( columnSelector === null || columnSelector === undefined ) {
       return this.iterator( 'table', function ( settings ) {
         return __cell_selector( settings, rowSelector, _selector_opts( opts ) );
       } );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Row + column selector
     var columns = this.columns( columnSelector, opts );
     var rows = this.rows( rowSelector, opts );
     var a, i, ien, j, jen;
-<<<<<<< HEAD
-  
-    var cells = this.iterator( 'table', function ( settings, idx ) {
-      a = [];
-  
-=======
 
     var cells = this.iterator( 'table', function ( settings, idx ) {
       a = [];
 
->>>>>>> hotfix-5338-not-working
       for ( i=0, ien=rows[idx].length ; i<ien ; i++ ) {
         for ( j=0, jen=columns[idx].length ; j<jen ; j++ ) {
           a.push( {
@@ -12319,35 +8639,20 @@
           } );
         }
       }
-<<<<<<< HEAD
-  
-      return a;
-    }, 1 );
-  
-=======
 
       return a;
     }, 1 );
 
->>>>>>> hotfix-5338-not-working
     $.extend( cells.selector, {
       cols: columnSelector,
       rows: rowSelector,
       opts: opts
     } );
-<<<<<<< HEAD
-  
-    return cells;
-  } );
-  
-  
-=======
 
     return cells;
   } );
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'cells().nodes()', 'cell().node()', function () {
     return this.iterator( 'cell', function ( settings, row, column ) {
       var cells = settings.aoData[ row ].anCells;
@@ -12356,54 +8661,31 @@
         undefined;
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'cells().data()', function () {
     return this.iterator( 'cell', function ( settings, row, column ) {
       return _fnGetCellData( settings, row, column );
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-  _api_registerPlural( 'cells().cache()', 'cell().cache()', function ( type ) {
-    type = type === 'search' ? '_aFilterData' : '_aSortData';
-  
-=======
 
 
   _api_registerPlural( 'cells().cache()', 'cell().cache()', function ( type ) {
     type = type === 'search' ? '_aFilterData' : '_aSortData';
 
->>>>>>> hotfix-5338-not-working
     return this.iterator( 'cell', function ( settings, row, column ) {
       return settings.aoData[ row ][ type ][ column ];
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'cells().render()', 'cell().render()', function ( type ) {
     return this.iterator( 'cell', function ( settings, row, column ) {
       return _fnGetCellData( settings, row, column, type );
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'cells().indexes()', 'cell().index()', function () {
     return this.iterator( 'cell', function ( settings, row, column ) {
       return {
@@ -12413,32 +8695,13 @@
       };
     }, 1 );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural( 'cells().invalidate()', 'cell().invalidate()', function ( src ) {
     return this.iterator( 'cell', function ( settings, row, column ) {
       _fnInvalidate( settings, row, src, column );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-  
-  _api_register( 'cell()', function ( rowSelector, columnSelector, opts ) {
-    return _selector_first( this.cells( rowSelector, columnSelector, opts ) );
-  } );
-  
-  
-  _api_register( 'cell().data()', function ( data ) {
-    var ctx = this.context;
-    var cell = this[0];
-  
-=======
 
 
 
@@ -12451,25 +8714,12 @@
     var ctx = this.context;
     var cell = this[0];
 
->>>>>>> hotfix-5338-not-working
     if ( data === undefined ) {
       // Get
       return ctx.length && cell.length ?
         _fnGetCellData( ctx[0], cell[0].row, cell[0].column ) :
         undefined;
     }
-<<<<<<< HEAD
-  
-    // Set
-    _fnSetCellData( ctx[0], cell[0].row, cell[0].column, data );
-    _fnInvalidate( ctx[0], cell[0].row, 'data', cell[0].column );
-  
-    return this;
-  } );
-  
-  
-  
-=======
 
     // Set
     _fnSetCellData( ctx[0], cell[0].row, cell[0].column, data );
@@ -12480,7 +8730,6 @@
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get current ordering (sorting) that has been applied to the table.
    *
@@ -12511,22 +8760,14 @@
    */
   _api_register( 'order()', function ( order, dir ) {
     var ctx = this.context;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( order === undefined ) {
       // get
       return ctx.length !== 0 ?
         ctx[0].aaSorting :
         undefined;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // set
     if ( typeof order === 'number' ) {
       // Simple column / direction passed in
@@ -12537,22 +8778,13 @@
       order = Array.prototype.slice.call( arguments );
     }
     // otherwise a 2D array was passed in
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return this.iterator( 'table', function ( settings ) {
       settings.aaSorting = order.slice();
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Attach a sort listener to an element for a given column
    *
@@ -12568,69 +8800,32 @@
       _fnSortAttachListener( settings, node, column, callback );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'order.fixed()', function ( set ) {
     if ( ! set ) {
       var ctx = this.context;
       var fixed = ctx.length ?
         ctx[0].aaSortingFixed :
         undefined;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       return $.isArray( fixed ) ?
         { pre: fixed } :
         fixed;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return this.iterator( 'table', function ( settings ) {
       settings.aaSortingFixed = $.extend( true, {}, set );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   // Order by the selected column(s)
   _api_register( [
     'columns().order()',
     'column().order()'
   ], function ( dir ) {
     var that = this;
-<<<<<<< HEAD
-  
-    return this.iterator( 'table', function ( settings, i ) {
-      var sort = [];
-  
-      $.each( that[i], function (j, col) {
-        sort.push( [ col, dir ] );
-      } );
-  
-      settings.aaSorting = sort;
-    } );
-  } );
-  
-  
-  
-  _api_register( 'search()', function ( input, regex, smart, caseInsen ) {
-    var ctx = this.context;
-  
-=======
 
     return this.iterator( 'table', function ( settings, i ) {
       var sort = [];
@@ -12648,28 +8843,19 @@
   _api_register( 'search()', function ( input, regex, smart, caseInsen ) {
     var ctx = this.context;
 
->>>>>>> hotfix-5338-not-working
     if ( input === undefined ) {
       // get
       return ctx.length !== 0 ?
         ctx[0].oPreviousSearch.sSearch :
         undefined;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // set
     return this.iterator( 'table', function ( settings ) {
       if ( ! settings.oFeatures.bFilter ) {
         return;
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       _fnFilterComplete( settings, $.extend( {}, settings.oPreviousSearch, {
         "sSearch": input+"",
         "bRegex":  regex === null ? false : regex,
@@ -12678,121 +8864,71 @@
       } ), 1 );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_registerPlural(
     'columns().search()',
     'column().search()',
     function ( input, regex, smart, caseInsen ) {
       return this.iterator( 'column', function ( settings, column ) {
         var preSearch = settings.aoPreSearchCols;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( input === undefined ) {
           // get
           return preSearch[ column ].sSearch;
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // set
         if ( ! settings.oFeatures.bFilter ) {
           return;
         }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         $.extend( preSearch[ column ], {
           "sSearch": input+"",
           "bRegex":  regex === null ? false : regex,
           "bSmart":  smart === null ? true  : smart,
           "bCaseInsensitive": caseInsen === null ? true : caseInsen
         } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         _fnFilterComplete( settings, settings.oPreviousSearch, 1 );
       } );
     }
   );
-<<<<<<< HEAD
-  
-  /*
-   * State API methods
-   */
-  
-=======
 
   /*
    * State API methods
    */
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'state()', function () {
     return this.context.length ?
       this.context[0].oSavedState :
       null;
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'state.clear()', function () {
     return this.iterator( 'table', function ( settings ) {
       // Save an empty object
       settings.fnStateSaveCallback.call( settings.oInstance, settings, {} );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'state.loaded()', function () {
     return this.context.length ?
       this.context[0].oLoadedState :
       null;
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'state.save()', function () {
     return this.iterator( 'table', function ( settings ) {
       _fnSaveState( settings );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Provide a common method for plug-ins to check the version of DataTables being
    * used, in order to ensure compatibility.
@@ -12813,34 +8949,15 @@
     var aThis = DataTable.version.split('.');
     var aThat = version.split('.');
     var iThis, iThat;
-<<<<<<< HEAD
-  
-    for ( var i=0, iLen=aThat.length ; i<iLen ; i++ ) {
-      iThis = parseInt( aThis[i], 10 ) || 0;
-      iThat = parseInt( aThat[i], 10 ) || 0;
-  
-=======
 
     for ( var i=0, iLen=aThat.length ; i<iLen ; i++ ) {
       iThis = parseInt( aThis[i], 10 ) || 0;
       iThat = parseInt( aThat[i], 10 ) || 0;
 
->>>>>>> hotfix-5338-not-working
       // Parts are the same, keep comparing
       if (iThis === iThat) {
         continue;
       }
-<<<<<<< HEAD
-  
-      // Parts are different, return immediately
-      return iThis > iThat;
-    }
-  
-    return true;
-  };
-  
-  
-=======
 
       // Parts are different, return immediately
       return iThis > iThat;
@@ -12850,7 +8967,6 @@
   };
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Check if a `<table>` node is a DataTable table already or not.
    *
@@ -12870,36 +8986,20 @@
   {
     var t = $(table).get(0);
     var is = false;
-<<<<<<< HEAD
-  
-    $.each( DataTable.settings, function (i, o) {
-      var head = o.nScrollHead ? $('table', o.nScrollHead)[0] : null;
-      var foot = o.nScrollFoot ? $('table', o.nScrollFoot)[0] : null;
-  
-=======
 
     $.each( DataTable.settings, function (i, o) {
       var head = o.nScrollHead ? $('table', o.nScrollHead)[0] : null;
       var foot = o.nScrollFoot ? $('table', o.nScrollFoot)[0] : null;
 
->>>>>>> hotfix-5338-not-working
       if ( o.nTable === t || head === t || foot === t ) {
         is = true;
       }
     } );
-<<<<<<< HEAD
-  
-    return is;
-  };
-  
-  
-=======
 
     return is;
   };
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Get all DataTable tables that have been initialised - optionally you can
    * select to get only currently visible tables.
@@ -12919,47 +9019,27 @@
   DataTable.tables = DataTable.fnTables = function ( visible )
   {
     var api = false;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( $.isPlainObject( visible ) ) {
       api = visible.api;
       visible = visible.visible;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     var a = $.map( DataTable.settings, function (o) {
       if ( !visible || (visible && $(o.nTable).is(':visible')) ) {
         return o.nTable;
       }
     } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return api ?
       new _Api( a ) :
       a;
   };
-<<<<<<< HEAD
-  
-  
-  /**
-   * DataTables utility methods
-   * 
-=======
 
 
   /**
    * DataTables utility methods
    *
->>>>>>> hotfix-5338-not-working
    * This namespace provides helper methods that DataTables uses internally to
    * create a DataTable, but which are not exclusively used only for DataTables.
    * These methods can be used by extension authors to save the duplication of
@@ -12977,13 +9057,8 @@
      * @return {function} Wrapped function
      */
     throttle: _fnThrottle,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Escape a string such that it can be used in a regular expression
      *
@@ -12992,13 +9067,8 @@
      */
     escapeRegex: _fnEscapeRegex
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Convert from camel case parameters to Hungarian notation. This is made public
    * for the extensions to provide the same ability as DataTables core to accept
@@ -13013,15 +9083,9 @@
    *    won't be.
    */
   DataTable.camelToHungarian = _fnCamelToHungarian;
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    *
    */
@@ -13029,67 +9093,36 @@
     var
       rows   = this.rows( opts ).nodes(), // Get all rows
       jqRows = $(rows);
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return $( [].concat(
       jqRows.filter( selector ).toArray(),
       jqRows.find( selector ).toArray()
     ) );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   // jQuery functions to operate on the tables
   $.each( [ 'on', 'one', 'off' ], function (i, key) {
     _api_register( key+'()', function ( /* event, handler */ ) {
       var args = Array.prototype.slice.call(arguments);
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Add the `dt` namespace automatically if it isn't already present
       if ( ! args[0].match(/\.dt\b/) ) {
         args[0] += '.dt';
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       var inst = $( this.tables().nodes() );
       inst[key].apply( inst, args );
       return this;
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'clear()', function () {
     return this.iterator( 'table', function ( settings ) {
       _fnClearTable( settings );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-  _api_register( 'settings()', function () {
-    return new _Api( this.context, this.context );
-  } );
-  
-  
-=======
 
 
   _api_register( 'settings()', function () {
@@ -13097,36 +9130,22 @@
   } );
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'init()', function () {
     var ctx = this.context;
     return ctx.length ? ctx[0].oInit : null;
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   _api_register( 'data()', function () {
     return this.iterator( 'table', function ( settings ) {
       return _pluck( settings.aoData, '_aData' );
     } ).flatten();
   } );
-<<<<<<< HEAD
-  
-  
-  _api_register( 'destroy()', function ( remove ) {
-    remove = remove || false;
-  
-=======
 
 
   _api_register( 'destroy()', function ( remove ) {
     remove = remove || false;
 
->>>>>>> hotfix-5338-not-working
     return this.iterator( 'table', function ( settings ) {
       var orig      = settings.nTableWrapper.parentNode;
       var classes   = settings.oClasses;
@@ -13139,16 +9158,6 @@
       var jqWrapper = $(settings.nTableWrapper);
       var rows      = $.map( settings.aoData, function (r) { return r.nTr; } );
       var i, ien;
-<<<<<<< HEAD
-  
-      // Flag to note that the table is currently being destroyed - no action
-      // should be taken
-      settings.bDestroying = true;
-  
-      // Fire off the destroy callbacks for plug-ins etc
-      _fnCallbackFire( settings, "aoDestroyCallback", "destroy", [settings] );
-  
-=======
 
       // Flag to note that the table is currently being destroyed - no action
       // should be taken
@@ -13157,53 +9166,27 @@
       // Fire off the destroy callbacks for plug-ins etc
       _fnCallbackFire( settings, "aoDestroyCallback", "destroy", [settings] );
 
->>>>>>> hotfix-5338-not-working
       // If not being removed from the document, make all columns visible
       if ( ! remove ) {
         new _Api( settings ).columns().visible( true );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Blitz all `DT` namespaced events (these are internal events, the
       // lowercase, `dt` events are user subscribed and they are responsible
       // for removing them
       jqWrapper.unbind('.DT').find(':not(tbody *)').unbind('.DT');
       $(window).unbind('.DT-'+settings.sInstance);
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // When scrolling we had to break the table up - restore it
       if ( table != thead.parentNode ) {
         jqTable.children('thead').detach();
         jqTable.append( thead );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( tfoot && table != tfoot.parentNode ) {
         jqTable.children('tfoot').detach();
         jqTable.append( tfoot );
       }
-<<<<<<< HEAD
-  
-      settings.aaSorting = [];
-      settings.aaSortingFixed = [];
-      _fnSortingClasses( settings );
-  
-      $( rows ).removeClass( settings.asStripeClasses.join(' ') );
-  
-      $('th, td', thead).removeClass( classes.sSortable+' '+
-        classes.sSortableAsc+' '+classes.sSortableDesc+' '+classes.sSortableNone
-      );
-  
-=======
 
       settings.aaSorting = [];
       settings.aaSortingFixed = [];
@@ -13215,7 +9198,6 @@
         classes.sSortableAsc+' '+classes.sSortableDesc+' '+classes.sSortableNone
       );
 
->>>>>>> hotfix-5338-not-working
       if ( settings.bJUI ) {
         $('th span.'+classes.sSortIcon+ ', td span.'+classes.sSortIcon, thead).detach();
         $('th, td', thead).each( function () {
@@ -13228,59 +9210,35 @@
       // Add the TR elements back into the table in their original order
       jqTbody.children().detach();
       jqTbody.append( rows );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // Remove the DataTables generated nodes, events and classes
       var removedMethod = remove ? 'remove' : 'detach';
       jqTable[ removedMethod ]();
       jqWrapper[ removedMethod ]();
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       // If we need to reattach the table to the document
       if ( ! remove && orig ) {
         // insertBefore acts like appendChild if !arg[1]
         orig.insertBefore( table, settings.nTableReinsertBefore );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Restore the width of the original table - was read from the style property,
         // so we can restore directly to that
         jqTable
           .css( 'width', settings.sDestroyWidth )
           .removeClass( classes.sTable );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // If the were originally stripe classes - then we add them back here.
         // Note this is not fool proof (for example if not all rows had stripe
         // classes - but it's a good effort without getting carried away
         ien = settings.asDestroyStripes.length;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         if ( ien ) {
           jqTbody.children().each( function (i) {
             $(this).addClass( settings.asDestroyStripes[i % ien] );
           } );
         }
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /* Remove the settings object from the settings array */
       var idx = $.inArray( settings, DataTable.settings );
       if ( idx !== -1 ) {
@@ -13288,23 +9246,14 @@
       }
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   // Add the `every()` method for rows, columns and cells in a compact form
   $.each( [ 'column', 'row', 'cell' ], function ( i, type ) {
     _api_register( type+'s().every()', function ( fn ) {
       var opts = this.selector.opts;
       var api = this;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       return this.iterator( type, function ( settings, arg1, arg2, arg3, arg4 ) {
         // Rows and columns:
         //  arg1 - index
@@ -13327,41 +9276,24 @@
       } );
     } );
   } );
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   // i18n method for extensions to be able to use the language object from the
   // DataTable
   _api_register( 'i18n()', function ( token, def, plural ) {
     var ctx = this.context[0];
     var resolved = _fnGetObjectDataFn( token )( ctx.oLanguage );
-<<<<<<< HEAD
-  
-    if ( resolved === undefined ) {
-      resolved = def;
-    }
-  
-=======
 
     if ( resolved === undefined ) {
       resolved = def;
     }
 
->>>>>>> hotfix-5338-not-working
     if ( plural !== undefined && $.isPlainObject( resolved ) ) {
       resolved = resolved[ plural ] !== undefined ?
         resolved[ plural ] :
         resolved._;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     return resolved.replace( '%d', plural ); // nb: plural might be undefined,
   } );
 
@@ -13396,15 +9328,9 @@
    *  @namespace
    */
   DataTable.models = {};
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Template object for the way in which DataTables holds information about
    * search information for the global filter and individual column filters.
@@ -13417,22 +9343,14 @@
      *  @default true
      */
     "bCaseInsensitive": true,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Applied search term
      *  @type string
      *  @default <i>Empty string</i>
      */
     "sSearch": "",
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Flag to indicate if the search term should be interpreted as a
      * regular expression (true) or not (false) and therefore and special
@@ -13441,11 +9359,7 @@
      *  @default false
      */
     "bRegex": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Flag to indicate if DataTables is to use its smart filtering or not.
      *  @type boolean
@@ -13453,17 +9367,10 @@
      */
     "bSmart": true
   };
-<<<<<<< HEAD
-  
-  
-  
-  
-=======
 
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Template object for the way in which DataTables holds information about
    * each individual row. This is the object format used for the settings
@@ -13477,11 +9384,7 @@
      *  @default null
      */
     "nTr": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Array of TD elements for each row. This is null until the row has been
      * created.
@@ -13489,11 +9392,7 @@
      *  @default []
      */
     "anCells": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Data object from the original data source for the row. This is either
      * an array if using the traditional form of DataTables, or an object if
@@ -13504,11 +9403,7 @@
      *  @default []
      */
     "_aData": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Sorting data cache - this array is ostensibly the same length as the
      * number of columns (although each index is generated only as it is
@@ -13522,11 +9417,7 @@
      *  @private
      */
     "_aSortData": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Per cell filtering data cache. As per the sort data cache, used to
      * increase the performance of the filtering in DataTables
@@ -13535,11 +9426,7 @@
      *  @private
      */
     "_aFilterData": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Filtering data cache. This is the same as the cell filtering cache, but
      * in this case a string rather than an array. This is easily computed with
@@ -13550,11 +9437,7 @@
      *  @private
      */
     "_sFilterRow": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Cache of the class name that DataTables has applied to the row, so we
      * can quickly look at this variable rather than needing to do a DOM check
@@ -13564,11 +9447,7 @@
      *  @private
      */
     "_sRowStripe": "",
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Denote if the original data source was from the DOM, or the data source
      * object. This is used for invalidating data, so DataTables can
@@ -13579,11 +9458,7 @@
      *  @private
      */
     "src": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Index in the aoData array. This saves an indexOf lookup when we have the
      * object, but want to know the index
@@ -13593,13 +9468,8 @@
      */
     "idx": -1
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Template object for the column information object in DataTables. This object
    * is held in the settings aoColumns array and contains all the information that
@@ -13619,11 +9489,7 @@
      *  @default null
      */
     "idx": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * A list of the columns that sorting should occur on when this column
      * is sorted. That this property is an array allows multi-column sorting
@@ -13634,11 +9500,7 @@
      *  @type array
      */
     "aDataSort": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Define the sorting directions that are applied to the column, in sequence
      * as the column is repeatedly sorted upon - i.e. the first value is used
@@ -13648,42 +9510,26 @@
      *  @type array
      */
     "asSorting": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Flag to indicate if the column is searchable, and thus should be included
      * in the filtering or not.
      *  @type boolean
      */
     "bSearchable": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Flag to indicate if the column is sortable or not.
      *  @type boolean
      */
     "bSortable": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Flag to indicate if the column is currently visible in the table or not
      *  @type boolean
      */
     "bVisible": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Store for manual type assignment using the `column.type` option. This
      * is held in store so we can manipulate the column's `sType` property.
@@ -13692,11 +9538,7 @@
      *  @private
      */
     "_sManualType": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Flag to indicate if HTML5 data attributes should be used as the data
      * source for filtering or sorting. True is either are.
@@ -13705,11 +9547,7 @@
      *  @private
      */
     "_bAttrSrc": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Developer definable function that is called whenever a cell is created (Ajax source,
      * etc) or processed for input (DOM source). This can be used as a compliment to mRender
@@ -13723,11 +9561,7 @@
      *  @default null
      */
     "fnCreatedCell": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Function to get data from a cell in a column. You should <b>never</b>
      * access data directly through _aData internally in DataTables - always use
@@ -13743,11 +9577,7 @@
      *  @default null
      */
     "fnGetData": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Function to set data for a cell in the column. You should <b>never</b>
      * set the data directly to _aData internally in DataTables - always use
@@ -13760,11 +9590,7 @@
      *  @default null
      */
     "fnSetData": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Property to read the value for the cells in the column from the data
      * source array / object. If null, then the default content is used, if a
@@ -13773,11 +9599,7 @@
      *  @default null
      */
     "mData": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Partner property to mData which is used (only when defined) to get
      * the data - i.e. it is basically the same as mData, but without the
@@ -13787,11 +9609,7 @@
      *  @default null
      */
     "mRender": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Unique header TH/TD element for this column - this is what the sorting
      * listener is attached to (if sorting is enabled.)
@@ -13799,11 +9617,7 @@
      *  @default null
      */
     "nTh": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Unique footer TH/TD element for this column (if there is one). Not used
      * in DataTables as such, but can be used for plug-ins to reference the
@@ -13812,22 +9626,14 @@
      *  @default null
      */
     "nTf": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * The class to apply to all TD elements in the table's TBODY for the column
      *  @type string
      *  @default null
      */
     "sClass": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * When DataTables calculates the column widths to assign to each column,
      * it finds the longest string in each column and then constructs a
@@ -13840,11 +9646,7 @@
      *  @type string
      */
     "sContentPadding": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Allows a default value to be given for a column's data, and will be used
      * whenever a null data source is encountered (this can be because mData
@@ -13853,22 +9655,14 @@
      *  @default null
      */
     "sDefaultContent": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Name for the column, allowing reference to the column by name as well as
      * by index (needs a lookup to work by name).
      *  @type string
      */
     "sName": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Custom sorting data type - defines which of the available plug-ins in
      * afnSortData the custom sorting will use - if any is defined.
@@ -13876,22 +9670,14 @@
      *  @default std
      */
     "sSortDataType": 'std',
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Class to be applied to the header element when sorting on this column
      *  @type string
      *  @default null
      */
     "sSortingClass": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Class to be applied to the header element when sorting on this column -
      * when jQuery UI theming is used.
@@ -13899,43 +9685,27 @@
      *  @default null
      */
     "sSortingClassJUI": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Title of the column - what is seen in the TH element (nTh).
      *  @type string
      */
     "sTitle": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Column sorting and filtering type
      *  @type string
      *  @default null
      */
     "sType": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Width of the column
      *  @type string
      *  @default null
      */
     "sWidth": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Width of the column when it was first "encountered"
      *  @type string
@@ -13943,13 +9713,8 @@
      */
     "sWidthOrig": null
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /*
    * Developer note: The properties of the object below are given in Hungarian
    * notation, that was used as the interface for DataTables prior to v1.10, however
@@ -13965,11 +9730,7 @@
    * completely, but that is a massive amount of work and will break current
    * installs (therefore is on-hold until v2).
    */
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   /**
    * Initialisation options that can be given to DataTables at initialisation
    * time.
@@ -14036,13 +9797,8 @@
      *    } );
      */
     "aaData": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * If ordering is enabled, then DataTables will perform a first pass sort on
      * initialisation. You can define which column(s) the sort is performed
@@ -14071,13 +9827,8 @@
      *    } );
      */
     "aaSorting": [[0,'asc']],
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This parameter is basically identical to the `sorting` parameter, but
      * cannot be overridden by user interaction with the table. What this means
@@ -14099,13 +9850,8 @@
      *    } )
      */
     "aaSortingFixed": [],
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * DataTables can be instructed to load data to display in the table from a
      * Ajax source. This option defines how that Ajax call is made and where to.
@@ -14261,13 +10007,8 @@
      *   } );
      */
     "ajax": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This parameter allows you to readily specify the entries in the length drop
      * down menu that DataTables shows when pagination is enabled. It can be
@@ -14292,13 +10033,8 @@
      *    } );
      */
     "aLengthMenu": [ 10, 25, 50, 100 ],
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * The `columns` option in the initialisation parameter allows you to define
      * details about the way individual columns behave. For a full list of
@@ -14312,11 +10048,7 @@
      *  @name DataTable.defaults.column
      */
     "aoColumns": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Very similar to `columns`, `columnDefs` allows you to target a specific
      * column, multiple columns, or all columns, using the `targets` property of
@@ -14337,13 +10069,8 @@
      *  @name DataTable.defaults.columnDefs
      */
     "aoColumnDefs": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Basically the same as `search`, this parameter defines the individual column
      * filtering state at initialisation time. The array must be of the same size
@@ -14369,13 +10096,8 @@
      *    } )
      */
     "aoSearchCols": [],
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * An array of CSS classes that should be applied to displayed rows. This
      * array may be of any length, and DataTables will apply each class
@@ -14395,13 +10117,8 @@
      *    } )
      */
     "asStripeClasses": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable automatic column width calculation. This can be disabled
      * as an optimisation (it takes some time to calculate the widths) if the
@@ -14420,13 +10137,8 @@
      *    } );
      */
     "bAutoWidth": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Deferred rendering can provide DataTables with a huge speed boost when you
      * are using an Ajax or JS data source for the table. This option, when set to
@@ -14448,13 +10160,8 @@
      *    } );
      */
     "bDeferRender": false,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Replace a DataTable which matches the given selector and replace it with
      * one which has the properties of the new initialisation object passed. If no
@@ -14481,13 +10188,8 @@
      *    } );
      */
     "bDestroy": false,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable filtering of data. Filtering in DataTables is "smart" in
      * that it allows the end user to input multiple words (space separated) and
@@ -14510,13 +10212,8 @@
      *    } );
      */
     "bFilter": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable the table information display. This shows information
      * about the data that is currently visible on the page, including information
@@ -14535,13 +10232,8 @@
      *    } );
      */
     "bInfo": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable jQuery UI ThemeRoller support (required as ThemeRoller requires some
      * slightly different and additional mark-up from what DataTables has
@@ -14560,13 +10252,8 @@
      *    } );
      */
     "bJQueryUI": false,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Allows the end user to select the size of a formatted page from a select
      * menu (sizes are 10, 25, 50 and 100). Requires pagination (`paginate`).
@@ -14584,13 +10271,8 @@
      *    } );
      */
     "bLengthChange": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable pagination.
      *  @type boolean
@@ -14607,13 +10289,8 @@
      *    } );
      */
     "bPaginate": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable the display of a 'processing' indicator when the table is
      * being processed (e.g. a sort). This is particularly useful for tables with
@@ -14633,13 +10310,8 @@
      *    } );
      */
     "bProcessing": false,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Retrieve the DataTables object for the given selector. Note that if the
      * table has already been initialised, this parameter will cause DataTables
@@ -14676,13 +10348,8 @@
      *    }
      */
     "bRetrieve": false,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * When vertical (y) scrolling is enabled, DataTables will force the height of
      * the table's viewport to the given height at all times (useful for layout).
@@ -14705,13 +10372,8 @@
      *    } );
      */
     "bScrollCollapse": false,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Configure DataTables to use server-side processing. Note that the
      * `ajax` parameter must also be given in order to give DataTables a
@@ -14732,13 +10394,8 @@
      *    } );
      */
     "bServerSide": false,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable sorting of columns. Sorting of individual columns can be
      * disabled by the `sortable` option for each column.
@@ -14756,13 +10413,8 @@
      *    } );
      */
     "bSort": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or display DataTables' ability to sort multiple columns at the
      * same time (activated by shift-click by the user).
@@ -14781,13 +10433,8 @@
      *    } );
      */
     "bSortMulti": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Allows control over whether DataTables should use the top (true) unique
      * cell that is found for a single column, or the bottom (false - default).
@@ -14806,13 +10453,8 @@
      *    } );
      */
     "bSortCellsTop": false,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable the addition of the classes `sorting\_1`, `sorting\_2` and
      * `sorting\_3` to the columns which are currently being sorted on. This is
@@ -14833,13 +10475,8 @@
      *    } );
      */
     "bSortClasses": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable state saving. When enabled HTML5 `localStorage` will be
      * used to save table display information such as pagination information,
@@ -14863,13 +10500,8 @@
      *    } );
      */
     "bStateSave": false,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This function is called when a TR element is created (and all TD child
      * elements have been inserted), or registered if using a DOM source, allowing
@@ -14896,13 +10528,8 @@
      *    } );
      */
     "fnCreatedRow": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This function is called on every 'draw' event, and allows you to
      * dynamically modify any aspect you want about the created DOM.
@@ -14922,13 +10549,8 @@
      *    } );
      */
     "fnDrawCallback": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Identical to fnHeaderCallback() but for the table footer this function
      * allows you to modify the table footer on every 'draw' event.
@@ -14955,13 +10577,8 @@
      *    } )
      */
     "fnFooterCallback": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * When rendering large numbers in the information element for the table
      * (i.e. "Showing 1 to 10 of 57 entries") DataTables will render large numbers
@@ -14995,13 +10612,8 @@
         this.oLanguage.sThousands
       );
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This function is called on every 'draw' event, and allows you to
      * dynamically modify the header row. This can be used to calculate and
@@ -15029,13 +10641,8 @@
      *    } )
      */
     "fnHeaderCallback": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * The information element can be used to convey information about the current
      * state of the table. Although the internationalisation options presented by
@@ -15064,13 +10671,8 @@
      *    } );
      */
     "fnInfoCallback": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Called when the table has been initialised. Normally DataTables will
      * initialise sequentially and there will be no need for this function,
@@ -15094,13 +10696,8 @@
      *    } )
      */
     "fnInitComplete": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Called at the very start of each table draw and can be used to cancel the
      * draw by returning false, any other return (including undefined) results in
@@ -15125,13 +10722,8 @@
      *    } );
      */
     "fnPreDrawCallback": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This function allows you to 'post process' each row after it have been
      * generated for each table draw, but before it is rendered on screen. This
@@ -15159,13 +10751,8 @@
      *    } );
      */
     "fnRowCallback": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * __Deprecated__ The functionality provided by this parameter has now been
      * superseded by that provided through `ajax`, which should be used instead.
@@ -15190,13 +10777,8 @@
      *  @deprecated 1.10. Please use `ajax` for this functionality now.
      */
     "fnServerData": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * __Deprecated__ The functionality provided by this parameter has now been
      * superseded by that provided through `ajax`, which should be used instead.
@@ -15222,13 +10804,8 @@
      *  @deprecated 1.10. Please use `ajax` for this functionality now.
      */
     "fnServerParams": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Load the table state. With this function you can define from where, and how, the
      * state of a table is loaded. By default DataTables will load from `localStorage`
@@ -15273,13 +10850,8 @@
         );
       } catch (e) {}
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callback which allows modification of the saved state prior to loading that state.
      * This callback is called when the table is loading state from the stored data, but
@@ -15316,13 +10888,8 @@
      *    } );
      */
     "fnStateLoadParams": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callback that is called when the state has been loaded from the state saving method
      * and the DataTables settings object has been modified as a result of the loaded state.
@@ -15345,13 +10912,8 @@
      *    } );
      */
     "fnStateLoaded": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Save the table state. This function allows you to define where and how the state
      * information for the table is stored By default DataTables will use `localStorage`
@@ -15389,13 +10951,8 @@
         );
       } catch (e) {}
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callback which allows modification of the state to be saved. Called when the table
      * has changed state a new state save is required. This method allows modification of
@@ -15421,13 +10978,8 @@
      *    } );
      */
     "fnStateSaveParams": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Duration for which the saved state information is considered valid. After this period
      * has elapsed the state will be returned to the default.
@@ -15446,13 +10998,8 @@
      *    } )
      */
     "iStateDuration": 7200,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * When enabled DataTables will not make a request to the server for the first
      * page draw - rather it will use the data already on the page (no sorting etc
@@ -15495,13 +11042,8 @@
      *    } );
      */
     "iDeferLoading": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Number of rows to display on a single page when using pagination. If
      * feature enabled (`lengthChange`) then the end user will be able to override
@@ -15520,13 +11062,8 @@
      *    } )
      */
     "iDisplayLength": 10,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Define the starting point for data display when using DataTables with
      * pagination. Note that this parameter is the number of records, rather than
@@ -15546,13 +11083,8 @@
      *    } )
      */
     "iDisplayStart": 0,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * By default DataTables allows keyboard navigation of the table (sorting, paging,
      * and filtering) by adding a `tabindex` attribute to the required elements. This
@@ -15574,13 +11106,8 @@
      *    } );
      */
     "iTabIndex": 0,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Classes that DataTables assigns to the various components and features
      * that it adds to the HTML table. This allows classes to be configured
@@ -15590,13 +11117,8 @@
      *  @name DataTable.defaults.classes
      */
     "oClasses": {},
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * All strings that DataTables uses in the user interface that it creates
      * are defined in this object, allowing you to modified them individually or
@@ -15635,11 +11157,7 @@
          *    } );
          */
         "sSortAscending": ": activate to sort column ascending",
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         /**
          * ARIA label that is added to the table headers when the column may be
          * sorted descending by activing the column (click or return when focused).
@@ -15663,11 +11181,7 @@
          */
         "sSortDescending": ": activate to sort column descending"
       },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Pagination string used by DataTables for the built-in pagination
        * control types.
@@ -15696,13 +11210,8 @@
          *    } );
          */
         "sFirst": "First",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
         /**
          * Text to use when using the 'full_numbers' type of pagination for the
          * button to take the user to the last page.
@@ -15724,13 +11233,8 @@
          *    } );
          */
         "sLast": "Last",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
         /**
          * Text to use for the 'next' pagination button (to take the user to the
          * next page).
@@ -15752,13 +11256,8 @@
          *    } );
          */
         "sNext": "Next",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
         /**
          * Text to use for the 'previous' pagination button (to take the user to
          * the previous page).
@@ -15781,11 +11280,7 @@
          */
         "sPrevious": "Previous"
       },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * This string is shown in preference to `zeroRecords` when the table is
        * empty of data (regardless of filtering). Note that this is an optional
@@ -15807,13 +11302,8 @@
        *    } );
        */
       "sEmptyTable": "No data available in table",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * This string gives information to the end user about the information
        * that is current on display on the page. The following tokens can be
@@ -15844,13 +11334,8 @@
        *    } );
        */
       "sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * Display information string for when the table is empty. Typically the
        * format of this string should match `info`.
@@ -15870,13 +11355,8 @@
        *    } );
        */
       "sInfoEmpty": "Showing 0 to 0 of 0 entries",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * When a user filters the information in a table, this string is appended
        * to the information (`info`) to give an idea of how strong the filtering
@@ -15897,13 +11377,8 @@
        *    } );
        */
       "sInfoFiltered": "(filtered from _MAX_ total entries)",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * If can be useful to append extra information to the info string at times,
        * and this variable does exactly that. This information will be appended to
@@ -15925,13 +11400,8 @@
        *    } );
        */
       "sInfoPostFix": "",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
        * This decimal place operator is a little different from the other
        * language options since DataTables doesn't output floating point
@@ -15945,11 +11415,7 @@
        * However, multiple different tables on the page can use different
        * decimal place characters.
        *  @type string
-<<<<<<< HEAD
-       *  @default 
-=======
        *  @default
->>>>>>> hotfix-5338-not-working
        *
        *  @dtopt Language
        *  @name DataTable.defaults.language.decimal
@@ -15965,13 +11431,8 @@
        *    } );
        */
       "sDecimal": "",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * DataTables has a build in number formatter (`formatNumber`) which is
        * used to format large numbers that are used in the table information.
@@ -15993,13 +11454,8 @@
        *    } );
        */
       "sThousands": ",",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * Detail the action that will be taken when the drop down menu for the
        * pagination length option is changed. The '_MENU_' variable is replaced
@@ -16039,13 +11495,8 @@
        *    } );
        */
       "sLengthMenu": "Show _MENU_ entries",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * When using Ajax sourced data and during the first draw when DataTables is
        * gathering the data, this message is shown in an empty row in the table to
@@ -16068,13 +11519,8 @@
        *    } );
        */
       "sLoadingRecords": "Loading...",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * Text which is displayed when the table is processing a user action
        * (usually a sort command or similar).
@@ -16094,13 +11540,8 @@
        *    } );
        */
       "sProcessing": "Processing...",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * Details the actions that will be taken when the user types into the
        * filtering input text box. The variable "_INPUT_", if used in the string,
@@ -16134,33 +11575,19 @@
        *    } );
        */
       "sSearch": "Search:",
-<<<<<<< HEAD
-  
-  
-      /**
-       * Assign a `placeholder` attribute to the search `input` element
-       *  @type string
-       *  @default 
-=======
 
 
       /**
        * Assign a `placeholder` attribute to the search `input` element
        *  @type string
        *  @default
->>>>>>> hotfix-5338-not-working
        *
        *  @dtopt Language
        *  @name DataTable.defaults.language.searchPlaceholder
        */
       "sSearchPlaceholder": "",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * All of the language information can be stored in a file on the
        * server-side, which DataTables will look up if this parameter is passed.
@@ -16184,13 +11611,8 @@
        *    } );
        */
       "sUrl": "",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * Text shown inside the table records when the is no information to be
        * displayed after filtering. `emptyTable` is shown when there is simply no
@@ -16212,13 +11634,8 @@
        */
       "sZeroRecords": "No matching records found"
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This parameter allows you to have define the global filtering state at
      * initialisation time. As an object the `search` parameter must be
@@ -16241,13 +11658,8 @@
      *    } )
      */
     "oSearch": $.extend( {}, DataTable.models.oSearch ),
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * __Deprecated__ The functionality provided by this parameter has now been
      * superseded by that provided through `ajax`, which should be used instead.
@@ -16267,13 +11679,8 @@
      *  @deprecated 1.10. Please use `ajax` for this functionality now.
      */
     "sAjaxDataProp": "data",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * __Deprecated__ The functionality provided by this parameter has now been
      * superseded by that provided through `ajax`, which should be used instead.
@@ -16291,13 +11698,8 @@
      *  @deprecated 1.10. Please use `ajax` for this functionality now.
      */
     "sAjaxSource": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This initialisation variable allows you to specify exactly where in the
      * DOM you want DataTables to inject the various controls it adds to the page
@@ -16350,13 +11752,8 @@
      *    } );
      */
     "sDom": "lfrtip",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Search delay option. This will throttle full table searches that use the
      * DataTables provided search input element (it does not effect calls to
@@ -16375,13 +11772,8 @@
      *    } )
      */
     "searchDelay": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * DataTables features four different built-in options for the buttons to
      * display for pagination control:
@@ -16391,11 +11783,7 @@
      * * `full` - 'First', 'Previous', 'Next' and 'Last' buttons
      * * `full_numbers` - 'First', 'Previous', 'Next' and 'Last' buttons, plus
      *   page numbers
-<<<<<<< HEAD
-     *  
-=======
      *
->>>>>>> hotfix-5338-not-working
      * Further methods can be added using {@link DataTable.ext.oPagination}.
      *  @type string
      *  @default simple_numbers
@@ -16411,13 +11799,8 @@
      *    } )
      */
     "sPaginationType": "simple_numbers",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable horizontal scrolling. When a table is too wide to fit into a
      * certain layout, or you have a large number of columns in the table, you
@@ -16441,13 +11824,8 @@
      *    } );
      */
     "sScrollX": "",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This property can be used to force a DataTable to use more width than it
      * might otherwise do when x-scrolling is enabled. For example if you have a
@@ -16470,13 +11848,8 @@
      *    } );
      */
     "sScrollXInner": "",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable vertical scrolling. Vertical scrolling will constrain the DataTable
      * to the given height, and enable scrolling for any data which overflows the
@@ -16499,13 +11872,8 @@
      *    } );
      */
     "sScrollY": "",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * __Deprecated__ The functionality provided by this parameter has now been
      * superseded by that provided through `ajax`, which should be used instead.
@@ -16522,13 +11890,8 @@
      *  @deprecated 1.10. Please use `ajax` for this functionality now.
      */
     "sServerMethod": "GET",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * DataTables makes use of renderers when displaying HTML elements for
      * a table. These renderers can be added or modified by plug-ins to
@@ -16545,13 +11908,8 @@
      *
      */
     "renderer": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Set the data property name that DataTables should use to get a row's id
      * to set as the `id` property in the node.
@@ -16562,28 +11920,16 @@
      */
     "rowId": "DT_RowId"
   };
-<<<<<<< HEAD
-  
-  _fnHungarianMap( DataTable.defaults );
-  
-  
-  
-=======
 
   _fnHungarianMap( DataTable.defaults );
 
 
 
->>>>>>> hotfix-5338-not-working
   /*
    * Developer note - See note in model.defaults.js about the use of Hungarian
    * notation and camel case.
    */
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   /**
    * Column options that can be given to DataTables at initialisation time.
    *  @namespace
@@ -16629,13 +11975,8 @@
      */
     "aDataSort": null,
     "iDataSort": -1,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
      * You can control the default ordering direction, and even alter the
      * behaviour of the sort handler (i.e. only allow ascending ordering etc)
@@ -16673,13 +12014,8 @@
      *    } );
      */
     "asSorting": [ 'asc', 'desc' ],
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable filtering on the data in this column.
      *  @type boolean
@@ -16711,13 +12047,8 @@
      *    } );
      */
     "bSearchable": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable ordering on this column.
      *  @type boolean
@@ -16749,13 +12080,8 @@
      *    } );
      */
     "bSortable": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Enable or disable the display of this column.
      *  @type boolean
@@ -16787,13 +12113,8 @@
      *    } );
      */
     "bVisible": true,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Developer definable function that is called whenever a cell is created (Ajax source,
      * etc) or processed for input (DOM source). This can be used as a compliment to mRender
@@ -16824,13 +12145,8 @@
      *    } );
      */
     "fnCreatedCell": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This parameter has been replaced by `data` in DataTables to ensure naming
      * consistency. `dataProp` can still be used, as there is backwards
@@ -16838,13 +12154,8 @@
      * recommended that you use `data` in preference to `dataProp`.
      *  @name DataTable.defaults.column.dataProp
      */
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This property can be used to read data from any data source property,
      * including deeply nested objects / properties. `data` can be given in a
@@ -17015,13 +12326,8 @@
      *
      */
     "mData": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This property is the rendering partner to `data` and it is suggested that
      * when you want to manipulate data for display (including filtering,
@@ -17142,13 +12448,8 @@
      *    } );
      */
     "mRender": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Change the cell type created for the column - either TD cells or TH cells. This
      * can be useful as TH cells have semantic meaning in the table body, allowing them
@@ -17171,13 +12472,8 @@
      *    } );
      */
     "sCellType": "td",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Class to give to each cell in this column.
      *  @type string
@@ -17211,11 +12507,7 @@
      *    } );
      */
     "sClass": "",
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * When DataTables calculates the column widths to assign to each column,
      * it finds the longest string in each column and then constructs a
@@ -17248,13 +12540,8 @@
      *    } );
      */
     "sContentPadding": "",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Allows a default value to be given for a column's data, and will be used
      * whenever a null data source is encountered (this can be because `data`
@@ -17296,13 +12583,8 @@
      *    } );
      */
     "sDefaultContent": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * This parameter is only used in DataTables' server-side processing. It can
      * be exceptionally useful to know what columns are being displayed on the
@@ -17345,13 +12627,8 @@
      *    } );
      */
     "sName": "",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Defines a data source type for the ordering which can be used to read
      * real-time information from the table (updating the internally cached
@@ -17392,13 +12669,8 @@
      *    } );
      */
     "sSortDataType": "std",
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * The title of this column.
      *  @type string
@@ -17433,13 +12705,8 @@
      *    } );
      */
     "sTitle": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * The type allows you to specify how the data for this column will be
      * ordered. Four types (string, numeric, date and html (which will strip
@@ -17479,13 +12746,8 @@
      *    } );
      */
     "sType": null,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Defining the width of the column, this parameter may take any CSS value
      * (3em, 20px etc). DataTables applies 'smart' widths to columns which have not
@@ -17523,19 +12785,11 @@
      */
     "sWidth": null
   };
-<<<<<<< HEAD
-  
-  _fnHungarianMap( DataTable.defaults.column );
-  
-  
-  
-=======
 
   _fnHungarianMap( DataTable.defaults.column );
 
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * DataTables settings object - this holds all the information needed for a
    * given table, including configuration, data and current application of the
@@ -17564,11 +12818,7 @@
      *  @namespace
      */
     "oFeatures": {
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Flag to say if DataTables should automatically try to calculate the
        * optimum table and columns widths (true) or not (false).
@@ -17577,11 +12827,7 @@
        *  @type boolean
        */
       "bAutoWidth": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Delay the creation of TR and TD elements until they are actually
        * needed by a driven page draw. This can give a significant speed
@@ -17592,11 +12838,7 @@
        *  @type boolean
        */
       "bDeferRender": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Enable filtering on the table or not. Note that if this is disabled
        * then there is no filtering at all on the table, including fnFilter.
@@ -17606,11 +12848,7 @@
        *  @type boolean
        */
       "bFilter": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Table information element (the 'Showing x of y records' div) enable
        * flag.
@@ -17619,11 +12857,7 @@
        *  @type boolean
        */
       "bInfo": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Present a user control allowing the end user to change the page size
        * when pagination is enabled.
@@ -17632,11 +12866,7 @@
        *  @type boolean
        */
       "bLengthChange": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Pagination enabled or not. Note that if this is disabled then length
        * changing must also be disabled.
@@ -17645,11 +12875,7 @@
        *  @type boolean
        */
       "bPaginate": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Processing indicator enable flag whenever DataTables is enacting a
        * user request - typically an Ajax request for server-side processing.
@@ -17658,11 +12884,7 @@
        *  @type boolean
        */
       "bProcessing": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Server-side processing enabled flag - when enabled DataTables will
        * get all data from the server for every draw - there is no filtering,
@@ -17672,11 +12894,7 @@
        *  @type boolean
        */
       "bServerSide": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Sorting enablement flag.
        * Note that this parameter will be set by the initialisation routine. To
@@ -17684,11 +12902,7 @@
        *  @type boolean
        */
       "bSort": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Multi-column sorting
        * Note that this parameter will be set by the initialisation routine. To
@@ -17696,11 +12910,7 @@
        *  @type boolean
        */
       "bSortMulti": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Apply a class to the columns which are being sorted to provide a
        * visual highlight or not. This can slow things down when enabled since
@@ -17710,11 +12920,7 @@
        *  @type boolean
        */
       "bSortClasses": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * State saving enablement flag.
        * Note that this parameter will be set by the initialisation routine. To
@@ -17723,13 +12929,8 @@
        */
       "bStateSave": null
     },
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Scrolling settings for a table.
      *  @namespace
@@ -17743,11 +12944,7 @@
        *  @type boolean
        */
       "bCollapse": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Width of the scrollbar for the web-browser's platform. Calculated
        * during table initialisation.
@@ -17755,11 +12952,7 @@
        *  @default 0
        */
       "iBarWidth": 0,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Viewport width for horizontal scrolling. Horizontal scrolling is
        * disabled if an empty string.
@@ -17768,11 +12961,7 @@
        *  @type string
        */
       "sX": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Width to expand the table to when using x-scrolling. Typically you
        * should not need to use this.
@@ -17782,11 +12971,7 @@
        *  @deprecated
        */
       "sXInner": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Viewport height for vertical scrolling. Vertical scrolling is disabled
        * if an empty string.
@@ -17796,11 +12981,7 @@
        */
       "sY": null
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Language information for the table.
      *  @namespace
@@ -17815,11 +12996,7 @@
        */
       "fnInfoCallback": null
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Browser support parameters
      *  @namespace
@@ -17832,11 +13009,7 @@
        *  @default false
        */
       "bScrollOversize": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Determine if the vertical scrollbar is on the right or left of the
        * scrolling container - needed for rtl language layout, although not
@@ -17845,22 +13018,14 @@
        *  @default false
        */
       "bScrollbarLeft": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Flag for if `getBoundingClientRect` is fully supported or not
        *  @type boolean
        *  @default false
        */
       "bBounding": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       /**
        * Browser scrollbar width
        *  @type integer
@@ -17868,19 +13033,11 @@
        */
       "barWidth": 0
     },
-<<<<<<< HEAD
-  
-  
-    "ajax": null,
-  
-  
-=======
 
 
     "ajax": null,
 
 
->>>>>>> hotfix-5338-not-working
   /**
      * Array referencing the nodes which are used for the features. The
      * parameters of this object match what is allowed by sDom - i.e.
@@ -17896,11 +13053,7 @@
      *  @default []
      */
     "aanFeatures": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Store data information - see {@link DataTable.models.oRow} for detailed
      * information.
@@ -17908,77 +13061,49 @@
      *  @default []
      */
     "aoData": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Array of indexes which are in the current display (after filtering etc)
      *  @type array
      *  @default []
      */
     "aiDisplay": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Array of indexes for display - no filtering
      *  @type array
      *  @default []
      */
     "aiDisplayMaster": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Map of row ids to data indexes
      *  @type object
      *  @default {}
      */
     "aIds": {},
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Store information about each column that is in use
      *  @type array
      *  @default []
      */
     "aoColumns": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Store information about the table's header
      *  @type array
      *  @default []
      */
     "aoHeader": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Store information about the table's footer
      *  @type array
      *  @default []
      */
     "aoFooter": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Store the applied global search information in case we want to force a
      * research or compare the old search to a new one.
@@ -17988,11 +13113,7 @@
      *  @extends DataTable.models.oSearch
      */
     "oPreviousSearch": {},
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Store the applied search for each column - see
      * {@link DataTable.models.oSearch} for the format that is used for the
@@ -18001,11 +13122,7 @@
      *  @default []
      */
     "aoPreSearchCols": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Sorting that is applied to the table. Note that the inner arrays are
      * used in the following manner:
@@ -18019,11 +13136,7 @@
      *  @todo These inner arrays should really be objects
      */
     "aaSorting": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Sorting that is always applied to the table (i.e. prefixed in front of
      * aaSorting).
@@ -18033,11 +13146,7 @@
      *  @default []
      */
     "aaSortingFixed": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Classes to use for the striping of a table.
      * Note that this parameter will be set by the initialisation routine. To
@@ -18046,88 +13155,56 @@
      *  @default []
      */
     "asStripeClasses": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * If restoring a table - we should restore its striping classes as well
      *  @type array
      *  @default []
      */
     "asDestroyStripes": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * If restoring a table - we should restore its width
      *  @type int
      *  @default 0
      */
     "sDestroyWidth": 0,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callback functions array for every time a row is inserted (i.e. on a draw).
      *  @type array
      *  @default []
      */
     "aoRowCallback": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callback functions for the header on each draw.
      *  @type array
      *  @default []
      */
     "aoHeaderCallback": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callback function for the footer on each draw.
      *  @type array
      *  @default []
      */
     "aoFooterCallback": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Array of callback functions for draw callback functions
      *  @type array
      *  @default []
      */
     "aoDrawCallback": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Array of callback functions for row created function
      *  @type array
      *  @default []
      */
     "aoRowCreatedCallback": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callback functions for just before the table is redrawn. A return of
      * false will be used to cancel the draw.
@@ -18135,24 +13212,15 @@
      *  @default []
      */
     "aoPreDrawCallback": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callback functions for when the table has been initialised.
      *  @type array
      *  @default []
      */
     "aoInitComplete": [],
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callbacks for modifying the settings to be stored for state saving, prior to
      * saving state.
@@ -18160,11 +13228,7 @@
      *  @default []
      */
     "aoStateSaveParams": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callbacks for modifying the settings that have been stored for state saving
      * prior to using the stored values to restore the state.
@@ -18172,11 +13236,7 @@
      *  @default []
      */
     "aoStateLoadParams": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Callbacks for operating on the settings object once the saved state has been
      * loaded
@@ -18184,77 +13244,49 @@
      *  @default []
      */
     "aoStateLoaded": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Cache the table ID for quick access
      *  @type string
      *  @default <i>Empty string</i>
      */
     "sTableId": "",
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * The TABLE node for the main table
      *  @type node
      *  @default null
      */
     "nTable": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Permanent ref to the thead element
      *  @type node
      *  @default null
      */
     "nTHead": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Permanent ref to the tfoot element - if it exists
      *  @type node
      *  @default null
      */
     "nTFoot": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Permanent ref to the tbody element
      *  @type node
      *  @default null
      */
     "nTBody": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Cache the wrapper node (contains all DataTables controlled elements)
      *  @type node
      *  @default null
      */
     "nTableWrapper": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Indicate if when using server-side processing the loading of data
      * should be deferred until the second draw.
@@ -18264,22 +13296,14 @@
      *  @default false
      */
     "bDeferLoading": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Indicate if all required information has been read in
      *  @type boolean
      *  @default false
      */
     "bInitialised": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Information about open rows. Each object in the array has the parameters
      * 'nTr' and 'nParent'
@@ -18287,11 +13311,7 @@
      *  @default []
      */
     "aoOpenRows": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Dictate the positioning of DataTables' control elements - see
      * {@link DataTable.model.oInit.sDom}.
@@ -18301,22 +13321,14 @@
      *  @default null
      */
     "sDom": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Search delay (in mS)
      *  @type integer
      *  @default null
      */
     "searchDelay": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Which type of pagination should be used.
      * Note that this parameter will be set by the initialisation routine. To
@@ -18325,11 +13337,7 @@
      *  @default two_button
      */
     "sPaginationType": "two_button",
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * The state duration (for `stateSave`) in seconds.
      * Note that this parameter will be set by the initialisation routine. To
@@ -18338,11 +13346,7 @@
      *  @default 0
      */
     "iStateDuration": 0,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Array of callback functions for state saving. Each array element is an
      * object with the following parameters:
@@ -18357,11 +13361,7 @@
      *  @default []
      */
     "aoStateSave": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Array of callback functions for state loading. Each array element is an
      * object with the following parameters:
@@ -18374,33 +13374,21 @@
      *  @default []
      */
     "aoStateLoad": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * State that was saved. Useful for back reference
      *  @type object
      *  @default null
      */
     "oSavedState": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * State that was loaded. Useful for back reference
      *  @type object
      *  @default null
      */
     "oLoadedState": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Source url for AJAX data for the table.
      * Note that this parameter will be set by the initialisation routine. To
@@ -18409,11 +13397,7 @@
      *  @default null
      */
     "sAjaxSource": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Property from a given object from which to read the table data from. This
      * can be an empty string (when not server-side processing), in which case
@@ -18423,22 +13407,14 @@
      *  @type string
      */
     "sAjaxDataProp": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Note if draw should be blocked while getting data
      *  @type boolean
      *  @default true
      */
     "bAjaxDataGet": true,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * The last jQuery XHR object that was used for server-side data gathering.
      * This can be used for working with the XHR information in one of the
@@ -18447,33 +13423,21 @@
      *  @default null
      */
     "jqXHR": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * JSON returned from the server in the last Ajax request
      *  @type object
      *  @default undefined
      */
     "json": undefined,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Data submitted as part of the last Ajax request
      *  @type object
      *  @default undefined
      */
     "oAjaxData": undefined,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Function to get the server-side data.
      * Note that this parameter will be set by the initialisation routine. To
@@ -18481,11 +13445,7 @@
      *  @type function
      */
     "fnServerData": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Functions which are called prior to sending an Ajax request so extra
      * parameters can easily be sent to the server
@@ -18493,11 +13453,7 @@
      *  @default []
      */
     "aoServerParams": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Send the XHR HTTP method - GET or POST (could be PUT or DELETE if
      * required).
@@ -18506,11 +13462,7 @@
      *  @type string
      */
     "sServerMethod": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Format numbers for display.
      * Note that this parameter will be set by the initialisation routine. To
@@ -18518,11 +13470,7 @@
      *  @type function
      */
     "fnFormatNumber": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * List of options that can be used for the user selectable length menu.
      * Note that this parameter will be set by the initialisation routine. To
@@ -18531,11 +13479,7 @@
      *  @default []
      */
     "aLengthMenu": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Counter for the draws that the table does. Also used as a tracker for
      * server-side processing
@@ -18543,55 +13487,35 @@
      *  @default 0
      */
     "iDraw": 0,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Indicate if a redraw is being done - useful for Ajax
      *  @type boolean
      *  @default false
      */
     "bDrawing": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Draw index (iDraw) of the last error when parsing the returned data
      *  @type int
      *  @default -1
      */
     "iDrawError": -1,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Paging display length
      *  @type int
      *  @default 10
      */
     "_iDisplayLength": 10,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Paging start point - aiDisplay index
      *  @type int
      *  @default 0
      */
     "_iDisplayStart": 0,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Server-side processing - number of records in the result set
      * (i.e. before filtering), Use fnRecordsTotal rather than
@@ -18602,11 +13526,7 @@
      *  @private
      */
     "_iRecordsTotal": 0,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   /**
      * Server-side processing - number of records in the current display set
      * (i.e. after filtering). Use fnRecordsDisplay rather than
@@ -18617,11 +13537,7 @@
      *  @private
      */
     "_iRecordsDisplay": 0,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Flag to indicate if jQuery UI marking and classes should be used.
      * Note that this parameter will be set by the initialisation routine. To
@@ -18629,22 +13545,14 @@
      *  @type boolean
      */
     "bJUI": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * The classes to use for the table
      *  @type object
      *  @default {}
      */
     "oClasses": {},
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Flag attached to the settings object so you can check in the draw
      * callback if filtering has been done in the draw. Deprecated in favour of
@@ -18654,11 +13562,7 @@
      *  @deprecated
      */
     "bFiltered": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Flag attached to the settings object so you can check in the draw
      * callback if sorting has been done in the draw. Deprecated in favour of
@@ -18668,11 +13572,7 @@
      *  @deprecated
      */
     "bSorted": false,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Indicate that if multiple rows are in the header and there is more than
      * one unique cell per column, if the top one (true) or bottom one (false)
@@ -18682,22 +13582,14 @@
      *  @type boolean
      */
     "bSortCellsTop": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Initialisation object that is used for the table
      *  @type object
      *  @default null
      */
     "oInit": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Destroy callback functions - for plug-ins to attach themselves to the
      * destroy so they can clean up markup and events.
@@ -18705,13 +13597,8 @@
      *  @default []
      */
     "aoDestroyCallback": [],
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Get the number of records in the current record set, before filtering
      *  @type function
@@ -18722,11 +13609,7 @@
         this._iRecordsTotal * 1 :
         this.aiDisplayMaster.length;
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Get the number of records in the current record set, after filtering
      *  @type function
@@ -18737,11 +13620,7 @@
         this._iRecordsDisplay * 1 :
         this.aiDisplay.length;
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Get the display end point - aiDisplay index
      *  @type function
@@ -18755,11 +13634,7 @@
         records  = this.aiDisplay.length,
         features = this.oFeatures,
         paginate = features.bPaginate;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( features.bServerSide ) {
         return paginate === false || len === -1 ?
           start + records :
@@ -18771,22 +13646,14 @@
           calc;
       }
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * The DataTables object for this table
      *  @type object
      *  @default null
      */
     "oInstance": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Unique identifier for each instance of the DataTables object. If there
      * is an ID on the table node, then it takes that value, otherwise an
@@ -18795,72 +13662,44 @@
      *  @default null
      */
     "sInstance": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * tabindex attribute value that is added to DataTables control elements, allowing
      * keyboard navigation of the table and its controls.
      */
     "iTabIndex": 0,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * DIV container for the footer scrolling table if scrolling
      */
     "nScrollHead": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * DIV container for the footer scrolling table if scrolling
      */
     "nScrollFoot": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Last applied sort
      *  @type array
      *  @default []
      */
     "aLastSort": [],
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Stored plug-in instances
      *  @type object
      *  @default {}
      */
     "oPlugins": {},
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Function used to get a row's id from the row's data
      *  @type function
      *  @default null
      */
     "rowIdFn": null,
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Data location where to store a row's id
      *  @type string
@@ -18879,19 +13718,11 @@
    *  @namespace
    *  @extends DataTable.models.ext
    */
-<<<<<<< HEAD
-  
-  
-  /**
-   * DataTables extensions
-   * 
-=======
 
 
   /**
    * DataTables extensions
    *
->>>>>>> hotfix-5338-not-working
    * This namespace acts as a collection area for plug-ins that can be used to
    * extend DataTables capabilities. Indeed many of the build in methods
    * use this method to provide their own capabilities (sorting methods for
@@ -18912,13 +13743,8 @@
      *  @default {}
      */
     buttons: {},
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Element class names
      *
@@ -18926,32 +13752,19 @@
      *  @default {}
      */
     classes: {},
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * DataTables build type (expanded by the download builder)
      *
      *  @type string
      */
     builder: "-source-",
-<<<<<<< HEAD
-  
-  
-    /**
-     * Error reporting.
-     * 
-=======
 
 
     /**
      * Error reporting.
      *
->>>>>>> hotfix-5338-not-working
      * How should DataTables report an error. Can take the value 'alert',
      * 'throw', 'none' or a function.
      *
@@ -18959,20 +13772,6 @@
      *  @default alert
      */
     errMode: "alert",
-<<<<<<< HEAD
-  
-  
-    /**
-     * Feature plug-ins.
-     * 
-     * This is an array of objects which describe the feature plug-ins that are
-     * available to DataTables. These feature plug-ins are then available for
-     * use through the `dom` initialisation option.
-     * 
-     * Each feature plug-in is described by an object which must have the
-     * following properties:
-     * 
-=======
 
 
     /**
@@ -18985,7 +13784,6 @@
      * Each feature plug-in is described by an object which must have the
      * following properties:
      *
->>>>>>> hotfix-5338-not-working
      * * `fnInit` - function that is used to initialise the plug-in,
      * * `cFeature` - a character so the feature can be enabled by the `dom`
      *   instillation option. This is case sensitive.
@@ -18996,11 +13794,7 @@
      *    {@link DataTable.models.oSettings}
      *
      * And the following return is expected:
-<<<<<<< HEAD
-     * 
-=======
      *
->>>>>>> hotfix-5338-not-working
      * * {node|null} The element which contains your feature. Note that the
      *   return may also be void if your plug-in does not require to inject any
      *   DOM elements into DataTables control (`dom`) - for example this might
@@ -19018,19 +13812,11 @@
      *    } );
      */
     feature: [],
-<<<<<<< HEAD
-  
-  
-    /**
-     * Row searching.
-     * 
-=======
 
 
     /**
      * Row searching.
      *
->>>>>>> hotfix-5338-not-working
      * This method of searching is complimentary to the default type based
      * searching, and a lot more comprehensive as it allows you complete control
      * over the searching logic. Each element in this array is a function
@@ -19087,13 +13873,8 @@
      *    );
      */
     search: [],
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Selector extensions
      *
@@ -19123,19 +13904,11 @@
       column: [],
       row: []
     },
-<<<<<<< HEAD
-  
-  
-    /**
-     * Internal functions, exposed for used in plug-ins.
-     * 
-=======
 
 
     /**
      * Internal functions, exposed for used in plug-ins.
      *
->>>>>>> hotfix-5338-not-working
      * Please note that you should not need to use the internal methods for
      * anything other than a plug-in (and even then, try to avoid if possible).
      * The internal function may change between releases.
@@ -19144,13 +13917,8 @@
      *  @default {}
      */
     internal: {},
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Legacy configuration options. Enable and disable legacy options that
      * are available in DataTables.
@@ -19167,19 +13935,11 @@
        */
       ajax: null
     },
-<<<<<<< HEAD
-  
-  
-    /**
-     * Pagination plug-in methods.
-     * 
-=======
 
 
     /**
      * Pagination plug-in methods.
      *
->>>>>>> hotfix-5338-not-working
      * Each entry in this object is a function and defines which buttons should
      * be shown by the pagination rendering method that is used for the table:
      * {@link DataTable.ext.renderer.pageButton}. The renderer addresses how the
@@ -19223,47 +13983,26 @@
      *    };
      */
     pager: {},
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     renderer: {
       pageButton: {},
       header: {}
     },
-<<<<<<< HEAD
-  
-  
-    /**
-     * Ordering plug-ins - custom data source
-     * 
-=======
 
 
     /**
      * Ordering plug-ins - custom data source
      *
->>>>>>> hotfix-5338-not-working
      * The extension options for ordering of data available here is complimentary
      * to the default type based ordering that DataTables typically uses. It
      * allows much greater control over the the data that is being used to
      * order a column, but is necessarily therefore more complex.
-<<<<<<< HEAD
-     * 
-     * This type of ordering is useful if you want to do ordering based on data
-     * live from the DOM (for example the contents of an 'input' element) rather
-     * than just the static string that DataTables knows of.
-     * 
-=======
      *
      * This type of ordering is useful if you want to do ordering based on data
      * live from the DOM (for example the contents of an 'input' element) rather
      * than just the static string that DataTables knows of.
      *
->>>>>>> hotfix-5338-not-working
      * The way these plug-ins work is that you create an array of the values you
      * wish to be ordering for the column in question and then return that
      * array. The data in the array much be in the index order of the rows in
@@ -19293,13 +14032,8 @@
      *    }
      */
     order: {},
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Type based plug-ins.
      *
@@ -19352,13 +14086,8 @@
        *    );
        */
       detect: [],
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * Type based search formatting.
        *
@@ -19368,11 +14097,7 @@
        *
        * Note that is a search is not defined for a column of a given type,
        * no search formatting will be performed.
-<<<<<<< HEAD
-       * 
-=======
        *
->>>>>>> hotfix-5338-not-working
        * Pre-processing of searching data plug-ins - When you assign the sType
        * for a column (or have it automatically detected for you by DataTables
        * or a type detection plug-in), you will typically be using this for
@@ -19400,13 +14125,8 @@
        *    }
        */
       search: {},
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
       /**
        * Type based ordering.
        *
@@ -19447,11 +14167,7 @@
        *   than the second parameter, ===0 if the two parameters are equal and
        *   >0 if the first parameter should be sorted height than the second
        *   parameter.
-<<<<<<< HEAD
-       * 
-=======
        *
->>>>>>> hotfix-5338-not-working
        *  @type object
        *  @default {}
        *
@@ -19477,11 +14193,7 @@
        */
       order: {}
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Unique DataTables instance counter
      *
@@ -19489,63 +14201,39 @@
      * @private
      */
     _unique: 0,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     //
     // Depreciated
     // The following properties are retained for backwards compatiblity only.
     // The should not be used in new projects and will be removed in a future
     // version
     //
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /**
      * Version check function.
      *  @type function
      *  @depreciated Since 1.10
      */
     fnVersionCheck: DataTable.fnVersionCheck,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Index for what 'this' index API functions should use
      *  @type int
      *  @deprecated Since v1.10
      */
     iApiIndex: 0,
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * jQuery UI class container
      *  @type object
      *  @deprecated Since v1.10
      */
     oJUIClasses: {},
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
     /**
      * Software version
      *  @type string
@@ -19553,13 +14241,8 @@
      */
     sVersion: DataTable.version
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   //
   // Backwards compatibility. Alias to pre 1.10 Hungarian notation counter parts
   //
@@ -19574,35 +14257,16 @@
     oStdClasses:  _ext.classes,
     oPagination:  _ext.pager
   } );
-<<<<<<< HEAD
-  
-  
-  $.extend( DataTable.ext.classes, {
-    "sTable": "dataTable",
-    "sNoFooter": "no-footer",
-  
-=======
 
 
   $.extend( DataTable.ext.classes, {
     "sTable": "dataTable",
     "sNoFooter": "no-footer",
 
->>>>>>> hotfix-5338-not-working
     /* Paging buttons */
     "sPageButton": "paginate_button",
     "sPageButtonActive": "current",
     "sPageButtonDisabled": "disabled",
-<<<<<<< HEAD
-  
-    /* Striping classes */
-    "sStripeOdd": "odd",
-    "sStripeEven": "even",
-  
-    /* Empty row */
-    "sRowEmpty": "dataTables_empty",
-  
-=======
 
     /* Striping classes */
     "sStripeOdd": "odd",
@@ -19611,7 +14275,6 @@
     /* Empty row */
     "sRowEmpty": "dataTables_empty",
 
->>>>>>> hotfix-5338-not-working
     /* Features */
     "sWrapper": "dataTables_wrapper",
     "sFilter": "dataTables_filter",
@@ -19619,11 +14282,7 @@
     "sPaging": "dataTables_paginate paging_", /* Note that the type is postfixed */
     "sLength": "dataTables_length",
     "sProcessing": "dataTables_processing",
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     /* Sorting */
     "sSortAsc": "sorting_asc",
     "sSortDesc": "sorting_desc",
@@ -19632,15 +14291,6 @@
     "sSortableDesc": "sorting_desc_disabled",
     "sSortableNone": "sorting_disabled",
     "sSortColumn": "sorting_", /* Note that an int is postfixed for the sorting order */
-<<<<<<< HEAD
-  
-    /* Filtering */
-    "sFilterInput": "",
-  
-    /* Page length */
-    "sLengthSelect": "",
-  
-=======
 
     /* Filtering */
     "sFilterInput": "",
@@ -19648,7 +14298,6 @@
     /* Page length */
     "sLengthSelect": "",
 
->>>>>>> hotfix-5338-not-working
     /* Scrolling */
     "sScrollWrapper": "dataTables_scroll",
     "sScrollHead": "dataTables_scrollHead",
@@ -19656,19 +14305,11 @@
     "sScrollBody": "dataTables_scrollBody",
     "sScrollFoot": "dataTables_scrollFoot",
     "sScrollFootInner": "dataTables_scrollFootInner",
-<<<<<<< HEAD
-  
-    /* Misc */
-    "sHeaderTH": "",
-    "sFooterTH": "",
-  
-=======
 
     /* Misc */
     "sHeaderTH": "",
     "sFooterTH": "",
 
->>>>>>> hotfix-5338-not-working
     // Deprecated
     "sSortJUIAsc": "",
     "sSortJUIDesc": "",
@@ -19680,54 +14321,31 @@
     "sJUIHeader": "",
     "sJUIFooter": ""
   } );
-<<<<<<< HEAD
-  
-  
-  (function() {
-  
-=======
 
 
   (function() {
 
->>>>>>> hotfix-5338-not-working
   // Reused strings for better compression. Closure compiler appears to have a
   // weird edge case where it is trying to expand strings rather than use the
   // variable version. This results in about 200 bytes being added, for very
   // little preference benefit since it this run on script load only.
   var _empty = '';
   _empty = '';
-<<<<<<< HEAD
-  
-  var _stateDefault = _empty + 'ui-state-default';
-  var _sortIcon     = _empty + 'css_right ui-icon ui-icon-';
-  var _headerFooter = _empty + 'fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix';
-  
-=======
 
   var _stateDefault = _empty + 'ui-state-default';
   var _sortIcon     = _empty + 'css_right ui-icon ui-icon-';
   var _headerFooter = _empty + 'fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix';
 
->>>>>>> hotfix-5338-not-working
   $.extend( DataTable.ext.oJUIClasses, DataTable.ext.classes, {
     /* Full numbers paging buttons */
     "sPageButton":         "fg-button ui-button "+_stateDefault,
     "sPageButtonActive":   "ui-state-disabled",
     "sPageButtonDisabled": "ui-state-disabled",
-<<<<<<< HEAD
-  
-    /* Features */
-    "sPaging": "dataTables_paginate fg-buttonset ui-buttonset fg-buttonset-multi "+
-      "ui-buttonset-multi paging_", /* Note that the type is postfixed */
-  
-=======
 
     /* Features */
     "sPaging": "dataTables_paginate fg-buttonset ui-buttonset fg-buttonset-multi "+
       "ui-buttonset-multi paging_", /* Note that the type is postfixed */
 
->>>>>>> hotfix-5338-not-working
     /* Sorting */
     "sSortAsc":            _stateDefault+" sorting_asc",
     "sSortDesc":           _stateDefault+" sorting_desc",
@@ -19742,38 +14360,22 @@
     "sSortJUIDescAllowed": _sortIcon+"carat-1-s",
     "sSortJUIWrapper":     "DataTables_sort_wrapper",
     "sSortIcon":           "DataTables_sort_icon",
-<<<<<<< HEAD
-  
-    /* Scrolling */
-    "sScrollHead": "dataTables_scrollHead "+_stateDefault,
-    "sScrollFoot": "dataTables_scrollFoot "+_stateDefault,
-  
-=======
 
     /* Scrolling */
     "sScrollHead": "dataTables_scrollHead "+_stateDefault,
     "sScrollFoot": "dataTables_scrollFoot "+_stateDefault,
 
->>>>>>> hotfix-5338-not-working
     /* Misc */
     "sHeaderTH":  _stateDefault,
     "sFooterTH":  _stateDefault,
     "sJUIHeader": _headerFooter+" ui-corner-tl ui-corner-tr",
     "sJUIFooter": _headerFooter+" ui-corner-bl ui-corner-br"
   } );
-<<<<<<< HEAD
-  
-  }());
-  
-  
-  
-=======
 
   }());
 
 
 
->>>>>>> hotfix-5338-not-working
   var extPagination = DataTable.ext.pager;
 
   function _numbers ( page, pages ) {
@@ -19782,11 +14384,7 @@
       buttons = extPagination.numbers_length,
       half = Math.floor( buttons / 2 ),
       i = 1;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( pages <= buttons ) {
       numbers = _range( 0, pages );
     }
@@ -19807,52 +14405,16 @@
       numbers.splice( 0, 0, 'ellipsis' );
       numbers.splice( 0, 0, 0 );
     }
-<<<<<<< HEAD
-  
-    numbers.DT_el = 'span';
-    return numbers;
-  }
-  
-  
-=======
 
     numbers.DT_el = 'span';
     return numbers;
   }
 
 
->>>>>>> hotfix-5338-not-working
   $.extend( extPagination, {
     simple: function ( page, pages ) {
       return [ 'previous', 'next' ];
     },
-<<<<<<< HEAD
-  
-    full: function ( page, pages ) {
-      return [  'first', 'previous', 'next', 'last' ];
-    },
-  
-    numbers: function ( page, pages ) {
-      return [ _numbers(page, pages) ];
-    },
-  
-    simple_numbers: function ( page, pages ) {
-      return [ 'previous', _numbers(page, pages), 'next' ];
-    },
-  
-    full_numbers: function ( page, pages ) {
-      return [ 'first', 'previous', _numbers(page, pages), 'next', 'last' ];
-    },
-  
-    // For testing and plug-ins to use
-    _numbers: _numbers,
-  
-    // Number of number buttons (including ellipsis) to show. _Must be odd!_
-    numbers_length: 7
-  } );
-  
-  
-=======
 
     full: function ( page, pages ) {
       return [  'first', 'previous', 'next', 'last' ];
@@ -19878,7 +14440,6 @@
   } );
 
 
->>>>>>> hotfix-5338-not-working
   $.extend( true, DataTable.ext.renderer, {
     pageButton: {
       _: function ( settings, host, idx, buttons, page, pages ) {
@@ -19886,27 +14447,16 @@
         var lang = settings.oLanguage.oPaginate;
         var aria = settings.oLanguage.oAria.paginate || {};
         var btnDisplay, btnClass, counter=0;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         var attach = function( container, buttons ) {
           var i, ien, node, button;
           var clickHandler = function ( e ) {
             _fnPageChange( settings, e.data.action, true );
           };
-<<<<<<< HEAD
-  
-          for ( i=0, ien=buttons.length ; i<ien ; i++ ) {
-            button = buttons[i];
-  
-=======
 
           for ( i=0, ien=buttons.length ; i<ien ; i++ ) {
             button = buttons[i];
 
->>>>>>> hotfix-5338-not-working
             if ( $.isArray( button ) ) {
               var inner = $( '<'+(button.DT_el || 'div')+'/>' )
                 .appendTo( container );
@@ -19915,71 +14465,43 @@
             else {
               btnDisplay = null;
               btnClass = '';
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
               switch ( button ) {
                 case 'ellipsis':
                   container.append('<span class="ellipsis">&#x2026;</span>');
                   break;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
                 case 'first':
                   btnDisplay = lang.sFirst;
                   btnClass = button + (page > 0 ?
                     '' : ' '+classes.sPageButtonDisabled);
                   break;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
                 case 'previous':
                   btnDisplay = lang.sPrevious;
                   btnClass = button + (page > 0 ?
                     '' : ' '+classes.sPageButtonDisabled);
                   break;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
                 case 'next':
                   btnDisplay = lang.sNext;
                   btnClass = button + (page < pages-1 ?
                     '' : ' '+classes.sPageButtonDisabled);
                   break;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
                 case 'last':
                   btnDisplay = lang.sLast;
                   btnClass = button + (page < pages-1 ?
                     '' : ' '+classes.sPageButtonDisabled);
                   break;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
                 default:
                   btnDisplay = button + 1;
                   btnClass = page === button ?
                     classes.sPageButtonActive : '';
                   break;
               }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
               if ( btnDisplay !== null ) {
                 node = $('<a>', {
                     'class': classes.sPageButton+' '+btnClass,
@@ -19993,38 +14515,22 @@
                   } )
                   .html( btnDisplay )
                   .appendTo( container );
-<<<<<<< HEAD
-  
-                _fnBindAction(
-                  node, {action: button}, clickHandler
-                );
-  
-=======
 
                 _fnBindAction(
                   node, {action: button}, clickHandler
                 );
 
->>>>>>> hotfix-5338-not-working
                 counter++;
               }
             }
           }
         };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // IE9 throws an 'unknown error' if document.activeElement is used
         // inside an iframe or frame. Try / catch the error. Not good for
         // accessibility, but neither are frames.
         var activeEl;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         try {
           // Because this approach is destroying and recreating the paging
           // elements, focus is lost on the select button which is bad for
@@ -20033,30 +14539,18 @@
           activeEl = $(host).find(document.activeElement).data('dt-idx');
         }
         catch (e) {}
-<<<<<<< HEAD
-  
-        attach( $(host).empty(), buttons );
-  
-=======
 
         attach( $(host).empty(), buttons );
 
->>>>>>> hotfix-5338-not-working
         if ( activeEl ) {
           $(host).find( '[data-dt-idx='+activeEl+']' ).focus();
         }
       }
     }
   } );
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   // Built in type detection. See model.ext.aTypes for information about
   // what is required from this methods.
   $.extend( DataTable.ext.type.detect, [
@@ -20067,11 +14561,7 @@
       var decimal = settings.oLanguage.sDecimal;
       return _isNumber( d, decimal ) ? 'num'+decimal : null;
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Dates (only those recognised by the browser's Date.parse)
     function ( d, settings )
     {
@@ -20084,44 +14574,28 @@
       var parsed = Date.parse(d);
       return (parsed !== null && !isNaN(parsed)) || _empty(d) ? 'date' : null;
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // Formatted numbers
     function ( d, settings )
     {
       var decimal = settings.oLanguage.sDecimal;
       return _isNumber( d, decimal, true ) ? 'num-fmt'+decimal : null;
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // HTML numeric
     function ( d, settings )
     {
       var decimal = settings.oLanguage.sDecimal;
       return _htmlNumeric( d, decimal ) ? 'html-num'+decimal : null;
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // HTML numeric, formatted
     function ( d, settings )
     {
       var decimal = settings.oLanguage.sDecimal;
       return _htmlNumeric( d, decimal, true ) ? 'html-num-fmt'+decimal : null;
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // HTML (this is strict checking - there must be html)
     function ( d, settings )
     {
@@ -20129,19 +14603,6 @@
         'html' : null;
     }
   ] );
-<<<<<<< HEAD
-  
-  
-  
-  // Filter formatting functions. See model.ext.ofnSearch for information about
-  // what is required from these methods.
-  // 
-  // Note that additional search methods are added for the html numbers and
-  // html formatted numbers by `_addNumericSort()` when we know what the decimal
-  // place is
-  
-  
-=======
 
 
 
@@ -20153,7 +14614,6 @@
   // place is
 
 
->>>>>>> hotfix-5338-not-working
   $.extend( DataTable.ext.type.search, {
     html: function ( data ) {
       return _empty(data) ?
@@ -20164,11 +14624,7 @@
             .replace( _re_html, "" ) :
           '';
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     string: function ( data ) {
       return _empty(data) ?
         data :
@@ -20177,61 +14633,35 @@
           data;
     }
   } );
-<<<<<<< HEAD
-  
-  
-  
-=======
 
 
 
->>>>>>> hotfix-5338-not-working
   var __numericReplace = function ( d, decimalPlace, re1, re2 ) {
     if ( d !== 0 && (!d || d === '-') ) {
       return -Infinity;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // If a decimal place other than `.` is used, it needs to be given to the
     // function so we can detect it and replace with a `.` which is the only
     // decimal place Javascript recognises - it is not locale aware.
     if ( decimalPlace ) {
       d = _numToDecimal( d, decimalPlace );
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     if ( d.replace ) {
       if ( re1 ) {
         d = d.replace( re1, '' );
       }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       if ( re2 ) {
         d = d.replace( re2, '' );
       }
     }
-<<<<<<< HEAD
-  
-    return d * 1;
-  };
-  
-  
-=======
 
     return d * 1;
   };
 
 
->>>>>>> hotfix-5338-not-working
   // Add the numeric 'deformatting' functions for sorting and search. This is done
   // in a function to provide an easy ability for the language options to add
   // additional methods if a non-period decimal place is used.
@@ -20242,29 +14672,17 @@
         "num": function ( d ) {
           return __numericReplace( d, decimalPlace );
         },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Formatted numbers
         "num-fmt": function ( d ) {
           return __numericReplace( d, decimalPlace, _re_formatted_numeric );
         },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // HTML numeric
         "html-num": function ( d ) {
           return __numericReplace( d, decimalPlace, _re_html );
         },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // HTML numeric, formatted
         "html-num-fmt": function ( d ) {
           return __numericReplace( d, decimalPlace, _re_html, _re_formatted_numeric );
@@ -20273,11 +14691,7 @@
       function ( key, fn ) {
         // Add the ordering method
         _ext.type.order[ key+decimalPlace+'-pre' ] = fn;
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // For HTML types add a search formatter that will strip the HTML
         if ( key.match(/^html\-/) ) {
           _ext.type.search[ key+decimalPlace ] = _ext.type.search.html;
@@ -20285,24 +14699,15 @@
       }
     );
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   // Default sort methods
   $.extend( _ext.type.order, {
     // Dates
     "date-pre": function ( d ) {
       return Date.parse( d ) || 0;
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // html
     "html-pre": function ( a ) {
       return _empty(a) ?
@@ -20311,11 +14716,7 @@
           a.replace( /<.*?>/g, "" ).toLowerCase() :
           a+'';
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     // string
     "string-pre": function ( a ) {
       // This is a little complex, but faster than always calling toString,
@@ -20334,30 +14735,17 @@
     "string-asc": function ( x, y ) {
       return ((x < y) ? -1 : ((x > y) ? 1 : 0));
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     "string-desc": function ( x, y ) {
       return ((x < y) ? 1 : ((x > y) ? -1 : 0));
     }
   } );
-<<<<<<< HEAD
-  
-  
-  // Numeric sorting types - order doesn't matter here
-  _addNumericSort( '' );
-  
-  
-=======
 
 
   // Numeric sorting types - order doesn't matter here
   _addNumericSort( '' );
 
 
->>>>>>> hotfix-5338-not-working
   $.extend( true, DataTable.ext.renderer, {
     header: {
       _: function ( settings, cell, column, classes ) {
@@ -20370,15 +14758,9 @@
           if ( settings !== ctx ) { // need to check this this is the host
             return;               // table, not a nested one
           }
-<<<<<<< HEAD
-  
-          var colIdx = column.idx;
-  
-=======
 
           var colIdx = column.idx;
 
->>>>>>> hotfix-5338-not-working
           cell
             .removeClass(
               column.sSortingClass +' '+
@@ -20392,11 +14774,7 @@
             );
         } );
       },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
       jqueryui: function ( settings, cell, column, classes ) {
         $('<div/>')
           .addClass( classes.sSortJUIWrapper )
@@ -20405,25 +14783,15 @@
             .addClass( classes.sSortIcon+' '+column.sSortingClassJUI )
           )
           .appendTo( cell );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
         // Attach a sort listener to update on sort
         $(settings.nTable).on( 'order.dt.DT', function ( e, ctx, sorting, columns ) {
           if ( settings !== ctx ) {
             return;
           }
-<<<<<<< HEAD
-  
-          var colIdx = column.idx;
-  
-=======
 
           var colIdx = column.idx;
 
->>>>>>> hotfix-5338-not-working
           cell
             .removeClass( classes.sSortAsc +" "+classes.sSortDesc )
             .addClass( columns[ colIdx ] == 'asc' ?
@@ -20431,11 +14799,7 @@
                 classes.sSortDesc :
                 column.sSortingClass
             );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           cell
             .find( 'span.'+classes.sSortIcon )
             .removeClass(
@@ -20454,22 +14818,14 @@
       }
     }
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   /*
    * Public helper functions. These aren't used internally by DataTables, or
    * called by any of the options passed into DataTables, but they can be used
    * externally by developers working with DataTables. They are helper functions
    * to make working with DataTables a little bit easier.
    */
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
   /**
    * Helpers for `columns.render`.
    *
@@ -20503,40 +14859,23 @@
           if ( typeof d !== 'number' && typeof d !== 'string' ) {
             return d;
           }
-<<<<<<< HEAD
-  
-          var negative = d < 0 ? '-' : '';
-          var flo = parseFloat( d );
-  
-=======
 
           var negative = d < 0 ? '-' : '';
           var flo = parseFloat( d );
 
->>>>>>> hotfix-5338-not-working
           // If NaN then there isn't much formatting that we can do - just
           // return immediately
           if ( isNaN( flo ) ) {
             return d;
           }
-<<<<<<< HEAD
-  
-          d = Math.abs( flo );
-  
-=======
 
           d = Math.abs( flo );
 
->>>>>>> hotfix-5338-not-working
           var intPart = parseInt( d, 10 );
           var floatPart = precision ?
             decimal+(d - intPart).toFixed( precision ).substring( 2 ):
             '';
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
           return negative + (prefix||'') +
             intPart.toString().replace(
               /\B(?=(\d{3})+(?!\d))/g, thousands
@@ -20546,11 +14885,7 @@
         }
       };
     },
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
     text: function () {
       return {
         display: function ( d ) {
@@ -20561,24 +14896,14 @@
       };
     }
   };
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /*
    * This is really a good bit rubbish this method of exposing the internal methods
    * publicly... - To be fixed in 2.0 using methods on the prototype
    */
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Create a wrapper function for exporting an internal functions to an external API.
    *  @param {string} fn API function name
@@ -20594,13 +14919,8 @@
       return DataTable.ext.internal[fn].apply( this, args );
     };
   }
-<<<<<<< HEAD
-  
-  
-=======
 
 
->>>>>>> hotfix-5338-not-working
   /**
    * Reference to internal functions for use by plug-in developers. Note that
    * these methods are references to internal functions and are considered to be
@@ -20701,11 +15021,7 @@
                                     // in 1.10, so this dead-end function is
                                     // added to prevent errors
   } );
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> hotfix-5338-not-working
 
   // jQuery access
   $.fn.dataTable = DataTable;
@@ -20893,8 +15209,4 @@
    */
 
   return $.fn.dataTable;
-<<<<<<< HEAD
 }));
-=======
-}));
->>>>>>> hotfix-5338-not-working
