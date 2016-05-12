@@ -4,7 +4,9 @@
 #end
 
 Given(/^I click the SEP link from the Admin DC Health Link login page$/) do
-  #load the system with an instance of All, EE and IVL SEP individuals
+  # load the system with an instance of All. The admin portal by default goes to the All
+  # tab and needs to have at least a single entry there in order for cucumber to not fail 
+  # when the view calls the fam.each do |f| method
 
   #create All person
   person_all = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_employee_role)
