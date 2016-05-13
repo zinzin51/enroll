@@ -24,9 +24,8 @@
 
 		  <% if f.primary_applicant.person.consumer_role.present? %>
 			
-			<% unless f.primary_applicant.person.active_employee_roles.present? %>	
 				<% init_arr.push(f) %>
-			<% end %>
+		
 
 		 <% end %>
 
@@ -40,9 +39,7 @@
 
 		  <% if f.primary_applicant.person.active_employee_roles.present? %>
 
-			<% unless f.primary_applicant.person.consumer_role.present? %>
 				<% init_arr.push(f) %>
-			<% end %>
 
 		  <% end %>
 
