@@ -224,7 +224,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-
   def sep_index
 
     @event_kinds_all = ['first_of_next_month', '15th_day_rule'];
@@ -329,7 +328,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     render
 
   end
-
 
   def broker_agency_index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -451,7 +449,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         flash[:error] = "Not saved"
       end
     end
-    redirect_to exchanges_hbx_profiles_root_path
+    
   end
 
   # GET /exchanges/hbx_profiles/new
