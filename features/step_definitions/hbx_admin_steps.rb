@@ -327,3 +327,7 @@ Given(/^Mark Jones is registered as All$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
 
+Then(/^the SEP add page is displayed with the following SEP end Date for EE$/) do
+  pending # Write code here that turns the phrase above into concrete actions
+end
+
