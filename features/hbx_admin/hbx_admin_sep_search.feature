@@ -32,6 +32,10 @@ Feature: search IVL enrollment for SEP information
 		Given I have a primary subscriber who is registered as a consumer and as an employee
 		When I click the All tab
 		Then I see Yes in the Consumer Field and Yes in the Employee field for his search results
+		When I click the IVL tab
+		Then I see Yes in the Consumer Field and Yes in the Employee field for his search results
+		When I click the EE tab
+		Then I see Yes in the Consumer Field and Yes in the Employee field for his search results
 
 	#TODO	
 	#Scenario Outline: filter SEP dashboard results using the filter buttons
