@@ -7,7 +7,7 @@ end
 World(HbxAdminWorld)
 
 Given(/^an HBX admin exists$/) do
-  hbx_admin :with_family, :hbx_staff_sep
+  hbx_admin :with_family, :hbx_staff
 end
 
 Given(/^the HBX admin is logged in$/) do
