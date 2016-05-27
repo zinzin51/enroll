@@ -22,7 +22,7 @@ Feature: HBX-Admin needs to add a self-attested SEP for an enrollment/household
 		| submit button								 |
 		| SEP start Date							 |
 		| SEP end Date for IVL 				 |
-		| SEP end Datre for EE 				 |
+		| SEP end Date for EE 				 |
 		| Next Possible Effective Date |
 		| Choice Date 1								 |
 		| Choice Date 2								 |

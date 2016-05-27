@@ -20,6 +20,3 @@ Feature: Consumer views effective date and any choice dates entered
 		When the consumer selects the effective date
 		And then selects the Choice date
 		Then the choice date is the one that will be applied to the consumer
-
-
-	
