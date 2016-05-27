@@ -18,16 +18,15 @@
 	<% end %>
 
 
-<% elsif state == 'ivl'%>
-	
+<% elsif state == 'ivl' %>
+	 	
    <% fam.each do|f| if fam.present? %>
 
 		  <% if f.primary_applicant.person.consumer_role.present? %>
 			
 				<% init_arr.push(f) %>
-		
 
-		 <% end %>
+			<% end %>	
 
 	  <% end %>
 
