@@ -335,7 +335,7 @@ class ConsumerRole
     state :verifications_outstanding
     state :fully_verified
 
-    #before_all_events :ensure_ssn_validation_status
+    before_all_events :ensure_ssn_validation_status
 
     event :import, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :verifications_pending, to: :fully_verified
