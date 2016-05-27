@@ -1,4 +1,4 @@
-
+GIT
   remote: https://github.com/dchbx/acapi.git
   revision: d41e5fab75a77abca64f33278150735438acfff6
   branch: development
@@ -594,4 +594,4 @@ DEPENDENCIES
   wkhtmltopdf-binary-edge (= 0.12.3.0)
 
 BUNDLED WITH
-   1.11.2
+   1.12.1
