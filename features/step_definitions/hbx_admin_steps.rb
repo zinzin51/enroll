@@ -326,4 +326,3 @@ end
 Given(/^Mark Jones is registered as All$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
-
