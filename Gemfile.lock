@@ -537,7 +537,7 @@ DEPENDENCIES
   font-awesome-rails (= 4.5.0.1)
   forgery
   haml
-  jbuilder (~> 2.0)
+  jbuilder (~> 2.0)s
   jquery-datatables-rails (= 3.4.0)
   jquery-rails (= 4.0.5)
   jquery-turbolinks
