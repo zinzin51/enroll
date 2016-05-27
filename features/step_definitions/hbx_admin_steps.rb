@@ -126,6 +126,16 @@ end
 
 Given(/^I have a primary subscriber who is registered as a consumer and as an employee$/) do
   #already created instnace of this subscriber in previous step
+  person_both = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_employee_role)
+  family_both = person_both.primary_family
+  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
+  qle_both = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryGirl.create(:special_enrollment_period, family: family_both, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle_both.id)
+  both_er_profile = FactoryGirl.create(:employer_profile)
+  both_census_ee = FactoryGirl.create(:census_employee, employer_profile: both_er_profile)
+  person_both.employee_roles.first.census_employee = both_census_ee
+  person_both.employee_roles.first.save!
+  family_both = Family.find(family_both.id)
 end
 
 
