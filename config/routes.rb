@@ -36,9 +36,12 @@ Rails.application.routes.draw do
         get :staff_index
         get :assister_index
         get :request_help
+        get :verification_index
+        get :verifications_index_datatable
         get :sep_index
         post :sep_index_datatable
         post :add_new_sep
+
       end
 
       member do
@@ -101,6 +104,7 @@ Rails.application.routes.draw do
       get 'new'
       member do
         post 'unblock'
+        delete 'delete_consumer_broker'
       end
 
       collection do
@@ -109,7 +113,7 @@ Rails.application.routes.draw do
         get 'personal'
         get 'inbox'
         get 'brokers'
-        get 'documents_index'
+        get 'verification'
         get 'document_upload'
         get 'find_sep'
         post 'record_sep'
@@ -170,7 +174,7 @@ Rails.application.routes.draw do
         get :approve
       end
     end
-    
+
     #TODO REFACTOR
     resources :people do
       collection do
@@ -329,7 +333,6 @@ Rails.application.routes.draw do
   resources :people do #TODO Delete
     get 'select_employer'
     get 'my_account'
-    get 'person_landing'
 
     collection do
       post 'person_confirm'
@@ -368,14 +371,20 @@ Rails.application.routes.draw do
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
 
-  resources :documents, only: [:index, :update] do
+  resources :documents, only: [:update, :destroy, :update] do
     collection do
-      get :consumer_role_status
-      put :change_doc_status
       put :change_person_aasm_state
-      get :new_comment
+      get :show_docs
+      get :update_individual
+      put :update_verification_type
+      get :enrollment_verification
+      put :enrollment_docs_state
+      put :extend_due_date
+      get :fed_hub_request
     end
   end
+
+
 
   resources :sep_history, only: [:index]
 

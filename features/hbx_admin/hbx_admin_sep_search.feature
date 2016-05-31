@@ -53,6 +53,3 @@ Feature: search IVL enrollment for SEP information
 			#|   IVL	 |     2		 |     0		|   0	 |
 			#| 	EE 	 |     0     |     3	  |   0  |
 			#|   All  |     0     |     0    |   3  |
-
-
-

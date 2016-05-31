@@ -1,5 +1,4 @@
 class Exchanges::HbxProfilesController < ApplicationController
-
   include DataTablesAdapter
   include SepAll
 
@@ -172,7 +171,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @status = status_params[:status] || 'applicant'
     @people = @people.send("general_agency_staff_#{@status}") if @people.respond_to?("general_agency_staff_#{@status}")
 
-    @general_agency_profiles = @people.map { |p| p.general_agency_staff_roles.last.general_agency_profile }.uniq rescue []
+    @general_agency_profiles = @people.map { |p| p.general_agency_staff_roles.map(&:general_agency_profile) }.flatten.uniq rescue []
     @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
 
     respond_to do |format|
@@ -188,6 +187,32 @@ class Exchanges::HbxProfilesController < ApplicationController
       format.html { render "issuer_index" }
       format.js {}
     end
+  end
+
+  def verification_index
+    respond_to do |format|
+      format.html { render partial: "index_verification" }
+      format.js {}
+    end
+  end
+
+  def verifications_index_datatable
+    dt_query = extract_datatable_parameters
+    families = []
+    all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+    if dt_query.search_string.blank?
+      families = all_families
+    else
+      person_ids = Person.search(dt_query.search_string).pluck(:id)
+      families = all_families.where({
+        "family_members.person_id" => {"$in" => person_ids}
+      })
+    end
+    @draw = dt_query.draw
+    @total_records = all_families.count
+    @records_filtered = families.count
+    @families = families.skip(dt_query.skip).limit(dt_query.take)
+    render 
   end
 
   def product_index
@@ -228,6 +253,29 @@ class Exchanges::HbxProfilesController < ApplicationController
   def add_new_sep
     if params[:qle_id].present?
       createSep 
+    end
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
+
+  def add_new_sep
+    if params[:qle_id].present?
+      qle = QualifyingLifeEventKind.find(params[:qle_id])
+      @family = Family.find(params[:person])
+      special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
+      special_enrollment_period.selected_effective_on = params.permit(:effective_on_date)[:effective_on_date] if params[:effective_on_date].present?
+      special_enrollment_period.start_on = Date.strptime(params[:start_on], "%m/%d/%Y") if params[:start_on].present?
+      special_enrollment_period.end_on = Date.strptime(params[:end_on], "%m/%d/%Y") if params[:end_on].present?
+      special_enrollment_period.qualifying_life_event_kind = qle
+      special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment] if params[:admin_comment].present?
+      special_enrollment_period.csl_num = params.permit(:csl_num)[:csl_num] if params[:csl_num].present?
+      special_enrollment_period.next_poss_effective_date = Date.strptime(params[:next_poss_effective_date], "%m/%d/%Y") if params[:next_poss_effective_date].present?
+      special_enrollment_period.option1_date = Date.strptime(params[:option1_date], "%m/%d/%Y") if params[:option1_date].present?
+      special_enrollment_period.option2_date = Date.strptime(params[:option2_date], "%m/%d/%Y") if params[:option2_date].present?
+      special_enrollment_period.option3_date = Date.strptime(params[:option3_date], "%m/%d/%Y") if params[:option3_date].present?
+      special_enrollment_period.qle_on = Date.strptime(params[:event_date], "%m/%d/%Y") if params[:event_date].present?
+      
+      special_enrollment_period.save
     end
     redirect_to exchanges_hbx_profiles_root_path
   end

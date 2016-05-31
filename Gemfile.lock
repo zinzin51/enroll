@@ -11,7 +11,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (1.0.2)
-    aasm (4.0.8)
+    aasm (4.8.0)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
     actionmailer (4.2.3)
@@ -96,7 +96,9 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    capybara-screenshot (1.0.13)
+
+    capybara-screenshot (1.0.12)
+
       capybara (>= 1.0, < 3)
       launchy
     carrierwave (0.10.0)
@@ -215,7 +217,11 @@ GEM
       multi_json (~> 1.2)
     jmespath (1.2.4)
       json_pure (>= 1.8.1)
+<<<<<<< HEAD
     jquery-datatables-rails (3.3.0)
+=======
+    jquery-datatables-rails (3.4.0)
+>>>>>>> c0e91a3b400a5fe967353378f4a85faa156b5bf5
       actionpack (>= 3.1)
       jquery-rails
       railties (>= 3.1)
@@ -499,7 +505,11 @@ GEM
       railties (>= 4.0)
       sprockets-rails (>= 2.0, < 4.0)
     websocket (1.2.3)
+<<<<<<< HEAD
     websocket-driver (0.6.4)
+=======
+    websocket-driver (0.6.3)
+>>>>>>> c0e91a3b400a5fe967353378f4a85faa156b5bf5
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
     wicked_pdf (1.0.4)
@@ -511,7 +521,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aasm (~> 4.0.7)
+  aasm (~> 4.8.0)
   acapi!
   action_mailer_cache_delivery (~> 0.3.7)
   addressable (= 2.3.8)
@@ -538,7 +548,11 @@ DEPENDENCIES
   forgery
   haml
   jbuilder (~> 2.0)
+<<<<<<< HEAD
   jquery-datatables-rails (~> 3.3.0)
+=======
+  jquery-datatables-rails (= 3.4.0)
+>>>>>>> c0e91a3b400a5fe967353378f4a85faa156b5bf5
   jquery-rails (= 4.0.5)
   jquery-turbolinks
   jquery-ui-rails

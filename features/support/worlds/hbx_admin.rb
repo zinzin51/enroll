@@ -15,5 +15,5 @@ Given(/^the HBX admin is logged in$/) do
 end
 
 Given(/^I have logged in as an HBX\-Admin$/) do
-	login_as hbx_admin(:hbx_staff), scope: :user
+	login_as hbx_admin(:hbx_staff_sep), scope: :user
 end
