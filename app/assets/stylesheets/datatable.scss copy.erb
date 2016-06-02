@@ -1,5 +1,6 @@
-.module {
-  &#employers_dataTable_wrapper, &#families_dataTable_wrapper, &#sepAdmin_wrapper {
+
+#employers_dataTable_wrapper, #families_dataTable_wrapper, #sepAdmin_wrapper, #sepAdmin1_wrapper, #sepAdmin2_wrapper {
+  .module {
     .small-6 {
       width: 50%;
       &:first-of-type {
@@ -75,8 +76,24 @@
   }
 
   div.dataTables_paginate {
-      margin: 20px;
-      white-space: nowrap;
+
       text-align: center;
+
+  }
+}
+
+.dn-1 {
+  display: block !important;
+  opacity: 100 !important;
+}
+
+#sepAdmin_wrapper, #sepAdmin1_wrapper, #sepAdmin2_wrapper {
+  .header {
+    .small-6:first-of-type {
+      display: none;
+    }
+    .small-6:last-of-type {
+      float: right !important;
+    }
   }
 }
