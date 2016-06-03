@@ -21,13 +21,14 @@
 	        "employer_contribution": <%= detail[:employer_contribution] %>
 	     },
          "contact_info": {
-               "phone": "<%= er.organization.primary_office_location.phone.area_code %>-<%= er.organization.primary_office_location.phone.number %>",
+         		<% office = er.organization.primary_office_location %>
+               "phone": "<%= office.phone.area_code %>-<%= office.phone.number %>",
                "emails": <%= detail[:emails].to_json.html_safe %>,
-               "address_1": "<%= er.organization.primary_office_location.address.address_1 %>",
-               "address_2": <%= er.organization.primary_office_location.address.address_2 %>,
-               "city": "<%= er.organization.primary_office_location.address.city %>",
-               "state": "<%= er.organization.primary_office_location.address.state %>",
-               "zip": "<%= er.organization.primary_office_location.address.zip %>"
+               "address_1": "<%= office.address.address_1 %>",
+               "address_2": <%= office.address.address_2 %>,
+               "city": "<%= office.address.city %>",
+               "state": "<%= office.address.state %>",
+               "zip": "<%= office.address.zip %>"
          }
        }
    <% end.join(",\n") %>
