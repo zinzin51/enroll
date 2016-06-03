@@ -5,18 +5,10 @@
 		er = detail[:profile] 
 	%>{
 		 "employer_name" : "<%= er.legal_name %>",
-	    <% if er.active_plan_year %>
-		 "open_enrollment_begins" : "<%= er.active_plan_year.open_enrollment_start_on %>",
-		 "open_enrollment_ends" : "<%= er.active_plan_year.open_enrollment_end_on %>",
-		 "plan_year_begins" : "<%= er.active_plan_year.start_on %>"
-		 "renewal_in_progress": "<%= er.active_plan_year.aasm_state %>"
-	    <% end %>
-	    <% if er.show_plan_year %>
 		 "open_enrollment_begins" : "<%= er.show_plan_year.open_enrollment_start_on %>",
 		 "open_enrollment_ends" : "<%= er.show_plan_year.open_enrollment_end_on %>",
 		 "plan_year_begins" : "<%= er.show_plan_year.start_on %>",
 		 "renewal_in_progress": "<%= er.show_plan_year.is_renewing? %>",
-	    <% end %>
 	     "renewal_applicable_available": "<%= er.show_plan_year.due_date_for_publish %>",
 	     "renewal_application_due": "",
 	     "binder_payment_due": "",
