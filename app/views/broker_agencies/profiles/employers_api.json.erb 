@@ -1,0 +1,43 @@
+{
+	"broker_agency" : "<%= @broker_agency_profile.legal_name %>",
+	"broker_clients" : [
+	<% @employer_details.map do |detail| 
+		er = detail[:profile] 
+	%>{
+		 "employer_name" : "<%= er.legal_name %>",
+	    <% if er.active_plan_year %>
+		 "open_enrollment_begins" : "<%= er.active_plan_year.open_enrollment_start_on %>",
+		 "open_enrollment_ends" : "<%= er.active_plan_year.open_enrollment_end_on %>",
+		 "plan_year_begins" : "<%= er.active_plan_year.start_on %>"
+		 "renewal_in_progress": "<%= er.active_plan_year.aasm_state %>"
+	    <% end %>
+	    <% if er.show_plan_year %>
+		 "open_enrollment_begins" : "<%= er.show_plan_year.open_enrollment_start_on %>",
+		 "open_enrollment_ends" : "<%= er.show_plan_year.open_enrollment_end_on %>",
+		 "plan_year_begins" : "<%= er.show_plan_year.start_on %>",
+		 "renewal_in_progress": "<%= er.show_plan_year.is_renewing? %>",
+	    <% end %>
+	     "renewal_applicable_available": "<%= er.show_plan_year.due_date_for_publish %>",
+	     "renewal_application_due": "",
+	     "binder_payment_due": "",
+		 "employees_total": "<%= er.roster_size %>",
+		 "employees_enrolled" : "<%= er.show_plan_year.total_enrolled_count %>",
+	     "employees_waived": "<%= er.show_plan_year.waived_count %>",
+	     "minimum_participation_required": "<%= er.show_plan_year.minimum_enrolled_count %>",
+	     "estimated_premium": {
+	        "employee_contribution": <%= detail[:employee_contribution] %>,
+	        "employer_contribution": <%= detail[:employer_contribution] %>
+	     },
+         "contact_info": {
+               "phone": "<%= er.organization.primary_office_location.phone.area_code %>-<%= er.organization.primary_office_location.phone.number %>",
+               "emails": <%= detail[:emails].to_json.html_safe %>,
+               "address_1": "<%= er.organization.primary_office_location.address.address_1 %>",
+               "address_2": <%= er.organization.primary_office_location.address.address_2 %>,
+               "city": "<%= er.organization.primary_office_location.address.city %>",
+               "state": "<%= er.organization.primary_office_location.address.state %>",
+               "zip": "<%= er.organization.primary_office_location.address.zip %>"
+         }
+       }
+   <% end.join(",\n") %>
+	]
+} 
