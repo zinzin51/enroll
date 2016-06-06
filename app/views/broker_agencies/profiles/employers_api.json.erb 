@@ -10,7 +10,7 @@
 		 "open_enrollment_ends" : "<%= year.open_enrollment_end_on %>",
 		 "plan_year_begins" : "<%= year.start_on %>",
 		 "renewal_in_progress": "<%= year.is_renewing? %>",
-	     "renewal_application_available": "<%= year.star_on >> @renewals_offset_in_months %>",
+	     "renewal_application_available": "<%= year.start_on >> @renewals_offset_in_months %>",
 	     "renewal_application_due": "<%= year.due_date_for_publish %>",
 	     "binder_payment_due": "",
 		 "employees_total": "<%= er.roster_size %>",

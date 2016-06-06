@@ -164,6 +164,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
 
+    @renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
+
     @employer_details = @employer_profiles.map do |er| 
         enrollments = er.enrollments_for_billing
         premium_amt_total   = enrollments.map(&:total_premium).sum
