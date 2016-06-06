@@ -158,6 +158,7 @@ Given /^a general agency, approved, confirmed, exists$/ do
   general_agency(legal_name: 'Rooxo')
   staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
+  staff.approve!
   email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
   user = FactoryGirl.create(:user, email: "ga1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 
@@ -250,7 +251,7 @@ end
 And /^selects the general agency from dropdown for the employer$/ do
   expect(page).to have_content('EmployerA')
   find("input#employer_ids_").click
-  find(:xpath, "//p[@class='label']").click
+  find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Rooxo')]").click
   find("#assign_general_agency").click
 end
@@ -356,6 +357,7 @@ Given /^another general agency-ga2, approved, confirmed, exists$/ do
   general_agency = FactoryGirl.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
   staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
+  staff.approve!
   email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
   user = FactoryGirl.create(:user, email: "ga2@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 
@@ -368,7 +370,7 @@ end
 And /^selects the GA2 from dropdown for the employer$/ do
   expect(page).to have_content('EmployerA')
   find("input#employer_ids_").click
-  find(:xpath, "//p[@class='label']").click
+  find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Zooxy')]").click
   find("#assign_general_agency").click
 end

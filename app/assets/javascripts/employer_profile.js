@@ -1,7 +1,20 @@
 var EmployerProfile = ( function( window, undefined ) {
+  function viewDetails($thisObj) {
+    if ( $thisObj.hasClass('view') ) {
+      $thisObj.closest('.benefit-package').find('.health-offering, .dental-offering').slideDown();
+      $thisObj.html('Hide Details<i class="fa fa-chevron-up fa-lg"></i>');
+      $thisObj.removeClass('view');
+    } else {
+      $thisObj.closest('.benefit-package').find('.health-offering, .dental-offering').slideUp();
+      $thisObj.html('View Details<i class="fa fa-chevron-down fa-lg"></i>');
+      $thisObj.addClass('view');
+    }
+  }
+
   function validateEditPlanYear() {
     editbgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
     editbgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    edit_all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     editreferenceplanselections = $('.reference-plan input[type=radio]:checked');
     editselectedplan = $('input.ref-plan');
 
@@ -62,7 +75,7 @@ var EmployerProfile = ( function( window, undefined ) {
           editvalidatedbgemployeepremiums = true
           editvalidated = true;
         } else {
-          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
           editvalidatedbgemployeepremiums = false;
           editvalidated = false;
           return false;
@@ -70,6 +83,18 @@ var EmployerProfile = ( function( window, undefined ) {
       }
       });
     }
+
+    edit_all_premiums.each(function() {
+      if ( parseInt($(this).val()) >= parseInt(0) && parseInt($(this).val()) <= parseInt(100)) {
+        edit_validated_all_premiums = true;
+        editvalidated = true;
+      } else {
+        $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Premium contribution amounts must be between 0 and 100%');
+        edit_validated_all_premiums = false;
+        editvalidated = false;
+        return false;
+      }
+    });
 
     $('.benefit-group-fields').each(function() {
       if ( $(this).hasClass('edit-additional') ) {
@@ -134,7 +159,7 @@ var EmployerProfile = ( function( window, undefined ) {
     }
     });
 
-    if ( editvalidatedbgtitles == true && editvalidatedbgemployeepremiums == true && editvalidatedreferenceplanselections == true ) {
+    if ( editvalidatedbgtitles == true && editvalidatedbgemployeepremiums == true && editvalidatedreferenceplanselections == true && edit_validated_all_premiums == true ) {
         $('.interaction-click-control-save-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
         $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Click here to save your plan year');
@@ -147,6 +172,7 @@ var EmployerProfile = ( function( window, undefined ) {
   function validatePlanYear() {
     bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
     bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     referenceplanselections = $('.reference-plan input[type=radio]:checked');
 
     bgtitles.each(function() {
@@ -184,13 +210,25 @@ var EmployerProfile = ( function( window, undefined ) {
           validatedbgemployeepremiums = true;
           validated = true;
         } else {
-          $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+          $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
           validatedbgemployeepremiums = false;
           validated = false;
           return false;
         }
       });
     }
+
+    all_premiums.each(function() {
+      if ( parseInt($(this).val()) >= parseInt(0) && parseInt($(this).val()) <= parseInt(100)) {
+        validated_all_premiums = true;
+        validated = true;
+      } else {
+        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Premium contribution amounts must be between 0 and 100%');
+        validated_all_premiums = false;
+        validated = false;
+        return false;
+      }
+    });
 
     dental_bgs = $('.select-dental-plan:visible').length
     health_bgs = $('.benefit-group-fields > .health:visible').length
@@ -213,7 +251,7 @@ var EmployerProfile = ( function( window, undefined ) {
       });
     }
 
-    if ( validatedbgtitles == true && validatedbgemployeepremiums == true && validatedreferenceplanselections == true ) {
+    if ( validatedbgtitles == true && validatedbgemployeepremiums == true && validatedreferenceplanselections == true && validated_all_premiums == true ) {
         $('.interaction-click-control-create-plan-year').removeClass('disabled');
         $('.interaction-click-control-create-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Click here to create your plan year');
@@ -229,7 +267,8 @@ var EmployerProfile = ( function( window, undefined ) {
 
   return {
       validateEditPlanYear : validateEditPlanYear,
-      validatePlanYear : validatePlanYear
+      validatePlanYear : validatePlanYear,
+      viewDetails : viewDetails
     };
 
 } )( window );
@@ -481,15 +520,3 @@ function checkAreaCode(textbox) {
   }
   return true;
 }
-  //toggling of divs that show plan details (view details)
-  $('.nav-toggle').click(function(){
-    var collapse_content_selector = $(this).attr('href');
-    var toggle_switch = $(this);
-    $(collapse_content_selector).slideToggle('fast', function(){
-      if($(this).css('display')=='none'){
-        toggle_switch.html('View Details <i class="fa fa-chevron-down fa-lg">');
-      }else{
-        toggle_switch.html('Hide Details <i class="fa fa-chevron-up fa-lg">');
-      }
-    });
-  });

@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
 
-  devise_for :users, :controllers => { :registrations => "users/registrations" }
+  devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
@@ -20,6 +20,9 @@ Rails.application.routes.draw do
 
   namespace :exchanges do
     resources :inboxes, only: [:show, :destroy]
+    resources :announcements, only: [:index, :create, :destroy] do
+      get :dismiss, on: :collection
+    end
     resources :agents_inboxes, only: [:show, :destroy]
     resources :hbx_profiles do
       root 'hbx_profiles#show'
@@ -27,6 +30,9 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :employer_index
+        get :employer_invoice
+        post :employer_invoice_datatable
+        post :generate_invoice
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index
@@ -120,6 +126,8 @@ Rails.application.routes.draw do
         get 'check_qle_date'
         get 'purchase'
         get 'family'
+        get 'upload_notice_form'
+        post 'upload_notice'
       end
 
       resources :people do
@@ -188,8 +196,12 @@ Rails.application.routes.draw do
       get 'my_account'
       get 'show_profile'
       get 'consumer_override'
+      get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+      member do
+        get "download_invoice"
+      end
       collection do
         get 'welcome'
         get 'search'
@@ -208,6 +220,7 @@ Rails.application.routes.draw do
         post 'force_publish'
         get 'search_reference_plan', on: :collection
         post 'make_default_benefit_group'
+        post 'delete_benefit_group'
         get 'calc_employer_contributions', on: :collection
         get 'calc_offered_plan_contributions', on: :collection
         get 'employee_costs', on: :collection
@@ -370,6 +383,8 @@ Rails.application.routes.draw do
   resources :office_locations, only: [:new]
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
+  get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
+
 
   resources :documents, only: [:update, :destroy, :update] do
     collection do

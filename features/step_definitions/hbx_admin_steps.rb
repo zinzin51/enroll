@@ -5,7 +5,7 @@
 
 Given(/^I click the SEP link from the Admin DC Health Link login page$/) do
   # load the system with an instance of All. The admin portal by default goes to the All
-  # tab and needs to have at least a single entry there in order for cucumber to not fail 
+  # tab and needs to have at least a single entry there in order for cucumber to not fail
   # when the view calls the fam.each do |f| method
 
   #create All person
@@ -43,7 +43,7 @@ Given(/^I click the SEP link from the Admin DC Health Link login page$/) do
   sleep 2
   visit "/"
   click_link 'HBX Portal'
-  click_link 'SEP Admin'
+  click_link 'SEP'
 end
 
 Then(/^the SEP page is displayed$/) do
@@ -62,14 +62,14 @@ end
 
 Then(/^I see columns with headings HBX ID, Last Name, First Name, SSN, Consumer and Employee$/) do
   expect(page).to have_content('HBX ID')
-  
+
   expect(page).to have_content('Last Name')
-  
+
   expect(page).to have_content('First Name')
   expect(page).to have_content('SSN')
   expect(page).to have_content('Consumer?')
   expect(page).to have_content('Employee?')
-  
+
 end
 
 Then(/^I see the Add SEP and History buttons$/) do
@@ -334,9 +334,5 @@ Given(/^Jan Doe is registered as EE$/) do
 end
 
 Given(/^Mark Jones is registered as All$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
-
-Then(/^the SEP add page is displayed with the following SEP end Date for EE$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
