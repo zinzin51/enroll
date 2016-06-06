@@ -195,6 +195,31 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
+   describe "get employers_api" do
+    let(:broker_role) {FactoryGirl.build(:broker_role)}
+    let(:person) {double("person", broker_role: broker_role)}
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
+    let(:organization) {FactoryGirl.create(:organization)}
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
+    employer_profile1 = FactoryGirl.create(:employer_profile)
+    broker_agency_profile = FactoryGirl.build(:broker_agency_profile, organization: organization)
+    broker_agency_account = FactoryGirl.build(:broker_agency_account, broker_agency_profile: broker_agency_profile)
+    employer_profile1.broker_agency_accounts << broker_agency_account
+    employer_profile1.save!
+    
+    it "should get details for employers where broker_agency_account is active" do
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
+      sign_in user
+      xhr :get, :employers, id: broker_agency_profile.id, format: :js
+      expect(response).to have_http_status(:success)
+      orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :broker_agency_profile_id=>broker_agency_profile.id}}})
+      expect(assigns(:orgs)).to eq orgs
+      expect(assigns(:employer_details)[0][:emails]).to eq("Staff contact emails go here")
+    end
+
+  end
+
+
   describe "family_index" do
     before :all do
       org = FactoryGirl.create(:organization)
