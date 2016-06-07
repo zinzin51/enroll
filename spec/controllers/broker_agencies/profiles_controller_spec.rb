@@ -201,20 +201,27 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
     let(:organization) {FactoryGirl.create(:organization)}
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
-    employer_profile1 = FactoryGirl.create(:employer_profile)
-    broker_agency_profile = FactoryGirl.build(:broker_agency_profile, organization: organization)
-    broker_agency_account = FactoryGirl.build(:broker_agency_account, broker_agency_profile: broker_agency_profile)
-    employer_profile1.broker_agency_accounts << broker_agency_account
-    employer_profile1.save!
+    
+    #broker_agency_profile = FactoryGirl.build(:broker_agency_profile, organization: organization)
+  
+    let (:broker_agency_account) { FactoryGirl.build(:broker_agency_account, broker_agency_profile: broker_agency_profile) }
+    let (:employer_profile1) do 
+      e = FactoryGirl.create(:employer_profile) 
+      e.broker_agency_accounts << broker_agency_account
+      print "creating employer profile #{e.inspect} with broker #{broker_agency_account.inspect}"
+      e
+    end
     
     it "should get details for employers where broker_agency_account is active" do
+      employer_profile1.save!
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       sign_in user
-      xhr :get, :employers, id: broker_agency_profile.id, format: :js
+      xhr :get, :employers_api, id: broker_agency_profile.id, format: :json
       expect(response).to have_http_status(:success)
       orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :broker_agency_profile_id=>broker_agency_profile.id}}})
       expect(assigns(:orgs)).to eq orgs
-      expect(assigns(:employer_details)[0][:emails]).to eq("Staff contact emails go here")
+      expect(assigns(:employer_details).count).to eq 1
+#      expect(assigns(:employer_details)[0][:emails]).to eq("Staff contact emails go here")
     end
 
   end
