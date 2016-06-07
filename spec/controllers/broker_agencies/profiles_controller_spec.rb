@@ -201,19 +201,52 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
     let(:organization) {FactoryGirl.create(:organization)}
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
-    
+
+    let(:staff_user) { FactoryGirl.create(:user) }
+    let(:staff) do
+      s = FactoryGirl.create(:person, :with_work_email, :male)
+      s.user = staff_user
+      s
+    end
+
+
     #broker_agency_profile = FactoryGirl.build(:broker_agency_profile, organization: organization)
   
     let (:broker_agency_account) { FactoryGirl.build(:broker_agency_account, broker_agency_profile: broker_agency_profile) }
-    let (:employer_profile1) do 
+    let (:employer_profile) do 
       e = FactoryGirl.create(:employer_profile) 
       e.broker_agency_accounts << broker_agency_account
-      print "creating employer profile #{e.inspect} with broker #{broker_agency_account.inspect}"
+      print "creating employer profile \n\n#{e.inspect}\n\n with broker \n\n#{broker_agency_account.inspect}"
       e
     end
     
     it "should get details for employers where broker_agency_account is active" do
-      employer_profile1.save!
+      #employer_profile.save!
+      #employer_company.employer_profile = employer_profile
+
+      print "\n\n>>>>> STAFF <<<<<<\n\n"
+      p staff
+      print "\n\n>>>>> STAFF USER <<<<<<\n\n"
+      p staff_user
+      print "\n...\n"
+      p staff.emails
+
+#      employer_profile.employee_roles << FactoryGirl.create(:employee_role, :person => staff) 
+      staff.employer_staff_roles << FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
+#      staff.save  
+
+
+      print "\n\nEmployer's staff:\n"
+      all_staff = Person.staff_for_employer_including_pending(employer_profile)
+      p all_staff[0]
+      print "\n"
+      p all_staff[0].emails
+      print "\n"
+      p all_staff[1]
+      print "\n"
+      p all_staff[1].emails
+      print "\n"
+
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       sign_in user
       xhr :get, :employers_api, id: broker_agency_profile.id, format: :json
@@ -221,7 +254,10 @@ RSpec.describe BrokerAgencies::ProfilesController do
       orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :broker_agency_profile_id=>broker_agency_profile.id}}})
       expect(assigns(:orgs)).to eq orgs
       expect(assigns(:employer_details).count).to eq 1
-#      expect(assigns(:employer_details)[0][:emails]).to eq("Staff contact emails go here")
+      
+      print "\n\nDETAILS: "
+      p assigns(:employer_details)
+      expect(assigns(:employer_details)[0][:emails]).to include(staff.work_email.address)
     end
 
   end
