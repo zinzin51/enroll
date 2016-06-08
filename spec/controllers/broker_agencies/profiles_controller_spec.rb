@@ -217,6 +217,14 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
     
     it "should get details for employers where broker_agency_account is active" do
+
+      allow_any_instance_of(EmployerProfile).to receive(:enrollments_for_billing).and_return(
+        [
+          double("enrollment", :total_premium => 500, :total_employee_cost => 200, :total_employer_contribution => 300 ),
+          double("enrollment",  :total_premium => 5000, :total_employee_cost => 2000, :total_employer_contribution => 3000 )
+        ]
+      )
+
       staff.employer_staff_roles << FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       sign_in user
@@ -225,9 +233,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(assigns(:employer_details).count).to eq 1
       expect(assigns(:employer_details)[0][:emails]).to include(staff.work_email.address)
       expect(assigns(:employer_details)[0][:profile]).to eq employer_profile
-      expect(assigns(:employer_details)[0][:total_premium]).to eq 0
-      expect(assigns(:employer_details)[0][:employee_contribution]).to eq 0
-      expect(assigns(:employer_details)[0][:employer_contribution]).to eq 0
+      expect(assigns(:employer_details)[0][:total_premium]).to eq 5500
+      expect(assigns(:employer_details)[0][:employee_contribution]).to eq 2200
+      expect(assigns(:employer_details)[0][:employer_contribution]).to eq 3300
+
+      allow_any_instance_of(EmployerProfile).to receive(:enrollments_for_billing).and_call_original
     end
   end
 
