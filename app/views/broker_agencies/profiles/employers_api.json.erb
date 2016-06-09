@@ -12,7 +12,7 @@
 		 "renewal_in_progress": "<%= year.is_renewing? %>",
 	     "renewal_application_available": "<%= year.start_on >> @renewals_offset_in_months %>",
 	     "renewal_application_due": "<%= year.due_date_for_publish %>",
-	     "binder_payment_due": "",
+	     "binder_payment_due": null,
 		 "employees_total": "<%= er.roster_size %>",
 		 "employees_enrolled" : "<%= year.total_enrolled_count %>",
 	     "employees_waived": "<%= year.waived_count %>",
@@ -30,7 +30,8 @@
                "city": "<%= office.address.city %>",
                "state": "<%= office.address.state %>",
                "zip": "<%= office.address.zip %>"
-         }
+         },
+          "active_general_agency": "<% = er.active_general_agency_legal_name %>"
        }
    <% end.join(",\n") %>
 	]
