@@ -156,4 +156,18 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     end
 
   end
+
+  context 'with coverage_terminated_on present' do
+
+    before do
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record)
+      render template: 'employers/census_employees/show.html.erb'
+    end
+
+    it "doesn't show the waived coverage" do
+      expect(rendered).to match(/Plan End Date:/i)
+      expect(rendered).to match(/Employment Terminated/i)
+    end
+  end
+
 end

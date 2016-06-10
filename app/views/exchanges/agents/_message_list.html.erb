@@ -6,7 +6,7 @@
   <div class="row no_margin">
     <div id="inbox_form" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 no-pd">
       <ul class="list-group">
-      
+
         <%= link_to(inbox_exchanges_agent_path(id: provider.id), remote: true) do%>
         <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= provider.inbox.unread_messages.size %></span></li>
         <% end %>

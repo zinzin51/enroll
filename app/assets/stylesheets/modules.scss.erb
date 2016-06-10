@@ -6,6 +6,17 @@ $primary-white: #fff;
 $primary-black: #5C5C5C;
 
 .module {
+  .vertically-aligned-row {
+    display: table;
+    width: 100%;
+    > * {
+      display: table-cell;
+      float: none;
+    }
+    .label {
+      margin: 0;
+    }
+  }
   &.footer {
     font-size: 14px;
     color: $primary-white;
