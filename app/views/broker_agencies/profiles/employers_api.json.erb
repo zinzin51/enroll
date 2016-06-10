@@ -1,37 +1,42 @@
 {
-	"broker_agency" : "<%= @broker_agency_profile.legal_name %>",
-	"broker_clients" : [
-	<% @employer_details.map do |detail| 
-		er = detail[:profile] 
-		year = er.show_plan_year
-	%>{
-		 "employer_name" : "<%= er.legal_name %>",
-		 "open_enrollment_begins" : "<%= year.open_enrollment_start_on %>",
-		 "open_enrollment_ends" : "<%= year.open_enrollment_end_on %>",
-		 "plan_year_begins" : "<%= year.start_on %>",
-		 "renewal_in_progress": "<%= year.is_renewing? %>",
-	     "renewal_application_available": "<%= year.start_on >> @renewals_offset_in_months %>",
-	     "renewal_application_due": "<%= year.due_date_for_publish %>",
-	     "binder_payment_due": "",
-		 "employees_total": "<%= er.roster_size %>",
-		 "employees_enrolled" : "<%= year.total_enrolled_count %>",
-	     "employees_waived": "<%= year.waived_count %>",
-	     "minimum_participation_required": "<%= year.minimum_enrolled_count %>",
-	     "estimated_premium": {
-	        "employee_contribution": <%= detail[:employee_contribution] %>,
-	        "employer_contribution": <%= detail[:employer_contribution] %>
-	     },
+    "broker_agency" : "<%= @broker_agency_profile.legal_name %>",
+    "broker_clients" : [<% 
+        first_element = true
+        @employer_details.each do |detail| 
+        er = detail[:profile] 
+        year = er.show_plan_year
+    %><%= ',' unless first_element %>
+      {
+         "employer_name" : "<%= er.legal_name %>",
+         "open_enrollment_begins" : "<%= year.open_enrollment_start_on %>",
+         "open_enrollment_ends" : "<%= year.open_enrollment_end_on %>",
+         "plan_year_begins" : "<%= year.start_on %>",
+         "renewal_in_progress": "<%= year.is_renewing? %>",
+         "renewal_application_available": "<%= year.start_on >> @renewals_offset_in_months %>",
+         "renewal_application_due": "<%= year.due_date_for_publish %>",
+         "binder_payment_due": "",
+         "employees_total": "<%= er.roster_size %>",
+         "employees_enrolled" : "<%= year.total_enrolled_count %>",
+         "employees_waived": "<%= year.waived_count %>",
+         "minimum_participation_required": "<%= year.minimum_enrolled_count %>",
+         "estimated_premium": {
+            "employee_contribution": <%= detail[:employee_contribution] %>,
+            "employer_contribution": <%= detail[:employer_contribution] %>
+         },
          "contact_info": {
-         		<% office = er.organization.primary_office_location %>
+                <% office = er.organization.primary_office_location %>
                "phone": "<%= office.phone.area_code %>-<%= office.phone.number %>",
                "emails": <%= detail[:emails].to_json.html_safe %>,
                "address_1": "<%= office.address.address_1 %>",
-               "address_2": <%= office.address.address_2 %>,
+               "address_2": "<%= office.address.address_2 %>",
                "city": "<%= office.address.city %>",
                "state": "<%= office.address.state %>",
                "zip": "<%= office.address.zip %>"
          }
-       }
-   <% end.join(",\n") %>
-	]
+      }<% 
+
+     first_element = false
+
+   end %>
+    ]
 } 

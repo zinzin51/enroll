@@ -36,6 +36,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
      @provider = current_user.person
      @staff_role = current_user.has_broker_agency_staff_role?
      @id=params[:id]
+
+      respond_to do |format|
+      format.html {}
+      format.json { render json: {id: @id } }
+    end
   end
 
   def edit
