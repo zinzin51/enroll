@@ -157,8 +157,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
 
   def employers_api
-    # NOTE: perhaps refactor out commonalities between employers and employers_api?
-
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
       @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
     else
