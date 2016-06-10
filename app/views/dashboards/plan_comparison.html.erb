@@ -1,0 +1,83 @@
+<span class="text-muted">
+  <%= link_to '2014 - 2015', plan_comparison_dashboards_path(years: '2014-2015', unit: @unit) %>
+  |
+  <%= link_to '2015 - 2016', plan_comparison_dashboards_path(years: '2015-2016', unit: @unit) %>
+  |
+  <%= link_to '$', plan_comparison_dashboards_path(unit: '$', years: @years.join('-')) %>
+  |
+  <%= link_to '%', plan_comparison_dashboards_path(unit: '%', years: @years.join('-')) %>
+</span>
+<div id="report" style: "height:400px"> </div>
+<span class="text-muted">
+  <%= link_to 'premium', plan_comparison_dashboards_path(type: 'premium', unit: @unit, years: @years.join('-')) %>
+  |
+  <%= link_to 'deductible', plan_comparison_dashboards_path(type: 'deductible', unit: @unit, years: @years.join('-')) %>
+  |
+  <%= link_to 'family_deductible', plan_comparison_dashboards_path(type: 'family_deductible', unit: @unit, years: @years.join('-')) %>
+  <% if @type == 'premium' %>
+    |
+    <%= link_to '25', plan_comparison_dashboards_path(type: 'premium', age: 25, unit: @unit, years: @years.join('-')) %>
+    | 
+    <%= link_to '40', plan_comparison_dashboards_path(type: 'premium', age: 40, unit: @unit, years: @years.join('-')) %>
+    | 
+    <%= link_to '55', plan_comparison_dashboards_path(type: 'premium', age: 55, unit: @unit, years: @years.join('-')) %>
+  <% end %>
+</span>
+
+
+<script type="text/javascript">
+  var categories = <%= raw @plan_names.to_json %>;
+  $(document).ready(function () {
+      $('#report').highcharts({
+          chart: {
+              type: 'bar'
+          },
+          title: {
+            text: "Individual Market Plan Comparison for <%= @type %> (<%= @unit %>)"
+          },
+          subtitle: {
+              text: ''
+          },
+          xAxis: [{
+              categories: categories,
+              reversed: false,
+              labels: {
+                  step: 1
+              }
+          }, { // mirror axis on right side
+              opposite: true,
+              reversed: false,
+              categories: categories,
+              linkedTo: 0,
+              labels: {
+                  step: 1
+              }
+          }],
+          yAxis: {
+              title: {
+                  text: null
+              },
+              labels: {
+                  formatter: function () {
+                      return "<%= '$' if @unit == '$' %>" + this.value + "<%= '%' if @unit == '%' %>";
+                  }
+              }
+          },
+
+          plotOptions: {
+              series: {
+                  stacking: 'normal'
+              }
+          },
+
+          tooltip: {
+              formatter: function () {
+                  return '<b>' + this.series.name + ', plan: ' + this.point.category + '</b><br/>' +
+                    "<%= '$' if @unit == '$' %>" + this.point.y + "<%= '%' if @unit == '%' %>";
+              }
+          },
+
+          series: <%= raw @data.to_json %>
+      });
+  });
+</script>

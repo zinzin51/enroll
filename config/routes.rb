@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
 
+  resources :dashboards do
+    get :plan_comparison, on: :collection
+  end
+
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }

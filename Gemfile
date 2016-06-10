@@ -23,6 +23,8 @@ gem 'maskedinput-rails'
 gem 'jquery-turbolinks'
 gem 'turbolinks'
 
+gem 'highstock-rails', '~> 2.1', '>= 2.1.10'
+
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 

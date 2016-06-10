@@ -205,6 +205,8 @@ GEM
     haml (4.0.7)
       tilt
     hashery (2.1.2)
+    highstock-rails (2.1.10)
+      railties (>= 3.1)
     hike (1.2.3)
     hitimes (1.2.4)
     htmlentities (4.3.4)
@@ -537,6 +539,7 @@ DEPENDENCIES
   font-awesome-rails (= 4.5.0.1)
   forgery
   haml
+  highstock-rails (~> 2.1, >= 2.1.10)
   jbuilder (~> 2.0)
   jquery-datatables-rails (= 3.4.0)
   jquery-rails (= 4.0.5)
