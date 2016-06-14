@@ -7,6 +7,14 @@
     <% else %>
       <p>Plan Name: <%= enrollment.try(:plan).try(:name) %></p>
       <p>Plan Start: <%= enrollment.try(:effective_on) %></p>
+      <p>
+      <% if @census_employee.coverage_terminated_on.present? %>
+        <span class="text-danger">
+          Plan End: <%= @census_employee.coverage_terminated_on.end_of_month %>
+
+        </span>
+      <% end %>
+    </p>
       <% if @census_employee.employee_role.present? && employee_role = @census_employee.employee_role %>
         <p>Hired: <%= @census_employee.employee_role.try(:hired_on) %></p>
         <p>Eligible For Coverage: <em><%= @census_employee.employee_role.try(:effective_on) %></em></p>
