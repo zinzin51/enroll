@@ -15,8 +15,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   layout 'single_column'
   
   def check_params
-    if params[:csl_num].to_s.length < 10 
-      redirect_to :back, :flash => { error: "SEP not saved. CSL# should be a maximum of 10 digits" }
+    if params[:csl_num].to_s.length < 5
+      redirect_to :back, :flash => { error: "SEP not saved. CSL# should be a minimum of 5 digits and a maximum of 10 digits" }
     end
   end
 
