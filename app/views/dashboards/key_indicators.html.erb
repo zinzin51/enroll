@@ -1,0 +1,105 @@
+<div id="policy_chart_for_month" style: "height:400px"> </div>
+<script type="text/javascript">
+  $(function () { 
+    $('#policy_chart_for_month').highcharts({
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: " Individual Market - New Enrollments By Month"
+      },
+      xAxis: {
+        categories: <%= raw @reports_for_month_options.to_json %>,
+        title: {text: 'Month'}
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Policy Count'
+        }
+      },
+      series: <%= raw @reports_for_month.to_json %>,
+    });
+  });
+</script>
+
+<div id="policy_chart_for_week" style: "height:400px"> </div>
+<script type="text/javascript">
+  $(function () { 
+    $('#policy_chart_for_week').highcharts({
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: "Individual Market - Purchase Frequency By Day of the Week"
+      },
+      xAxis: {
+        categories: <%= raw @reports_for_week_options.to_json %>,
+        title: {text: 'Week'}
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Policy Count'
+        }
+      },
+      series: <%= raw @reports_for_week.to_json %>,
+    });
+  });
+</script>
+
+<div id="policy_chart_for_day" style: "height:400px"> </div>
+<script type="text/javascript">
+  $(function () { 
+    $('#policy_chart_for_day').highcharts({
+      chart: {
+        type: 'scatter',
+        zoomType: 'xy'
+      },
+      title: {
+        text: "Individual Market - Purchase Frequency By Time of Day"
+      },
+      xAxis: {
+        title: {
+          enabled: true,
+          text: 'Hour'
+        },
+        categories: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+        startOnTick: true,
+        endOnTick: true,
+        showLastLabel: true
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Policy Count'
+        }
+      },
+      plotOptions: {
+        scatter: {
+          marker: {
+            radius: 5,
+            states: {
+                hover: {
+                    enabled: true,
+                    lineColor: 'rgb(100,100,100)'
+                }
+            }
+          },
+          states: {
+              hover: {
+                  marker: {
+                      enabled: false
+                  }
+              }
+          },
+          tooltip: {
+              headerFormat: '<b>{series.name}</b><br>',
+              pointFormat: '{point.x} hour, {point.y}'
+          }
+        }
+      },
+      series: <%= raw @reports_for_day.to_json %>,
+    });
+  });
+</script>

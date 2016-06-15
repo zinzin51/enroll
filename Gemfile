@@ -24,6 +24,7 @@ gem 'jquery-turbolinks'
 gem 'turbolinks'
 
 gem 'highstock-rails', '~> 2.1', '>= 2.1.10'
+gem 'yajl-ruby', require: 'yajl'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
