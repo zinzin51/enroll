@@ -38,9 +38,19 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li><%= link_to 'Home', '#' %></li>
-            <li><%= link_to 'Key Indicators', key_indicators_dashboards_path %></li>
+            <li class="<%= 'active' if params[:action] == 'key_indicators' %>"><%= link_to 'Key Indicators', key_indicators_dashboards_path %></li>
             <li><%= link_to 'Weekly Reports', '#' %></li>
-            <li><%= link_to 'Plan Management', plan_comparison_dashboards_path %></li>
+            <li>
+              <%= link_to 'Plan Management', "#" %>
+              <ul class="nav">
+                <li class="<%= 'active' if params[:action] == 'plan_comparison' %>">
+                  <%= link_to 'Plan Comparison', plan_comparison_dashboards_path %>
+                </li>
+                <li>
+                  <%= link_to 'Copay Comparison', '#' %>
+                </li>
+              </ul>
+            </li>
           </ul>
         </div>
         <div class="col-sm-9 col-md-10 main">

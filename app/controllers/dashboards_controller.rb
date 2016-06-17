@@ -18,7 +18,7 @@ class DashboardsController < ApplicationController
     @data = []
     @type = params[:type].present? ? params[:type] : 'premium'
     @unit = params[:unit].present? ? params[:unit] : '$'
-    age = params[:age].present? ? params[:age].to_i : 25
+    @age = params[:age].present? ? params[:age].to_i : 25
     if params[:years].present?
       @years = params[:years].split("-").map(&:to_i)
     else
@@ -35,7 +35,7 @@ class DashboardsController < ApplicationController
 
         case @type
         when 'premium'
-          value = plan.premium_for(Date.new(year, 1, 1), age) rescue 0
+          value = plan.premium_for(Date.new(year, 1, 1), @age) rescue 0
         when 'deductible'
           value = plan.deductible.to_s.gsub(/[$,]/, '').to_i rescue 0
         when 'family_deductible'

@@ -1,83 +1,112 @@
-<span class="text-muted">
-  <%= link_to '2014 - 2015', plan_comparison_dashboards_path(years: '2014-2015', unit: @unit) %>
-  |
-  <%= link_to '2015 - 2016', plan_comparison_dashboards_path(years: '2015-2016', unit: @unit) %>
-  |
-  <%= link_to '$', plan_comparison_dashboards_path(unit: '$', years: @years.join('-')) %>
-  |
-  <%= link_to '%', plan_comparison_dashboards_path(unit: '%', years: @years.join('-')) %>
-</span>
-<div id="report" style: "height:400px"> </div>
-<span class="text-muted">
-  <%= link_to 'premium', plan_comparison_dashboards_path(type: 'premium', unit: @unit, years: @years.join('-')) %>
-  |
-  <%= link_to 'deductible', plan_comparison_dashboards_path(type: 'deductible', unit: @unit, years: @years.join('-')) %>
-  |
-  <%= link_to 'family_deductible', plan_comparison_dashboards_path(type: 'family_deductible', unit: @unit, years: @years.join('-')) %>
-  <% if @type == 'premium' %>
-    |
-    <%= link_to '25', plan_comparison_dashboards_path(type: 'premium', age: 25, unit: @unit, years: @years.join('-')) %>
-    | 
-    <%= link_to '40', plan_comparison_dashboards_path(type: 'premium', age: 40, unit: @unit, years: @years.join('-')) %>
-    | 
-    <%= link_to '55', plan_comparison_dashboards_path(type: 'premium', age: 55, unit: @unit, years: @years.join('-')) %>
-  <% end %>
-</span>
+<ul class="nav nav-pills" role="tablist">
+  <li role="presentation" class="dropdown <%= 'active' if @years == [2014,2015] %>">
+    <a id='drop1' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+      2014 - 2015
+      <span class="caret"></span>
+    </a>
+    <ul id="menu1" class="dropdown-menu" aria-labelledby="drop1">
+      <li>
+        <%= link_to 'cost $', plan_comparison_dashboards_path(unit: '$', years: '2014-2015') %>
+      </li>
+      <li>
+        <%= link_to 'percent %', plan_comparison_dashboards_path(unit: '%', years: '2014-2015') %>
+      </li>
+    </ul>
+  </li>
+  <li role="presentation" class="dropdown <%= 'active' if @years == [2015,2016] %>">
+    <a id='drop2' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+      2015 - 2016
+      <span class="caret"></span>
+    </a>
+    <ul id="menu2" class="dropdown-menu" aria-labelledby="drop2">
+      <li>
+        <%= link_to 'cost $', plan_comparison_dashboards_path(unit: '$', years: '2015-2016') %>
+      </li>
+      <li>
+        <%= link_to 'percent %', plan_comparison_dashboards_path(unit: '%', years: '2015-2016') %>
+      </li>
+    </ul>
+  </li>
+</ul>
 
+<div id="report" style: "height:400px"> </div>
+
+<ul class="nav nav-pills" role="tablist">
+  <li role="presentation" class="dropdown <%= 'active' if @type == 'premium' %>">
+    <a id='drop3' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+      premium
+      <span class="caret"></span>
+    </a>
+    <ul id="menu3" class="dropdown-menu" aria-labelledby="drop3">
+      <li class="<%= 'active' if @age == 25 && @type == 'premium' %>">
+        <%= link_to '25', plan_comparison_dashboards_path(type: 'premium', age: 25, unit: @unit, years: @years.join('-')) %>
+      </li>
+      <li class="<%= 'active' if @age == 40 && @type == 'premium' %>">
+        <%= link_to '40', plan_comparison_dashboards_path(type: 'premium', age: 40, unit: @unit, years: @years.join('-')) %>
+      </li>
+      <li class="<%= 'active' if @age == 55 && @type == 'premium' %>">
+        <%= link_to '55', plan_comparison_dashboards_path(type: 'premium', age: 55, unit: @unit, years: @years.join('-')) %>
+      </li>
+    </ul>
+  </li>
+  <li role="presentation" class="<%= 'active' if @type == 'deductible' %>">
+    <%= link_to 'deductible', plan_comparison_dashboards_path(type: 'deductible', unit: @unit, years: @years.join('-')) %>
+  </li>
+  <li role="presentation" class="<%= 'active' if @type == 'family_deductible' %>">
+    <%= link_to 'family_deductible', plan_comparison_dashboards_path(type: 'family_deductible', unit: @unit, years: @years.join('-')) %>
+  </li>
+</ul>
 
 <script type="text/javascript">
   var categories = <%= raw @plan_names.to_json %>;
   $(document).ready(function () {
-      $('#report').highcharts({
-          chart: {
-              type: 'bar'
-          },
-          title: {
-            text: "Individual Market Plan Comparison for <%= @type %> (<%= @unit %>)"
-          },
-          subtitle: {
-              text: ''
-          },
-          xAxis: [{
-              categories: categories,
-              reversed: false,
-              labels: {
-                  step: 1
-              }
-          }, { // mirror axis on right side
-              opposite: true,
-              reversed: false,
-              categories: categories,
-              linkedTo: 0,
-              labels: {
-                  step: 1
-              }
-          }],
-          yAxis: {
-              title: {
-                  text: null
-              },
-              labels: {
-                  formatter: function () {
-                      return "<%= '$' if @unit == '$' %>" + this.value + "<%= '%' if @unit == '%' %>";
-                  }
-              }
-          },
-
-          plotOptions: {
-              series: {
-                  stacking: 'normal'
-              }
-          },
-
-          tooltip: {
-              formatter: function () {
-                  return '<b>' + this.series.name + ', plan: ' + this.point.category + '</b><br/>' +
-                    "<%= '$' if @unit == '$' %>" + this.point.y + "<%= '%' if @unit == '%' %>";
-              }
-          },
-
-          series: <%= raw @data.to_json %>
-      });
+    $('#report').highcharts({
+      chart: {
+        type: 'bar'
+      },
+      title: {
+        text: "Individual Market Top 10 Plans Comparison for <%= @type %> (<%= @unit %>)"
+      },
+      subtitle: {
+        text: ''
+      },
+      xAxis: [{
+        categories: categories,
+        reversed: false,
+        labels: {
+          step: 1
+        }
+      }, { // mirror axis on right side
+        opposite: true,
+        reversed: false,
+        categories: categories,
+        linkedTo: 0,
+        labels: {
+          step: 1
+        }
+      }],
+      yAxis: {
+        title: {
+          text: null
+        },
+        labels: {
+          formatter: function () {
+            return "<%= '$' if @unit == '$' %>" + this.value + "<%= '%' if @unit == '%' %>";
+          }
+        }
+      },
+      plotOptions: {
+        series: {
+          stacking: 'normal'
+        }
+      },
+      tooltip: {
+        formatter: function () {
+          return '<b>' + this.series.name + ', plan: ' + this.point.category + '</b><br/>' +
+            "<%= '$' if @unit == '$' %>" + this.point.y + "<%= '%' if @unit == '%' %>";
+        }
+      },
+      series: <%= raw @data.to_json %>
+    });
   });
 </script>
