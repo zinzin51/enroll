@@ -1,0 +1,99 @@
+<ul class="nav nav-pills" role="tablist">
+  <li role="presentation" class="dropdown">
+    <a id='drop' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+      Select Plan
+      <span class="caret"></span>
+    </a>
+    <ul id="menu" class="dropdown-menu" aria-labelledby="drop">
+      <% @plan_names.each do |plan_name| %>
+        <li>
+          <%= link_to plan_name, copay_comparison_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-')) %>
+        </li>
+      <% end %>
+    </ul>
+  </li>
+  <li role="presentation" class="dropdown <%= 'active' if @years == [2014,2015] %>">
+    <a id='drop1' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+      2014 - 2015
+      <span class="caret"></span>
+    </a>
+    <ul id="menu1" class="dropdown-menu" aria-labelledby="drop1">
+      <li>
+        <%= link_to 'cost $', copay_comparison_dashboards_path(unit: '$', years: '2014-2015') %>
+      </li>
+      <li>
+        <%= link_to 'percent %', copay_comparison_dashboards_path(unit: '%', years: '2014-2015') %>
+      </li>
+    </ul>
+  </li>
+  <li role="presentation" class="dropdown <%= 'active' if @years == [2015,2016] %>">
+    <a id='drop2' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+      2015 - 2016
+      <span class="caret"></span>
+    </a>
+    <ul id="menu2" class="dropdown-menu" aria-labelledby="drop2">
+      <li>
+        <%= link_to 'cost $', copay_comparison_dashboards_path(unit: '$', years: '2015-2016') %>
+      </li>
+      <li>
+        <%= link_to 'percent %', copay_comparison_dashboards_path(unit: '%', years: '2015-2016') %>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<div id="report" style: "height:400px"> </div>
+
+<script type="text/javascript">
+  var categories = <%= raw @visit_types.to_json %>;
+  $(document).ready(function () {
+    $('#report').highcharts({
+      chart: {
+        type: 'bar'
+      },
+      title: {
+        text: "Individual Market Copay Comparison for <%= @plan_name %> (<%= @unit %>)"
+      },
+      subtitle: {
+        text: ''
+      },
+      xAxis: [{
+        categories: categories,
+        reversed: false,
+        labels: {
+          step: 1
+        }
+      }, { // mirror axis on right side
+        opposite: true,
+        reversed: false,
+        categories: categories,
+        linkedTo: 0,
+        labels: {
+          step: 1
+        }
+      }],
+      yAxis: {
+        title: {
+          text: null
+        },
+        labels: {
+          formatter: function () {
+            return "<%= '$' if @unit == '$' %>" + this.value + "<%= '%' if @unit == '%' %>";
+          }
+        }
+      },
+      plotOptions: {
+        series: {
+          stacking: 'normal'
+        }
+      },
+      tooltip: {
+        formatter: function () {
+          return '<b>' + this.series.name + ', plan: ' + this.point.category + '</b><br/>' +
+            "<%= '$' if @unit == '$' %>" + this.point.y + "<%= '%' if @unit == '%' %>";
+        }
+      },
+      series: <%= raw @data.to_json %>
+    });
+  });
+</script>

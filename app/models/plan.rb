@@ -369,6 +369,26 @@ class Plan
     (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
   end
 
+  def co_insurance
+    qhp = Products::Qhp.where(plan_id: id).last
+    qhp.qhp_cost_share_variances.first.qhp_service_visits.map {|qsv| qsv.co_insurance_in_network_tier_1.to_f}.max
+  rescue
+    0
+  end
+
+  def co_pay_by_visit_type(visit_type)
+    qhp = Products::Qhp.where(plan_id: id).last
+    puts qhp.try(:qhp_cost_share_variances).try(:first).try(:qhp_service_visits).try(:count)
+    qsv = qhp.qhp_cost_share_variances.first.qhp_service_visits.where(visit_type: visit_type).first
+    copay_in_network_tier_1 = qsv.copay_in_network_tier_1.match(/\$(\d+)/)[1].to_f rescue 0
+    copay_in_network_tier_2 = qsv.copay_in_network_tier_2.match(/\$(\d+)/)[1].to_f rescue 0
+    copay_out_of_network = qsc.copay_out_of_network.match(/\$(\d+)/)[1].to_f rescue 0
+    [copay_in_network_tier_1, copay_in_network_tier_2, copay_out_of_network].max
+
+  rescue => e
+    0
+  end
+
   class << self
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)

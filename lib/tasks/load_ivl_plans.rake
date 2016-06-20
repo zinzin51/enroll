@@ -12,7 +12,6 @@ namespace :seed do
           puts "#{plan.name} - #{plan.hios_base_id}"
         else
           next if row[0].blank?
-          puts "+++++add+++++++"
           if row['Network'] == "Nationwide In-Network"
             nationwide = true
             dc_in_network = false
@@ -59,6 +58,22 @@ namespace :seed do
           plan.premium_tables.create(start_on: start_on, end_on: end_on, age: 64, cost: row['64 +'].to_f)
           plan.premium_tables.create(start_on: start_on, end_on: end_on, age: 65, cost: row['64 +'].to_f)
         end
+      end
+    end
+  end
+
+  desc "Update the ivl plans data for copay and coinsurance"
+  task :update_plans_for_copay_and_coinsurance => :environment do
+    CSV.foreach("./health.csv", headers: true) do |row|
+      plan = Plan.where(name: row['Plan Name'], active_year: row['Active Year']).try(:last)
+      if plan.present?
+        puts "update for #{plan.name} - #{plan.hios_base_id}"
+        coinsurance = row['Co Pay'].match(/\$(\d+)/)[1].to_f rescue 0.0
+        copay = row['Co Insurance'].match(/(\d+)\%/)[1].to_f rescue 0.0
+        binding.pry if coinsurance == 0 and copay == 0
+        plan.update(coinsurance: coinsurance, copay: copay)
+      else
+        next if row[0].blank?
       end
     end
   end

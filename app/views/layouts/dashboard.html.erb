@@ -46,8 +46,8 @@
                 <li class="<%= 'active' if params[:action] == 'plan_comparison' %>">
                   <%= link_to 'Plan Comparison', plan_comparison_dashboards_path %>
                 </li>
-                <li>
-                  <%= link_to 'Copay Comparison', '#' %>
+                <li class="<%= 'active' if params[:action] == 'copay_comparison' %>">
+                  <%= link_to 'Copay Comparison', copay_comparison_dashboards_path %>
                 </li>
               </ul>
             </li>

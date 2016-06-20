@@ -55,6 +55,9 @@
   <li role="presentation" class="<%= 'active' if @type == 'family_deductible' %>">
     <%= link_to 'family_deductible', plan_comparison_dashboards_path(type: 'family_deductible', unit: @unit, years: @years.join('-')) %>
   </li>
+  <li role="presentation" class="<%= 'active' if @type == 'coinsurance' %>">
+    <%= link_to 'coinsurance', plan_comparison_dashboards_path(type: 'coinsurance', unit: @unit, years: @years.join('-')) %>
+  </li>
 </ul>
 
 <script type="text/javascript">
