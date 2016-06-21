@@ -4,35 +4,57 @@
 #end
 
 Given(/^I click the SEP link from the Admin DC Health Link login page$/) do
-  person = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_employee_role)
-  family = person.primary_family
-  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
-  qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
-  FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle.id)
-  FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event")
-  Caches::PlanDetails.load_record_cache!
-  #binding.pry 
+  # load the system with an instance of All. The admin portal by default goes to the All
+  # tab and needs to have at least a single entry there in order for cucumber to not fail 
+  # when the view calls the fam.each do |f| method
 
+  #create All person
+  person_all = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_employee_role)
+  family_all = person_all.primary_family
+  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
+  qle_all = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  FactoryGirl.create(:special_enrollment_period, family: family_all, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle_all.id)
+  all_er_profile = FactoryGirl.create(:employer_profile)
+  all_census_ee = FactoryGirl.create(:census_employee, employer_profile: all_er_profile)
+  person_all.employee_roles.first.census_employee = all_census_ee
+  person_all.employee_roles.first.save!
+  family_all = Family.find(family_all.id)
+
+  #create IVL only person
+  #person_ivl = FactoryGirl.create(:person, :with_family, :with_consumer_role)
+  #family_ivl = person_ivl.primary_family
+  #qle_ivl = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  #FactoryGirl.create(:special_enrollment_period, family: family_ivl, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle_ivl.id)
+  #family_ivl = Family.find(family_ivl.id)
+
+  #create EE only person
+  #person_ee = FactoryGirl.create(:person, :with_family, :with_employee_role)
+  #family_ee = person_ee.primary_family
+  #qle_ee = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  #FactoryGirl.create(:special_enrollment_period, family: family_ee, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle_ee.id)
+  #ee_er_profile = FactoryGirl.create(:employer_profile)
+  #ee_census_ee = FactoryGirl.create(:census_employee, employer_profile: ee_er_profile)
+  #person_ee.employee_roles.first.census_employee = ee_census_ee
+  #person_ee.employee_roles.first.save!
+  #family_ee = Family.find(family_ee.id)
+
+  Caches::PlanDetails.load_record_cache!
+  #binding.pry
   sleep 2
   visit "/"
-  screenshot("home")
-  debugger
   click_link 'HBX Portal'
-  screenshot("hbx login")
   click_link 'SEP Admin'
-  screenshot("main screen")
 end
 
 Then(/^the SEP page is displayed$/) do
   expect(page).to have_content('SEP Dashboard')
-  screenshot("here")
 end
 
 Then(/^a search box is displayed where I can search by name or ssn$/) do
   expect(page).to have_content('Search')
 end
 
-Then(/^the ALL, IVL and EE buttons appear above the display list$/) do
+Then(/^the ALL, IVL and EE tabs appear above the display list$/) do
   expect(page).to have_content('All')
   expect(page).to have_content('IVL')
   expect(page).to have_content('EE')
@@ -51,51 +73,69 @@ Then(/^I see columns with headings HBX ID, Last Name, First Name, SSN, Consumer 
 end
 
 Then(/^I see the Add SEP and History buttons$/) do
-  #expect(page).to have_content('SEP HISTORY')
-  page.has_button?("SEP HISTORY")
+  expect(page).to have_content('SEP HISTORY')
+  #find('.nav-tabs').find('a', :text => "All").click
+  #wait_for_ajax
+  #screenshot("All Tab Display")
+  #find('.nav-tabs').find('a', :text => "IVL").click
+  #wait_for_ajax
+  #screenshot("IVL Tab Display")
+  #find('.nav-tabs').find('a', :text => "EE").click
+  #wait_for_ajax
+  #screenshot("EE Tab Display")
+  #page.has_button?("SEP HISTORY")
 end
 
 Given(/^I have a primary subscriber who is registered only as a consumer$/) do
-  person = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_employee_role)
-  family = person.primary_family
-  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period, :ivl_2015_benefit_package)
-  qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
-  FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle.id)
-  FactoryGirl.create(:special_enrollment_period, family: family, effective_on_kind:"date_of_event")
-  Caches::PlanDetails.load_record_cache!
-  debugger
+  person_ivl = FactoryGirl.create(:person, :with_family, :with_consumer_role)
+  family_ivl = person_ivl.primary_family
+  qle_ivl = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryGirl.create(:special_enrollment_period, family: family_ivl, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle_ivl.id)
+  family_ivl = Family.find(family_ivl.id)
+
 end
 
 When(/^I click the IVL tab$/) do
-  #find(:xpath, '//*[@id="tab_datatables"]/li[2]').click
-  click_link 'IVL'
+  find('.nav-tabs').find('a', :text => "IVL").click
+  wait_for_ajax
+  screenshot("IVL Tab Display")
 end
 
 Then(/^I see Yes in the Consumer Field and No in the Employee field for his search results$/) do
   screenshot("IVL results")
+  expect(page).to have_content('Yes')
+  expect(page).to have_content('No')
 end
 
-Given(/^I search for a subscriber who is only registered as an employee$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+Given(/^I have a primary subscriber who is only registered as an employee$/) do
+  person_ee = FactoryGirl.create(:person, :with_family, :with_employee_role)
+  family_ee = person_ee.primary_family
+  qle_ee = FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  FactoryGirl.create(:special_enrollment_period, family: family_ee, effective_on_kind:"date_of_event", qualifying_life_event_kind_id: qle_ee.id)
+  ee_er_profile = FactoryGirl.create(:employer_profile)
+  ee_census_ee = FactoryGirl.create(:census_employee, employer_profile: ee_er_profile)
+  person_ee.employee_roles.first.census_employee = ee_census_ee
+  person_ee.employee_roles.first.save!
+  family_ee = Family.find(family_ee.id)
 end
 
 Then(/^I see No in the Consumer Field and Yes in the Employee field for his search results$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(page).to have_content('Yes')
+  expect(page).to have_content('No')
 end
 
-Given(/^I search for a subscriber who is only registered as a consumer and as an employee$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+Given(/^I have a primary subscriber who is registered as a consumer and as an employee$/) do
+  #already created instnace of this subscriber in previous step
 end
+
+
 
 Then(/^I see Yes in the Consumer Field and Yes in the Employee field for his search results$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(page).to have_content('Yes')
+  expect(page).not_to have_content('No')
 end
 
 Given(/^there are (\d+) consumer only subscribers, (\d+) employee only subscribers and (\d+) both subscribers in the system$/) do |arg1, arg2, arg3|
-  pending # Write code here that turns the phrase above into concrete actions
-end
-
-When(/^I push the IVL button$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
 
@@ -103,12 +143,16 @@ Then(/^I should see (\d+) consumers only,  (\d+) employees only and (\d+) both s
   pending # Write code here that turns the phrase above into concrete actions
 end
 
-When(/^I push the EE button$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+When(/^I click the EE tab$/) do
+  find('.nav-tabs').find('a', :text => "EE").click
+  wait_for_ajax
+  screenshot("EE Tab Display")
 end
 
-When(/^I push the All button$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+When(/^I click the All tab$/) do
+  find('.nav-tabs').find('a', :text => "All").click
+  wait_for_ajax
+  screenshot("All Tab Display")
 end
 
 When(/^I click on the Add SEP button$/) do
