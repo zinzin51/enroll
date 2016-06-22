@@ -165,7 +165,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     end
 
     it "doesn't show the waived coverage" do
-      expect(rendered).to match(/Plan End Date:/i)
+      expect(rendered).to match(/Plan End:/i)
       expect(rendered).to match(/Employment Terminated/i)
     end
   end
