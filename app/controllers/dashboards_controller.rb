@@ -1,10 +1,11 @@
 class DashboardsController < ApplicationController
   layout "dashboard"
-  before_action :init_plan_data, only: [:plan_comparison, :copay_comparison]
-  before_action :init_visit_types, only: [:copay_comparison]
+  before_action :init_plan_data, only: [:plan_comparison, :plan_visit_type]
+  before_action :init_visit_types, only: [:plan_visit_type]
 
   def plan_comparison
-    @plan_names = @plan_hash.keys
+    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'individual'
+    @plan_names = @plan_hash[@market_kind].keys
 
     @data = []
     @type = params[:type].present? ? params[:type] : 'premium'
@@ -16,8 +17,9 @@ class DashboardsController < ApplicationController
       @years = [2015, 2016]
     end
     @years.each do |year|
-      data_for_year = {name: year, data: []}
-      @plan_hash.each do |name, value|
+      name_for_hash = "cost #{@unit} " + (year == @years.min ? "reduce" : "increase")
+      data_for_year = {name: name_for_hash, data: []}
+      @plan_hash[@market_kind].each do |name, value|
         if year == 2014
           plan = Plan.where(name: name, active_year: year).last
         else
@@ -31,17 +33,14 @@ class DashboardsController < ApplicationController
           value = plan.deductible.to_s.gsub(/[$,]/, '').to_i rescue 0
         when 'family_deductible'
           value = plan.family_deductible.to_s.gsub(/[$,]/, '').to_i rescue 0
-        when 'coinsurance'
-          value = plan.co_insurance rescue 0
         end
         data_for_year[:data].push(value)
       end
       @data.push(data_for_year)
     end
-    @unit = '%' if @type == 'coinsurance'
 
     @plan_names.count.times do |i|
-      if @unit == '$' || @type == 'coinsurance'
+      if @unit == '$'
         value = (@data.last[:data][i] - @data.first[:data][i]).round(2)
       else
         value = ((@data.last[:data][i] - @data.first[:data][i]) / @data.first[:data][i].to_f * 100).round(1) rescue 0
@@ -59,22 +58,26 @@ class DashboardsController < ApplicationController
     end
   end
 
-  def copay_comparison
-    @plan_names = @plan_hash.keys
+  def plan_visit_type
+    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'individual'
+    @shop_plan_names = @plan_hash['shop'].keys
+    @individual_plan_names = @plan_hash['individual'].keys
     @data = []
+    @type = params[:type].present? ? params[:type] : 'copay'
     @unit = params[:unit].present? ? params[:unit] : '$'
-    @plan_name = params[:plan_name].present? ? params[:plan_name] : @plan_names.first
+    @plan_name = params[:plan_name].present? ? params[:plan_name] : @individual_plan_names.first
     if params[:years].present?
       @years = params[:years].split("-").map(&:to_i)
     else
       @years = [2015, 2016]
     end
     @years.each do |year|
-      data_for_year = {name: year, data: []}
+      name_for_hash = "cost #{@unit} " + (year == @years.min ? "reduce" : "increase")
+      data_for_year = {name: name_for_hash, data: []}
       if year == 2014
         plan = Plan.where(name: @plan_name, active_year: year).last
       else
-        plan = Plan.where(active_year: year, hios_id: @plan_hash[@plan_name][year]).last
+        plan = Plan.where(active_year: year, hios_id: @plan_hash[@market_kind][@plan_name][year]).last
       end
       @visit_types.each do |vtype|
         value = plan.co_pay_by_visit_type(vtype) rescue 0
@@ -83,9 +86,10 @@ class DashboardsController < ApplicationController
 
       @data.push(data_for_year)
     end
+    @unit = '%' if @type == 'coinsurance'
 
     @visit_types.count.times do |i|
-      if @unit == '$'
+      if @unit == '$' || @type == 'coinsurance'
         value = (@data.last[:data][i] - @data.first[:data][i]).round(2)
       else
         value = ((@data.last[:data][i] - @data.first[:data][i]) / @data.first[:data][i].to_f * 100).round(1) rescue 0
@@ -112,16 +116,30 @@ class DashboardsController < ApplicationController
   private
   def init_plan_data
     @plan_hash = {
-      'BluePreferred PPO $1,000 100%/80%'              => {2015=>'78079DC0220012-01', 2016=>'78079DC0220020-01'},
-      'HealthyBlue Advantage $1,500'                   => {2015=>'86052DC0520004-01', 2016=>'86052DC0440014-01'},
-      'HealthyBlue PPO $1,500'                         => {2015=>'78079DC0300004-01', 2016=>'78079DC0220027-01'},
-      'KP DC Gold 0/20/Dental/Ped Dental'              => {2015=>'94506DC0350004-01', 2016=>'94506DC0350004-01'},
-      'BluePreferred PPO $500 $20/$30'                 => {2015=>'78079DC0220019-01', 2016=>'78079DC0220021-01'},
-      'BluePreferred PPO 100%/80%, Rx:$10/$45/$65/50%' => {2015=>'78079DC0220013-01', 2016=>'78079DC0220024-01'},
-      'BlueChoice HMO $250'                            => {2015=>'86052DC0460006-01', 2016=>'86052DC0460010-01'},
-      'BluePreferred PPO $1,000 80%/60%'               => {2015=>'78079DC0220014-01', 2016=>'78079DC0220020-01'},
-      'BlueChoice Advantage $1000'                     => {2015=>'86052DC0440008-01', 2016=>'86052DC0440010-01'},
-      'DC Gold OAMC 90/50'                             => {2015=>'77422DC0070013-01', 2016=>'77422DC0070013-01'},
+      'shop' => {
+        'BluePreferred PPO $1,000 100%/80%'              => {2015=>'78079DC0220012-01', 2016=>'78079DC0220020-01'},
+        'HealthyBlue Advantage $1,500'                   => {2015=>'86052DC0520004-01', 2016=>'86052DC0440014-01'},
+        'HealthyBlue PPO $1,500'                         => {2015=>'78079DC0300004-01', 2016=>'78079DC0220027-01'},
+        'KP DC Gold 0/20/Dental/Ped Dental'              => {2015=>'94506DC0350004-01', 2016=>'94506DC0350004-01'},
+        'BluePreferred PPO $500 $20/$30'                 => {2015=>'78079DC0220019-01', 2016=>'78079DC0220021-01'},
+        'BluePreferred PPO 100%/80%, Rx:$10/$45/$65/50%' => {2015=>'78079DC0220013-01', 2016=>'78079DC0220024-01'},
+        'BlueChoice HMO $250'                            => {2015=>'86052DC0460006-01', 2016=>'86052DC0460010-01'},
+        'BluePreferred PPO $1,000 80%/60%'               => {2015=>'78079DC0220014-01', 2016=>'78079DC0220020-01'},
+        'BlueChoice Advantage $1000'                     => {2015=>'86052DC0440008-01', 2016=>'86052DC0440010-01'},
+        'DC Gold OAMC 90/50'                             => {2015=>'77422DC0070013-01', 2016=>'77422DC0070013-01'},
+      },
+      'individual' => {
+        'BlueChoice HSA Bronze $6,000'                            => {2015=>'86052DC0410002-01', 2016=>'86052DC0400005-01'},
+        'BluePreferred Platinum $0'                               => {2015=>'78079DC0210001-01', 2016=>'78079DC0210001-01'},
+        'HealthyBlue Platinum $0'                                 => {2015=>'86052DC0430002-02', 2016=>'86052DC0400008-02'},
+        'BlueCross BlueShield Preferred 500, A Multi-State Plan'  => {2015=>'78079DC0160001-01', 2016=>'78079DC0160001-01'},
+        'BlueChoice Gold $0'                                      => {2015=>'86052DC0400002-01', 2016=>'86052DC0400002-01'},
+        'HealthyBlue Gold $1,500'                                 => {2015=>'86052DC0430001-01', 2016=>'86052DC0400003-01'},
+        'BlueCross BlueShield Preferred 1500, A Multi-State Plan' => {2015=>'78079DC0180001-01', 2016=>'78079DC0160002-01'},
+        'BlueChoice HSA Silver $1,300'                            => {2015=>'86052DC0410003-01', 2016=>'86052DC0400006-01'},
+        'BlueChoice HSA Bronze $6,000'                            => {2015=>'86052DC0410002-01', 2016=>'86052DC0400005-01'},
+        'BlueChoice HSA Bronze $4,000'                            => {2015=>'86052DC0410001-01', 2016=>'86052DC0400005-01'},
+      }
     }
   end
 

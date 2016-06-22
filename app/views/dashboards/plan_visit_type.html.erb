@@ -5,9 +5,15 @@
       <span class="caret"></span>
     </a>
     <ul id="menu" class="dropdown-menu" aria-labelledby="drop">
-      <% @plan_names.each do |plan_name| %>
-        <li>
-          <%= link_to plan_name, copay_comparison_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-')) %>
+      <% @shop_plan_names.each do |plan_name| %>
+        <li class="<%= 'active' if plan_name == @plan_name %>">
+          <%= link_to plan_name, plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'shop') %>
+        </li>
+      <% end %>
+      <li role="separator" class="divider"></li>
+      <% @individual_plan_names.each do |plan_name| %>
+        <li class="<%= 'active' if plan_name == @plan_name %>">
+          <%= link_to plan_name, plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'individual') %>
         </li>
       <% end %>
     </ul>
@@ -19,10 +25,10 @@
     </a>
     <ul id="menu1" class="dropdown-menu" aria-labelledby="drop1">
       <li>
-        <%= link_to 'cost $', copay_comparison_dashboards_path(unit: '$', years: '2014-2015') %>
+        <%= link_to 'cost $', plan_visit_type_dashboards_path(unit: '$', years: '2014-2015') %>
       </li>
       <li>
-        <%= link_to 'percent %', copay_comparison_dashboards_path(unit: '%', years: '2014-2015') %>
+        <%= link_to 'percent %', plan_visit_type_dashboards_path(unit: '%', years: '2014-2015') %>
       </li>
     </ul>
   </li>
@@ -33,12 +39,18 @@
     </a>
     <ul id="menu2" class="dropdown-menu" aria-labelledby="drop2">
       <li>
-        <%= link_to 'cost $', copay_comparison_dashboards_path(unit: '$', years: '2015-2016') %>
+        <%= link_to 'cost $', plan_visit_type_dashboards_path(unit: '$', years: '2015-2016') %>
       </li>
       <li>
-        <%= link_to 'percent %', copay_comparison_dashboards_path(unit: '%', years: '2015-2016') %>
+        <%= link_to 'percent %', plan_visit_type_dashboards_path(unit: '%', years: '2015-2016') %>
       </li>
     </ul>
+  </li>
+  <li role="presentation" class="<%= 'active' if @type == 'copay' %>">
+    <%= link_to 'copay', plan_visit_type_dashboards_path(type: 'copay', unit: @unit, years: @years.join('-'), market_kind: @market_kind, plan_name: @plan_name) %>
+  </li>
+  <li role="presentation" class="<%= 'active' if @type == 'coinsurance' %>">
+    <%= link_to 'coinsurance', plan_visit_type_dashboards_path(type: 'coinsurance', unit: @unit, years: @years.join('-'), market_kind: @market_kind, plan_name: @plan_name) %>
   </li>
 </ul>
 
@@ -52,7 +64,7 @@
         type: 'bar'
       },
       title: {
-        text: "Individual Market Copay Comparison for <%= @plan_name %> (<%= @unit %>)"
+        text: "<%= @market_kind.capitalize %> Market <%= @type.capitalize %> Comparison for <%= @plan_name %> (<%= @unit %>)"
       },
       subtitle: {
         text: ''

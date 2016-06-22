@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   resources :dashboards do
     get :plan_comparison, on: :collection
     get :key_indicators, on: :collection
-    get :copay_comparison, on: :collection
+    get :plan_visit_type, on: :collection
   end
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }

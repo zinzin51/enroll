@@ -378,13 +378,8 @@ class Plan
 
   def co_pay_by_visit_type(visit_type)
     qhp = Products::Qhp.where(plan_id: id).last
-    puts qhp.try(:qhp_cost_share_variances).try(:first).try(:qhp_service_visits).try(:count)
     qsv = qhp.qhp_cost_share_variances.first.qhp_service_visits.where(visit_type: visit_type).first
-    copay_in_network_tier_1 = qsv.copay_in_network_tier_1.match(/\$(\d+)/)[1].to_f rescue 0
-    copay_in_network_tier_2 = qsv.copay_in_network_tier_2.match(/\$(\d+)/)[1].to_f rescue 0
-    copay_out_of_network = qsc.copay_out_of_network.match(/\$(\d+)/)[1].to_f rescue 0
-    [copay_in_network_tier_1, copay_in_network_tier_2, copay_out_of_network].max
-
+    qsv.copay_in_network_tier_1.match(/\$(\d+)/)[1].to_f rescue 0
   rescue => e
     0
   end

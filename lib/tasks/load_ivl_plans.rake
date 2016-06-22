@@ -65,13 +65,23 @@ namespace :seed do
   desc "Update the ivl plans data for copay and coinsurance"
   task :update_plans_for_copay_and_coinsurance => :environment do
     CSV.foreach("./health.csv", headers: true) do |row|
-      plan = Plan.where(name: row['Plan Name'], active_year: row['Active Year']).try(:last)
+      plan = Plan.where(hios_id: row['Hios Id'], active_year: row['Active Year']).last
       if plan.present?
-        puts "update for #{plan.name} - #{plan.hios_base_id}"
-        coinsurance = row['Co Pay'].match(/\$(\d+)/)[1].to_f rescue 0.0
-        copay = row['Co Insurance'].match(/(\d+)\%/)[1].to_f rescue 0.0
-        binding.pry if coinsurance == 0 and copay == 0
-        plan.update(coinsurance: coinsurance, copay: copay)
+        puts "-------------------update for #{plan.name} - #{plan.hios_id}-----------------"
+        qhp = Products::Qhp.where(plan_id: plan.id).last
+        if qhp.present?
+          qcsv = qhp.qhp_cost_share_variances.first
+          if qcsv.present?
+            qsv = qcsv.qhp_service_visits.where(visit_type: row['visit_type']).last rescue nil
+            #puts "#{row['Co Pay']} / #{row['Co Insurance']}"
+            #puts "#{qsv.copay_in_network_tier_1} / #{qsv.co_insurance_in_network_tier_1}"
+          else
+            #qcsv.create.qhp_service_visits.create(visit_type: row['visit_type'], copay_in_network_tier_1: row['Co Pay'], co_insurance_in_network_tier_1: row['Co Insurance'])
+            puts "#{row['Co Pay']} / #{row['Co Insurance']}"
+          end
+        else
+          puts "can not find qhp by plan id"
+        end
       else
         next if row[0].blank?
       end

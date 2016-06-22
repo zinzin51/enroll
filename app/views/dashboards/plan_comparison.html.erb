@@ -27,6 +27,12 @@
       </li>
     </ul>
   </li>
+  <li role="presentation" class="<%= 'active' if @market_kind == 'shop' %>">
+    <%= link_to 'shop', plan_comparison_dashboards_path(market_kind: 'shop', type: @type, unit: @unit, years: @years.join('-')) %>
+  </li>
+  <li role="presentation" class="<%= 'active' if @market_kind == 'individual' %>">
+    <%= link_to 'individual', plan_comparison_dashboards_path(market_kind: 'individual', type: @type, unit: @unit, years: @years.join('-')) %>
+  </li>
 </ul>
 
 <div id="report" style: "height:400px"> </div>
@@ -39,24 +45,21 @@
     </a>
     <ul id="menu3" class="dropdown-menu" aria-labelledby="drop3">
       <li class="<%= 'active' if @age == 25 && @type == 'premium' %>">
-        <%= link_to '25', plan_comparison_dashboards_path(type: 'premium', age: 25, unit: @unit, years: @years.join('-')) %>
+        <%= link_to '25', plan_comparison_dashboards_path(type: 'premium', age: 25, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
       </li>
       <li class="<%= 'active' if @age == 40 && @type == 'premium' %>">
-        <%= link_to '40', plan_comparison_dashboards_path(type: 'premium', age: 40, unit: @unit, years: @years.join('-')) %>
+        <%= link_to '40', plan_comparison_dashboards_path(type: 'premium', age: 40, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
       </li>
       <li class="<%= 'active' if @age == 55 && @type == 'premium' %>">
-        <%= link_to '55', plan_comparison_dashboards_path(type: 'premium', age: 55, unit: @unit, years: @years.join('-')) %>
+        <%= link_to '55', plan_comparison_dashboards_path(type: 'premium', age: 55, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
       </li>
     </ul>
   </li>
   <li role="presentation" class="<%= 'active' if @type == 'deductible' %>">
-    <%= link_to 'deductible', plan_comparison_dashboards_path(type: 'deductible', unit: @unit, years: @years.join('-')) %>
+    <%= link_to 'deductible', plan_comparison_dashboards_path(type: 'deductible', unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
   </li>
   <li role="presentation" class="<%= 'active' if @type == 'family_deductible' %>">
-    <%= link_to 'family_deductible', plan_comparison_dashboards_path(type: 'family_deductible', unit: @unit, years: @years.join('-')) %>
-  </li>
-  <li role="presentation" class="<%= 'active' if @type == 'coinsurance' %>">
-    <%= link_to 'coinsurance', plan_comparison_dashboards_path(type: 'coinsurance', unit: @unit, years: @years.join('-')) %>
+    <%= link_to 'family_deductible', plan_comparison_dashboards_path(type: 'family_deductible', unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
   </li>
 </ul>
 
@@ -68,7 +71,7 @@
         type: 'bar'
       },
       title: {
-        text: "Individual Market Top 10 Plans Comparison for <%= @type %> (<%= @unit %>)"
+        text: "<%= @market_kind.capitalize %> Market Top 10 Plans Comparison for <%= @type.capitalize %> (<%= @unit %>)"
       },
       subtitle: {
         text: ''
