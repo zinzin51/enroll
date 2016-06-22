@@ -7,13 +7,13 @@
     <ul id="menu" class="dropdown-menu" aria-labelledby="drop">
       <% @shop_plan_names.each do |plan_name| %>
         <li class="<%= 'active' if plan_name == @plan_name %>">
-          <%= link_to plan_name, plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'shop') %>
+          <%= link_to "Shop - #{plan_name}", plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'shop') %>
         </li>
       <% end %>
       <li role="separator" class="divider"></li>
       <% @individual_plan_names.each do |plan_name| %>
         <li class="<%= 'active' if plan_name == @plan_name %>">
-          <%= link_to plan_name, plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'individual') %>
+          <%= link_to "Individual - #{plan_name}", plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'individual') %>
         </li>
       <% end %>
     </ul>
