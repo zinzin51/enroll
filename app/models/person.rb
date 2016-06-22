@@ -81,7 +81,6 @@ class Person
   embeds_many :addresses, cascade_callbacks: true, validate: true
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
-  embeds_many :documents, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
@@ -462,12 +461,6 @@ class Person
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
     return false
-  end
-
-  def tax_documents
-    documents.select do |doc|
-      doc.subject == '1095A'
-    end
   end
 
   class << self
