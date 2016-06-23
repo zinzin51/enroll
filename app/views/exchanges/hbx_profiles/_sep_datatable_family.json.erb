@@ -5,10 +5,10 @@
 
 		[
 			
-			"<%= family.primary_applicant.person.full_name.to_json%>",
+			"<%= family.primary_applicant.person.full_name.to_s%>",
 			"<%= json_escape begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %>",
-            "<%= family.primary_applicant.person.dob.to_json %>",
-			"<%= family.primary_applicant.person.hbx_id.to_json %>",
+            "<%= Date.strptime(family.primary_applicant.person.dob.to_s, '%m/%d/%Y')%>",
+			"<%= family.primary_applicant.person.hbx_id.to_s %>",
 			"",
 			"",
 			"<%= json_escape family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %>",
@@ -31,10 +31,10 @@
 				
 		[
 			
-			"<%= family.primary_applicant.person.full_name.to_json%>",
+			"<%= family.primary_applicant.person.full_name.to_s%>",
 			"<%= json_escape begin; number_to_obscured_ssn(family.primary_applicant.person.ssn); rescue; end %>",
-            "<%= family.primary_applicant.person.dob.to_json%>",
-			"<%= family.primary_applicant.person.hbx_id.to_json %>",
+            "<%= Date.strptime(family.primary_applicant.person.dob.to_s, '%m/%d/%Y')%>",
+			"<%= family.primary_applicant.person.hbx_id.to_s %>",
 			"",
 			"",
 			"<%= json_escape family.primary_applicant.person.consumer_role.present?  ? "Yes" : "No" %>",
