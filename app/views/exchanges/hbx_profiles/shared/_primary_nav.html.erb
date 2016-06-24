@@ -84,6 +84,9 @@
           <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Inbox"></span>
         <% end %>
       </li>
+      <li role="presentation"<%= menu_tab_class(active_tab, "dashboard-tab") %>>
+        <%= link_to 'Dashboard', plan_comparison_dashboards_path %>
+      </li>
     </ul>
   </div>
 </div>

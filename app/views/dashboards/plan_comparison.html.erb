@@ -1,37 +1,23 @@
 <ul class="nav nav-pills" role="tablist">
   <li role="presentation" class="dropdown <%= 'active' if @years == [2014,2015] %>">
-    <a id='drop1' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-      2014 - 2015
-      <span class="caret"></span>
-    </a>
-    <ul id="menu1" class="dropdown-menu" aria-labelledby="drop1">
-      <li>
-        <%= link_to 'cost $', plan_comparison_dashboards_path(unit: '$', years: '2014-2015') %>
-      </li>
-      <li>
-        <%= link_to 'percent %', plan_comparison_dashboards_path(unit: '%', years: '2014-2015') %>
-      </li>
-    </ul>
+    <%= link_to '2014 - 2015', plan_comparison_dashboards_path(years: '2014-2015', type: @type, unit: @unit, market_kind: @market_kind) %>
   </li>
   <li role="presentation" class="dropdown <%= 'active' if @years == [2015,2016] %>">
-    <a id='drop2' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-      2015 - 2016
-      <span class="caret"></span>
-    </a>
-    <ul id="menu2" class="dropdown-menu" aria-labelledby="drop2">
-      <li>
-        <%= link_to 'cost $', plan_comparison_dashboards_path(unit: '$', years: '2015-2016') %>
-      </li>
-      <li>
-        <%= link_to 'percent %', plan_comparison_dashboards_path(unit: '%', years: '2015-2016') %>
-      </li>
-    </ul>
+    <%= link_to '2015 - 2016', plan_comparison_dashboards_path(years: '2015-2016', type: @type, unit: @unit, market_kind: @market_kind) %>
   </li>
+  <li role="separator" class='divider'></li>
   <li role="presentation" class="<%= 'active' if @market_kind == 'shop' %>">
     <%= link_to 'shop', plan_comparison_dashboards_path(market_kind: 'shop', type: @type, unit: @unit, years: @years.join('-')) %>
   </li>
   <li role="presentation" class="<%= 'active' if @market_kind == 'individual' %>">
     <%= link_to 'individual', plan_comparison_dashboards_path(market_kind: 'individual', type: @type, unit: @unit, years: @years.join('-')) %>
+  </li>
+  <li role="separator" class='divider'></li>
+  <li role="presentation" class="<%= 'active' if @unit == '$' %>">
+    <%= link_to 'cost $', plan_comparison_dashboards_path(unit: '$', market_kind: @market_kind, type: @type, years: @years.join('-')) %>
+  </li>
+  <li role="presentation" class="<%= 'active' if @unit == '%' %>">
+    <%= link_to 'percent %', plan_comparison_dashboards_path(unit: '%', market_kind: @market_kind, type: @type, years: @years.join('-')) %>
   </li>
 </ul>
 
@@ -45,13 +31,13 @@
     </a>
     <ul id="menu3" class="dropdown-menu" aria-labelledby="drop3">
       <li class="<%= 'active' if @age == 25 && @type == 'premium' %>">
-        <%= link_to '25', plan_comparison_dashboards_path(type: 'premium', age: 25, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
+        <%= link_to 'Age 25', plan_comparison_dashboards_path(type: 'premium', age: 25, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
       </li>
       <li class="<%= 'active' if @age == 40 && @type == 'premium' %>">
-        <%= link_to '40', plan_comparison_dashboards_path(type: 'premium', age: 40, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
+        <%= link_to 'Age 40', plan_comparison_dashboards_path(type: 'premium', age: 40, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
       </li>
       <li class="<%= 'active' if @age == 55 && @type == 'premium' %>">
-        <%= link_to '55', plan_comparison_dashboards_path(type: 'premium', age: 55, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
+        <%= link_to 'Age 55', plan_comparison_dashboards_path(type: 'premium', age: 55, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
       </li>
     </ul>
   </li>

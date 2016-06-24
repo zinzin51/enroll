@@ -1,56 +1,45 @@
 <ul class="nav nav-pills" role="tablist">
+  <li role="presentation" class="dropdown <%= 'active' if @years == [2014,2015] %>">
+    <%= link_to '2014 - 2015', plan_visit_type_dashboards_path(years: '2014-2015', type: @type, unit: @unit, market_kind: @market_kind, plan_name: @plan_name) %>
+  </li>
+  <li role="presentation" class="dropdown <%= 'active' if @years == [2015,2016] %>">
+    <%= link_to '2015 - 2016', plan_visit_type_dashboards_path(years: '2015-2016', type: @type, unit: @unit, market_kind: @market_kind, plan_name: @plan_name) %>
+  </li>
+  <li role="separator" class='divider'></li>
   <li role="presentation" class="dropdown">
     <a id='drop' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
       Select Plan
       <span class="caret"></span>
     </a>
     <ul id="menu" class="dropdown-menu" aria-labelledby="drop">
+      <li class='title'>Top 10 SHOP plans</li>
       <% @shop_plan_names.each do |plan_name| %>
         <li class="<%= 'active' if plan_name == @plan_name %>">
-          <%= link_to "Shop - #{plan_name}", plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'shop') %>
+          <%= link_to plan_name, plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'shop', unit: @unit) %>
         </li>
       <% end %>
       <li role="separator" class="divider"></li>
+      <li class='title'>Top 10 QHPs</li>
       <% @individual_plan_names.each do |plan_name| %>
         <li class="<%= 'active' if plan_name == @plan_name %>">
-          <%= link_to "Individual - #{plan_name}", plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'individual') %>
+          <%= link_to plan_name, plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'individual', unit: @unit) %>
         </li>
       <% end %>
     </ul>
   </li>
-  <li role="presentation" class="dropdown <%= 'active' if @years == [2014,2015] %>">
-    <a id='drop1' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-      2014 - 2015
-      <span class="caret"></span>
-    </a>
-    <ul id="menu1" class="dropdown-menu" aria-labelledby="drop1">
-      <li>
-        <%= link_to 'cost $', plan_visit_type_dashboards_path(unit: '$', years: '2014-2015') %>
-      </li>
-      <li>
-        <%= link_to 'percent %', plan_visit_type_dashboards_path(unit: '%', years: '2014-2015') %>
-      </li>
-    </ul>
-  </li>
-  <li role="presentation" class="dropdown <%= 'active' if @years == [2015,2016] %>">
-    <a id='drop2' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-      2015 - 2016
-      <span class="caret"></span>
-    </a>
-    <ul id="menu2" class="dropdown-menu" aria-labelledby="drop2">
-      <li>
-        <%= link_to 'cost $', plan_visit_type_dashboards_path(unit: '$', years: '2015-2016') %>
-      </li>
-      <li>
-        <%= link_to 'percent %', plan_visit_type_dashboards_path(unit: '%', years: '2015-2016') %>
-      </li>
-    </ul>
-  </li>
+  <li role="separator" class='divider'></li>
   <li role="presentation" class="<%= 'active' if @type == 'copay' %>">
-    <%= link_to 'copay', plan_visit_type_dashboards_path(type: 'copay', unit: @unit, years: @years.join('-'), market_kind: @market_kind, plan_name: @plan_name) %>
+    <%= link_to 'Copay', plan_visit_type_dashboards_path(type: 'copay', unit: @unit, years: @years.join('-'), market_kind: @market_kind, plan_name: @plan_name) %>
   </li>
   <li role="presentation" class="<%= 'active' if @type == 'coinsurance' %>">
-    <%= link_to 'coinsurance', plan_visit_type_dashboards_path(type: 'coinsurance', unit: @unit, years: @years.join('-'), market_kind: @market_kind, plan_name: @plan_name) %>
+    <%= link_to 'Coinsurance', plan_visit_type_dashboards_path(type: 'coinsurance', unit: @unit, years: @years.join('-'), market_kind: @market_kind, plan_name: @plan_name) %>
+  </li>
+  <li role="separator" class='divider'></li>
+  <li role="presentation" class="<%= 'active' if @unit == '$' %>">
+    <%= link_to 'cost $', plan_visit_type_dashboards_path(unit: '$', market_kind: @market_kind, type: @type, years: @years.join('-'), plan_name: @plan_name) %>
+  </li>
+  <li role="presentation" class="<%= 'active' if @unit == '%' %>">
+    <%= link_to 'percent %', plan_visit_type_dashboards_path(unit: '%', market_kind: @market_kind, type: @type, years: @years.join('-'), plan_name: @plan_name) %>
   </li>
 </ul>
 

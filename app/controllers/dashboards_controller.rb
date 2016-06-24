@@ -20,12 +20,7 @@ class DashboardsController < ApplicationController
       name_for_hash = "cost #{@unit} " + (year == @years.min ? "reduce" : "increase")
       data_for_year = {name: name_for_hash, data: []}
       @plan_hash[@market_kind].each do |name, value|
-        if year == 2014
-          plan = Plan.where(name: name, active_year: year).last
-        else
-          plan = Plan.where(active_year: year, hios_id: value[year]).last
-        end
-
+        plan = Plan.where(active_year: year, hios_id: value[year]).last
         case @type
         when 'premium'
           value = plan.premium_for(Date.new(year, 1, 1), @age) rescue 0
@@ -74,11 +69,7 @@ class DashboardsController < ApplicationController
     @years.each do |year|
       name_for_hash = "cost #{@unit} " + (year == @years.min ? "reduce" : "increase")
       data_for_year = {name: name_for_hash, data: []}
-      if year == 2014
-        plan = Plan.where(name: @plan_name, active_year: year).last
-      else
-        plan = Plan.where(active_year: year, hios_id: @plan_hash[@market_kind][@plan_name][year]).last
-      end
+      plan = Plan.where(active_year: year, hios_id: @plan_hash[@market_kind][@plan_name][year]).last
       @visit_types.each do |vtype|
         value = plan.co_pay_by_visit_type(vtype) rescue 0
         data_for_year[:data].push(value)
@@ -117,28 +108,29 @@ class DashboardsController < ApplicationController
   def init_plan_data
     @plan_hash = {
       'shop' => {
-        'BluePreferred PPO $1,000 100%/80%'              => {2015=>'78079DC0220012-01', 2016=>'78079DC0220020-01'},
-        'HealthyBlue Advantage $1,500'                   => {2015=>'86052DC0520004-01', 2016=>'86052DC0440014-01'},
-        'HealthyBlue PPO $1,500'                         => {2015=>'78079DC0300004-01', 2016=>'78079DC0220027-01'},
-        'KP DC Gold 0/20/Dental/Ped Dental'              => {2015=>'94506DC0350004-01', 2016=>'94506DC0350004-01'},
-        'BluePreferred PPO $500 $20/$30'                 => {2015=>'78079DC0220019-01', 2016=>'78079DC0220021-01'},
-        'BluePreferred PPO 100%/80%, Rx:$10/$45/$65/50%' => {2015=>'78079DC0220013-01', 2016=>'78079DC0220024-01'},
-        'BlueChoice HMO $250'                            => {2015=>'86052DC0460006-01', 2016=>'86052DC0460010-01'},
-        'BluePreferred PPO $1,000 80%/60%'               => {2015=>'78079DC0220014-01', 2016=>'78079DC0220020-01'},
-        'BlueChoice Advantage $1000'                     => {2015=>'86052DC0440008-01', 2016=>'86052DC0440010-01'},
-        'DC Gold OAMC 90/50'                             => {2015=>'77422DC0070013-01', 2016=>'77422DC0070013-01'},
+        'BluePreferred PPO $1,000 100%/80%'              => {2014=>'78079DC0220012-01', 2015=>'78079DC0220012-01', 2016=>'78079DC0220020-01'},
+        'HealthyBlue Advantage $1,500'                   => {2014=>'86052DC0520004-01', 2015=>'86052DC0520004-01', 2016=>'86052DC0440014-01'},
+        'HealthyBlue PPO $1,500'                         => {2014=>'78079DC0300004-01', 2015=>'78079DC0300004-01', 2016=>'78079DC0220027-01'},
+        'KP DC Gold 0/20/Dental/Ped Dental'              => {2014=>'94506DC0350004-01', 2015=>'94506DC0350004-01', 2016=>'94506DC0350004-01'},
+        'BluePreferred PPO $500 $20/$30'                 => {2014=>'', 2015=>'78079DC0220019-01', 2016=>'78079DC0220021-01'},
+        'BluePreferred PPO 100%/80%, Rx:$10/$45/$65/50%' => {2014=>'78079DC0220013-01', 2015=>'78079DC0220013-01', 2016=>'78079DC0220024-01'},
+        'BlueChoice HMO $250'                            => {2014=>'86052DC0460006-01', 2015=>'86052DC0460006-01', 2016=>'86052DC0460010-01'},
+        'BluePreferred PPO $1,000 80%/60%'               => {2014=>'78079DC0220014-01', 2015=>'78079DC0220014-01', 2016=>'78079DC0220020-01'},
+        'BlueChoice Advantage $1000'                     => {2014=>'86052DC0440008-01', 2015=>'86052DC0440008-01', 2016=>'86052DC0440010-01'},
+        'DC Gold OAMC 90/50'                             => {2014=>'77422DC0070013-01', 2015=>'77422DC0070013-01', 2016=>'77422DC0070013-01'},
       },
       'individual' => {
-        'BlueChoice HSA Bronze $6,000'                            => {2015=>'86052DC0410002-01', 2016=>'86052DC0400005-01'},
-        'BluePreferred Platinum $0'                               => {2015=>'78079DC0210001-01', 2016=>'78079DC0210001-01'},
-        'HealthyBlue Platinum $0'                                 => {2015=>'86052DC0430002-02', 2016=>'86052DC0400008-02'},
-        'BlueCross BlueShield Preferred 500, A Multi-State Plan'  => {2015=>'78079DC0160001-01', 2016=>'78079DC0160001-01'},
-        'BlueChoice Gold $0'                                      => {2015=>'86052DC0400002-01', 2016=>'86052DC0400002-01'},
-        'HealthyBlue Gold $1,500'                                 => {2015=>'86052DC0430001-01', 2016=>'86052DC0400003-01'},
-        'BlueCross BlueShield Preferred 1500, A Multi-State Plan' => {2015=>'78079DC0180001-01', 2016=>'78079DC0160002-01'},
-        'BlueChoice HSA Silver $1,300'                            => {2015=>'86052DC0410003-01', 2016=>'86052DC0400006-01'},
-        'BlueChoice HSA Bronze $6,000'                            => {2015=>'86052DC0410002-01', 2016=>'86052DC0400005-01'},
-        'BlueChoice HSA Bronze $4,000'                            => {2015=>'86052DC0410001-01', 2016=>'86052DC0400005-01'},
+        'BlueChoice HSA Bronze $6,000'                            => {2014=>'', 2015=>'86052DC0410002-01', 2016=>'86052DC0400005-01'},
+        'BluePreferred Platinum $0'                               => {2014=>'78079DC0210001-01', 2015=>'78079DC0210001-01', 2016=>'78079DC0210001-01'},
+        'HealthyBlue Platinum $0'                                 => {2014=>'86052DC0430002-01', 2015=>'86052DC0430002-02', 2016=>'86052DC0400008-02'},
+        'BlueCross BlueShield Preferred 500, A Multi-State Plan'  => {2014=>'78079DC0160001-01', 2015=>'78079DC0160001-01', 2016=>'78079DC0160001-01'},
+        'BlueChoice Gold $0'                                      => {2014=>'86052DC0400002-01', 2015=>'86052DC0400002-01', 2016=>'86052DC0400002-01'},
+        'HealthyBlue Gold $1,500'                                 => {2014=>'86052DC0430001-01', 2015=>'86052DC0430001-01', 2016=>'86052DC0400003-01'},
+        'BlueCross BlueShield Preferred 1500, A Multi-State Plan' => {2014=>'78079DC0180001-01', 2015=>'78079DC0180001-01', 2016=>'78079DC0160002-01'},
+        'BlueChoice HSA Silver $1,300'                            => {2014=>'86052DC0410003-01', 2015=>'86052DC0410003-01', 2016=>'86052DC0400006-01'},
+        'BlueChoice HSA Bronze $6,000'                            => {2014=>'86052DC0410002-01', 2015=>'86052DC0410002-01', 2016=>'86052DC0400005-01'},
+        'BlueChoice HSA Bronze $4,000'                            => {2014=>'86052DC0410001-01', 2015=>'86052DC0410001-01', 2016=>'86052DC0400005-01'},
+        'BlueChoice Young Adult $6,600'                           => {2014=>'86052DC0400004-01', 2015=>'86052DC0400004-01', 2016=>'86052DC0400004-01'},
       }
     }
   end
