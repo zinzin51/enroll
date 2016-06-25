@@ -5,8 +5,6 @@ class DashboardsController < ApplicationController
 
   def plan_comparison
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'individual'
-    @plan_names = @plan_hash[@market_kind].keys
-
     @data = []
     @type = params[:type].present? ? params[:type] : 'premium'
     @unit = params[:unit].present? ? params[:unit] : '$'
@@ -16,10 +14,12 @@ class DashboardsController < ApplicationController
     else
       @years = [2015, 2016]
     end
+    @plan_names = get_plan_hash_by_market_kind_and_years(@market_kind, @years).keys
+
     @years.each do |year|
       name_for_hash = "cost #{@unit} " + (year == @years.min ? "reduce" : "increase")
       data_for_year = {name: name_for_hash, data: []}
-      @plan_hash[@market_kind].each do |name, value|
+      get_plan_hash_by_market_kind_and_years(@market_kind, @years).each do |name, value|
         plan = Plan.where(active_year: year, hios_id: value[year]).last
         case @type
         when 'premium'
@@ -55,17 +55,17 @@ class DashboardsController < ApplicationController
 
   def plan_visit_type
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'individual'
-    @shop_plan_names = @plan_hash['shop'].keys
-    @individual_plan_names = @plan_hash['individual'].keys
     @data = []
     @type = params[:type].present? ? params[:type] : 'copay'
     @unit = params[:unit].present? ? params[:unit] : '$'
-    @plan_name = params[:plan_name].present? ? params[:plan_name] : @individual_plan_names.first
     if params[:years].present?
       @years = params[:years].split("-").map(&:to_i)
     else
       @years = [2015, 2016]
     end
+    @shop_plan_names = get_plan_hash_by_market_kind_and_years('shop', @years).keys
+    @individual_plan_names = get_plan_hash_by_market_kind_and_years('individual', @years).keys
+    @plan_name = params[:plan_name].present? ? params[:plan_name] : @individual_plan_names.first
     @years.each do |year|
       name_for_hash = "cost #{@unit} " + (year == @years.min ? "reduce" : "increase")
       data_for_year = {name: name_for_hash, data: []}
@@ -120,7 +120,6 @@ class DashboardsController < ApplicationController
         'DC Gold OAMC 90/50'                             => {2014=>'77422DC0070013-01', 2015=>'77422DC0070013-01', 2016=>'77422DC0070013-01'},
       },
       'individual' => {
-        'BlueChoice HSA Bronze $6,000'                            => {2014=>'', 2015=>'86052DC0410002-01', 2016=>'86052DC0400005-01'},
         'BluePreferred Platinum $0'                               => {2014=>'78079DC0210001-01', 2015=>'78079DC0210001-01', 2016=>'78079DC0210001-01'},
         'HealthyBlue Platinum $0'                                 => {2014=>'86052DC0430002-01', 2015=>'86052DC0430002-02', 2016=>'86052DC0400008-02'},
         'BlueCross BlueShield Preferred 500, A Multi-State Plan'  => {2014=>'78079DC0160001-01', 2015=>'78079DC0160001-01', 2016=>'78079DC0160001-01'},
@@ -133,6 +132,16 @@ class DashboardsController < ApplicationController
         'BlueChoice Young Adult $6,600'                           => {2014=>'86052DC0400004-01', 2015=>'86052DC0400004-01', 2016=>'86052DC0400004-01'},
       }
     }
+  end
+
+  def get_plan_hash_by_market_kind_and_years(market_kind='individual', years=[])
+    @plan_hash[market_kind].select do |key, value|
+      result = true
+      years.each do |year|
+        result = false if value[year].blank?
+      end
+      result
+    end
   end
 
   def init_visit_types
