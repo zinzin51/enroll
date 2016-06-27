@@ -4,7 +4,8 @@ module SepAll
     dt_query = extract_datatable_parameters
     families_dt = []
 
-    all_families = Family.exists(special_enrollment_periods: true)
+    #all_families = Family.exists(special_enrollment_periods: true)
+    all_families = Family.all
         #@families = all_families.to_a     
     if dt_query.search_string.blank?
       families_dt = all_families
@@ -26,9 +27,11 @@ module SepAll
   def includeIVL
 
     if QualifyingLifeEventKind.where(:market_kind => 'individual').present?
-      ivl_qles = QualifyingLifeEventKind.where(:market_kind => 'individual').map(&:id)  
-      all_families_in_ivl = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => ivl_qles)
-          
+      #ivl_qles = QualifyingLifeEventKind.where(:market_kind => 'individual').map(&:id)  
+      #all_families_in_ivl = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => ivl_qles)
+       
+      all_families_in_ivl = Family.all
+
       dt_query = extract_datatable_parameters
       families_dt = []
 
@@ -54,8 +57,10 @@ module SepAll
   def includeShop
 
     if QualifyingLifeEventKind.where(:market_kind => 'shop').present?
-      shop_qles = QualifyingLifeEventKind.where(:market_kind => 'shop').map(&:id)  
-      all_families_in_shop = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => shop_qles)
+      #shop_qles = QualifyingLifeEventKind.where(:market_kind => 'shop').map(&:id)  
+      #all_families_in_shop = Family.where(:"special_enrollment_periods.qualifying_life_event_kind_id".in => shop_qles)
+       
+      all_families_in_shop = Family.all
         
       dt_query = extract_datatable_parameters
       families_dt = []
@@ -111,35 +116,23 @@ module SepAll
     init_arr = []
 
     if (state == 'both')
-      families.each do|f| if families.present?
-
-        if f.primary_applicant.person.consumer_role.present? && f.primary_applicant.person.active_employee_roles.present?     
+      families.each do|f| 
+        if f.primary_applicant.person.consumer_role.present? || f.primary_applicant.person.active_employee_roles.present?        
           init_arr.push(f)
         end
-
-       end
       end
-
     elsif (state == 'ivl')
-      families.each do|f| if families.present?
-
+      families.each do|f|
         if f.primary_applicant.person.consumer_role.present? 
           init_arr.push(f)
         end
-
-       end
       end
-
     else
-      families.each do|f| if families.present?
-
-        if f.primary_applicant.person.active_employee_roles.present?    
+      families.each do|f|
+        if f.primary_applicant.person.active_employee_roles.present?
           init_arr.push(f)
         end
-
-       end
       end
-
     end
 
    returnData == 'yes' ? init_arr : init_arr.length;
