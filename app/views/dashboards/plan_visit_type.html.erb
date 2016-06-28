@@ -36,7 +36,12 @@
   </li>
   <li role="separator" class='divider'></li>
   <li role="presentation" class="<%= 'active' if @unit == '$' %>">
-    <%= link_to 'cost $', plan_visit_type_dashboards_path(unit: '$', market_kind: @market_kind, type: @type, years: @years.join('-'), plan_name: @plan_name) %>
+    <% if @type == 'coinsurance' %>
+      <%= link_to 'cost $', '#', data: {toggle: "modal", target: "#coinsurance_alert"} %>
+      <%= render :partial => 'coinsurance_alert' %>
+    <% else %>
+      <%= link_to 'cost $', plan_visit_type_dashboards_path(unit: '$', market_kind: @market_kind, type: @type, years: @years.join('-'), plan_name: @plan_name) %>
+    <% end %>
   </li>
   <li role="presentation" class="<%= 'active' if @unit == '%' %>">
     <%= link_to 'percent %', plan_visit_type_dashboards_path(unit: '%', market_kind: @market_kind, type: @type, years: @years.join('-'), plan_name: @plan_name) %>
