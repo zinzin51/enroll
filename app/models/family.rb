@@ -43,6 +43,7 @@ class Family
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
   embeds_many :broker_agency_accounts
+  embeds_many :documents, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, :households, :broker_agency_accounts
 
@@ -581,7 +582,14 @@ class Family
   def generate_family_search
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
-private
+
+  def tax_documents
+    documents.select do |doc|
+      (doc.subject == '1095A') && (doc.is_a? TaxDocument)
+    end
+  end
+
+  private
   def build_household
     if households.size == 0
       irs_group = initialize_irs_group
