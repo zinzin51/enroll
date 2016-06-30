@@ -1,8 +1,8 @@
 {
     "broker_agency" : "<%= @broker_agency_profile.legal_name %>",
     "broker_clients" : [<% 
-        first_element = true
-        @employer_details.each do |detail| 
+      first_element = true
+      @employer_details.each do |detail| 
         er = detail[:profile] 
         year = er.show_plan_year 
     %><%= ',' unless first_element %>
@@ -49,8 +49,7 @@
           "active_general_agency": "<%= er.active_general_agency_legal_name %>"
       }<% 
 
-     first_element = false
-
-   end %>
+        first_element = false
+      end %>
     ]
 } 
