@@ -39,7 +39,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
       respond_to do |format|
       format.html {}
-      format.json { render json: {id: @id } }
+      format.json { render json: {id: @id, first: @provider.first_name } }
     end
   end
 

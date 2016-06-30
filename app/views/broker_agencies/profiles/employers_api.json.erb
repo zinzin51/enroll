@@ -4,10 +4,14 @@
         first_element = true
         @employer_details.each do |detail| 
         er = detail[:profile] 
-        year = er.show_plan_year
+        year = er.show_plan_year 
     %><%= ',' unless first_element %>
       {
          "employer_name" : "<%= er.legal_name %>",
+         "employees_total": "<%= er.roster_size %>",
+      <%if year %>   
+         "employees_enrolled" : "<%= year.total_enrolled_count %>",
+         "employees_waived": "<%= year.waived_count %>",
          "open_enrollment_begins" : "<%= year.open_enrollment_start_on %>",
          "open_enrollment_ends" : "<%= year.open_enrollment_end_on %>",
          "plan_year_begins" : "<%= year.start_on %>",
@@ -15,10 +19,19 @@
          "renewal_application_available": "<%= year.start_on >> @renewals_offset_in_months %>",
          "renewal_application_due": "<%= year.due_date_for_publish %>",
          "binder_payment_due": "",
-         "employees_total": "<%= er.roster_size %>",
-         "employees_enrolled" : "<%= year.total_enrolled_count %>",
-         "employees_waived": "<%= year.waived_count %>",
          "minimum_participation_required": "<%= year.minimum_enrolled_count %>",
+      <% else %>
+         "employees_enrolled" : null,
+         "employees_waived": null,
+         "open_enrollment_begins" : null,
+         "open_enrollment_ends" : null,
+         "plan_year_begins" : null,
+         "renewal_in_progress": null,
+         "renewal_application_available": null,
+         "renewal_application_due": null,
+         "binder_payment_due": null,
+         "minimum_participation_required": null,
+      <% end %>
          "estimated_premium": {
             "employee_contribution": <%= detail[:employee_contribution] %>,
             "employer_contribution": <%= detail[:employer_contribution] %>
