@@ -7,17 +7,37 @@
   </li>
   <li role="separator" class='divider'></li>
   <li role="presentation" class="<%= 'active' if @market_kind == 'shop' %>">
-    <%= link_to 'shop', plan_comparison_dashboards_path(market_kind: 'shop', type: @type, unit: @unit, years: @years.join('-')) %>
+    <a id='drop1' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+      shop
+      <span class="caret"></span>
+    </a>
+    <ul id="menu1" class="dropdown-menu" aria-labelledby="drop1">
+      <% Analytics::PlanComparison.get_carriers_by_type('shop').each do |carrier| %>
+        <li class="<%= 'active' if @market_kind == 'shop' && @carrier == carrier %>">
+          <%= link_to carrier, plan_comparison_dashboards_path(market_kind: 'shop', type: @type, unit: @unit, years: @years.join('-'), carrier: carrier) %>
+        </li>
+      <% end %>
+    </ul>
   </li>
   <li role="presentation" class="<%= 'active' if @market_kind == 'individual' %>">
-    <%= link_to 'individual', plan_comparison_dashboards_path(market_kind: 'individual', type: @type, unit: @unit, years: @years.join('-')) %>
+    <a id='drop2' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+      individual
+      <span class="caret"></span>
+    </a>
+    <ul id="menu2" class="dropdown-menu" aria-labelledby="drop2">
+      <% Analytics::PlanComparison.get_carriers_by_type('individual').each do |carrier| %>
+        <li class="<%= 'active' if @market_kind == 'individual' && @carrier == carrier %>">
+          <%= link_to carrier, plan_comparison_dashboards_path(market_kind: 'individual', type: @type, unit: @unit, years: @years.join('-'), carrier: carrier) %>
+        </li>
+      <% end %>
+    </ul>
   </li>
   <li role="separator" class='divider'></li>
   <li role="presentation" class="<%= 'active' if @unit == '$' %>">
-    <%= link_to 'cost $', plan_comparison_dashboards_path(unit: '$', market_kind: @market_kind, type: @type, years: @years.join('-')) %>
+    <%= link_to 'cost $', plan_comparison_dashboards_path(unit: '$', market_kind: @market_kind, type: @type, years: @years.join('-'), carrier: @carrier) %>
   </li>
   <li role="presentation" class="<%= 'active' if @unit == '%' %>">
-    <%= link_to 'percent %', plan_comparison_dashboards_path(unit: '%', market_kind: @market_kind, type: @type, years: @years.join('-')) %>
+    <%= link_to 'percent %', plan_comparison_dashboards_path(unit: '%', market_kind: @market_kind, type: @type, years: @years.join('-'), carrier: @carrier) %>
   </li>
 </ul>
 
@@ -31,13 +51,13 @@
     </a>
     <ul id="menu3" class="dropdown-menu" aria-labelledby="drop3">
       <li class="<%= 'active' if @age == 25 && @type == 'premium' %>">
-        <%= link_to 'Age 25', plan_comparison_dashboards_path(type: 'premium', age: 25, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
+        <%= link_to 'Age 25', plan_comparison_dashboards_path(type: 'premium', age: 25, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind], carrier: @carrier) %>
       </li>
       <li class="<%= 'active' if @age == 40 && @type == 'premium' %>">
-        <%= link_to 'Age 40', plan_comparison_dashboards_path(type: 'premium', age: 40, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
+        <%= link_to 'Age 40', plan_comparison_dashboards_path(type: 'premium', age: 40, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind], carrier: @carrier) %>
       </li>
       <li class="<%= 'active' if @age == 55 && @type == 'premium' %>">
-        <%= link_to 'Age 55', plan_comparison_dashboards_path(type: 'premium', age: 55, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
+        <%= link_to 'Age 55', plan_comparison_dashboards_path(type: 'premium', age: 55, unit: @unit, years: @years.join('-'), market_kind: params[:market_kind], carrier: @carrier) %>
       </li>
     </ul>
   </li>
@@ -47,23 +67,25 @@
   <li role="presentation" class="<%= 'active' if @type == 'family_deductible' %>">
     <%= link_to 'family_deductible', plan_comparison_dashboards_path(type: 'family_deductible', unit: @unit, years: @years.join('-'), market_kind: params[:market_kind]) %>
   </li>
+  <li>
+    <%= link_to 'compare plans over multiple years', comparison_over_multiple_years_dashboards_path %>
+  </li>
 </ul>
 
 <script type="text/javascript">
-  var categories = <%= raw @plan_names.to_json %>;
   $(document).ready(function () {
     $('#report').highcharts({
       chart: {
         type: 'bar'
       },
       title: {
-        text: "<%= @market_kind.capitalize %> Market Top 10 Plans Comparison for <%= @type.capitalize %> (<%= @unit %>)"
+        text: "<%= @carrier.capitalize %> <%= @market_kind.capitalize %> Changes to Most Popular Plans <%= @years.join('-') %> (<%= @unit %>)"
       },
       subtitle: {
         text: ''
       },
       xAxis: [{
-        categories: categories,
+        categories: <%= raw @pre_plan_names.to_json %>,
         reversed: false,
         labels: {
           step: 1
@@ -71,7 +93,7 @@
       }, { // mirror axis on right side
         opposite: true,
         reversed: false,
-        categories: categories,
+        categories: <%= raw @plan_names.to_json %>,
         linkedTo: 0,
         labels: {
           step: 1

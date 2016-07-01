@@ -1,0 +1,35 @@
+<div id="report" style: "height:400px"> </div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#report').highcharts({
+      title: {
+        text: 'Individual Changes to Most Popular Plans for premium($)',
+        x: -20 //center
+      },
+      xAxis: {
+        categories: <%= raw @years.to_json %>
+      },
+      yAxis: {
+        title: {
+          text: 'Cost ($)'
+        },
+        plotLines: [{
+          value: 0,
+          width: 1,
+          color: '#808080'
+        }]
+      },
+      tooltip: {
+        //valueSuffix: '$'
+      },
+      legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle',
+        borderWidth: 0
+      },
+      series: <%= raw @data.to_json %>
+    });
+  });
+</script>

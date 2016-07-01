@@ -12,14 +12,14 @@
       <span class="caret"></span>
     </a>
     <ul id="menu" class="dropdown-menu" aria-labelledby="drop">
-      <li class='title'>Top 10 SHOP plans</li>
+      <li class='title'>SHOP plans</li>
       <% @shop_plan_names.each do |plan_name| %>
         <li class="<%= 'active' if plan_name == @plan_name %>">
           <%= link_to plan_name, plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'shop', unit: @unit) %>
         </li>
       <% end %>
       <li role="separator" class="divider"></li>
-      <li class='title'>Top 10 QHPs</li>
+      <li class='title'>Individual plans</li>
       <% @individual_plan_names.each do |plan_name| %>
         <li class="<%= 'active' if plan_name == @plan_name %>">
           <%= link_to plan_name, plan_visit_type_dashboards_path(plan_name: plan_name, unit: @unit, years: @years.join('-'), market_kind: 'individual', unit: @unit) %>

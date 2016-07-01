@@ -15,13 +15,21 @@ class DashboardsController < ApplicationController
     else
       @years = [2015, 2016]
     end
-    @plan_names = get_plan_hash_by_market_kind_and_years(@market_kind, @years).keys
+    @carrier = params[:carrier].present? ? params[:carrier] : Analytics::PlanComparison.get_carriers_by_type(@market_kind).first
+    @pre_plan_names = []
+    @plan_names = []
 
     @years.each do |year|
       name_for_hash = "cost #{@unit} " + (year == @years.min ? "reduce" : "increase")
       data_for_year = {name: name_for_hash, data: []}
-      get_plan_hash_by_market_kind_and_years(@market_kind, @years).each do |name, value|
-        plan = Plan.where(active_year: year, hios_id: value[year]).last
+      Analytics::PlanComparison.get_hois_data_by_type_carrier_and_years(@market_kind, @carrier, @years).each do |value|
+        if year == @years.min
+          plan = Plan.where(active_year: year, hios_id: value.first).last
+          @pre_plan_names << plan.try(:name) || ''
+        else
+          plan = Plan.where(active_year: year, hios_id: value.last).last
+          @plan_names << plan.try(:name) || ''
+        end
         case @type
         when 'premium'
           value = plan.premium_for(Date.new(year, 1, 1), @age) rescue 0
@@ -51,6 +59,38 @@ class DashboardsController < ApplicationController
         @data.last[:data][i] = 0
         @data.first[:data][i] = 0
       end
+    end
+  end
+
+  def comparison_over_multiple_years
+    @years = [2014, 2015, 2016]
+    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'individual'
+    @data = []
+    @type = params[:type].present? ? params[:type] : 'premium'
+    @unit = params[:unit].present? ? params[:unit] : '$'
+    @age = params[:age].present? ? params[:age].to_i : 25
+    @carrier = params[:carrier].present? ? params[:carrier] : Analytics::PlanComparison.get_carriers_by_type(@market_kind).first
+
+    Analytics::PlanComparison.get_hois_data_by_type_and_carrier(@market_kind, @carrier).each do |hois_arr|
+      data_for_plan = {name: '', data: []}
+      @years.each_with_index do |year, index|
+        plan = Plan.where(active_year: year, hios_id: hois_arr[index]).last
+        if plan.present?
+          case @type
+          when 'premium'
+            value = plan.premium_for(Date.new(year, 1, 1), @age) rescue 0
+          when 'deductible'
+            value = plan.deductible.to_s.gsub(/[$,]/, '').to_i rescue 0
+          when 'family_deductible'
+            value = plan.family_deductible.to_s.gsub(/[$,]/, '').to_i rescue 0
+          end
+          data_for_plan[:data].push(value)
+          data_for_plan[:name] = plan.name
+        else
+          data_for_plan[:data].push(0)
+        end
+      end
+      @data.push(data_for_plan)
     end
   end
 

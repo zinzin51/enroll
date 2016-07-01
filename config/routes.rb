@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     get :key_indicators, on: :collection
     get :plan_visit_type, on: :collection
     get :weekly_reports, on: :collection
+    get :comparison_over_multiple_years, on: :collection
   end
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
