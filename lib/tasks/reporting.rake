@@ -54,6 +54,13 @@ namespace :reporting do
           state_transitions: b_rec['state_transitions'],
           market: plan['market'],
           consumer_role_id: ([b_rec['consumer_role_id']['$oid']] rescue []),
+          member_count: b_rec['member_count'],
+          is_standard_plan: plan['is_standard_plan'],
+          carrier_profile_id: plan['carrier_profile_id'],
+          metal_level: plan['metal_level'],
+          plan_type: plan['plan_type'],
+          csr_variant_id: plan['csr_variant_id'],
+          plan_name: plan['name'],
         )
         puts "#{count}"
         count += 1

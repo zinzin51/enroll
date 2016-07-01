@@ -2,6 +2,7 @@ class DashboardsController < ApplicationController
   layout "dashboard"
   before_action :init_plan_data, only: [:plan_comparison, :plan_visit_type]
   before_action :init_visit_types, only: [:plan_visit_type]
+  before_action :init_weekly_report_selections, only: [:weekly_reports]
 
   def plan_comparison
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'individual'
@@ -104,6 +105,17 @@ class DashboardsController < ApplicationController
     @reports_for_day_options, @reports_for_day = ReportSources::HbxEnrollmentStatistic.report_for_chart_by('day')
   end
 
+  def weekly_reports
+    @kind = params[:kind].present? ? params[:kind] : @selections.first.first
+    @subkind = params[:subkind].present? ? params[:subkind] : @selections.first.last.keys.first
+    action_name = @selections[@kind][@subkind]
+    if action_name.present?
+      @report_for_options, @report_data, @title, @table_kind = ReportSources::HbxEnrollmentStatistic.public_send(action_name)
+    else
+      @report_for_options, @report_data, @title, @table_kind = [[], [], '']
+    end
+  end
+
   private
   def init_plan_data
     @plan_hash = {
@@ -163,4 +175,39 @@ class DashboardsController < ApplicationController
       "Prescription Drugs Other",
     ]
   end
+
+  def init_weekly_report_selections
+    @selections = {
+      "Health Covered Lives" => {
+        'Individual Market Total Covered Lives' => 'health_covered_lives_by_year',
+        'Individual Market Age Group' => 'health_covered_lives_by_age',
+        'Individual Market Gender' => 'health_covered_lives_by_gender',
+        'Individual Market Covered Lives Zip Codes' => '',
+      },
+      "Health Plans" => {
+        'Individual Market Total Plans' => 'health_plans_by_year',
+        'Individual Market Count of People on Plan' => 'health_plans_by_member_count',
+        'Individual Market Standard Plans' => 'health_plans_by_standard',
+        'Individual Market Carriers' => 'health_plans_by_carrier_profile',
+        'Individual Market Metal Level' => 'health_plans_by_metal_level',
+        'Individual Market Plan Type' => 'health_plans_by_plan_type',
+        'Individual Market APTC and CSR' => 'health_plans_by_csr',
+        'Individual Market Plan Selection' => 'health_plans_by_name',
+      },
+      "Dental Covered Lives" => {
+        'Individual Market Dental Total Covered Lives' => 'dental_covered_lives_by_year',
+        'Individual Market Dental Age Groups' => '',
+        'Individual Market Dental Gender' => '',
+      },
+      "Dental Plans" => {
+        'Individual Market Dental Total Plans' => 'dental_plans_by_year',
+        'Individual Market Dental Carriers' => 'dental_plans_by_carrier_profile',
+        'Individual Market Dental Count of People on Plan' => 'dental_plans_by_member_count',
+      }
+    }
+  end
 end
+
+
+
+

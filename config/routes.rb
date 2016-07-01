@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     get :plan_comparison, on: :collection
     get :key_indicators, on: :collection
     get :plan_visit_type, on: :collection
+    get :weekly_reports, on: :collection
   end
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }

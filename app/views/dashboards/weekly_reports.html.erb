@@ -1,0 +1,93 @@
+<ul class="nav nav-pills" role="tablist">
+  <li role="presentation" class="dropdown">
+    <a id='drop' href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+      Select
+      <span class="caret"></span>
+    </a>
+    <ul id="menu" class="dropdown-menu" aria-labelledby="drop">
+      <% @selections.each do |key, value| %>
+        <li class='title'><%= key %></li>
+        <% value.keys.each do |name| %>
+          <li class="<%= 'active' if name == @subkind %>">
+            <%= link_to name, weekly_reports_dashboards_path(kind: key, subkind: name) %>
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+  </li>
+</ul>
+
+<% if @report_data.present? %>
+<div id="weekly_report" style: "height:400px"> </div>
+<script type="text/javascript">
+  $(function () { 
+    $('#weekly_report').highcharts({
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: "<%= @subkind %>"
+      },
+      xAxis: {
+        categories: <%= raw @report_for_options.to_json %>,
+        title: {text: "<%= @title %>"}
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Policy Count'
+        }
+      },
+      series: <%= raw @report_data.to_json %>,
+    });
+  });
+</script>
+
+<hr />
+
+<% if @table_kind == 'double dimensional' %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th><%= @title %></th>
+        <% @report_for_options.each do |year| %>
+          <th><%= year %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @report_data.each do |report| %>
+        <tr>
+          <td><%= report[:name] %></td>
+          <% report[:data].each do |count| %>
+            <td><%= count %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th><%= @title %></th>
+        <th>Count</th>
+        <th>Percent</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% total = @report_data.first[:data].sum %>
+      <% @report_for_options.each_with_index do |option, i| %>
+        <tr>
+          <td><%= option %></td>
+          <% count = @report_data.first[:data][i] %>
+          <td><%= count %></td>
+          <td><%= "#{(count * 100.0 / total).round(2)}%" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+<% else %>
+  <h4>Please Waiting</h4>
+<% end %>

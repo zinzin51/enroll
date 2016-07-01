@@ -39,7 +39,7 @@
           <ul class="nav nav-sidebar">
             <li><%= link_to 'Home', '#' %></li>
             <li class="<%= 'active' if params[:action] == 'key_indicators' %>"><%= link_to 'Key Indicators', key_indicators_dashboards_path %></li>
-            <li><%= link_to 'Weekly Reports', '#' %></li>
+            <li class="<%= 'active' if params[:action] == 'weekly_reports' %>"><%= link_to 'Weekly Reports', weekly_reports_dashboards_path %></li>
             <li>
               <%= link_to 'Plan Management', "#" %>
               <ul class="nav">
