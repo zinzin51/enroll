@@ -150,7 +150,7 @@ class DashboardsController < ApplicationController
     @subkind = params[:subkind].present? ? params[:subkind] : @selections.first.last.keys.first
     action_name = @selections[@kind][@subkind]
     if action_name.present?
-      @report_for_options, @report_data, @title, @table_kind = ReportSources::HbxEnrollmentStatistic.public_send(action_name)
+      @report_for_options, @report_data, @title, @table_kind, @location_arr = ReportSources::HbxEnrollmentStatistic.public_send(action_name)
     else
       @report_for_options, @report_data, @title, @table_kind = [[], [], '']
     end
@@ -222,7 +222,7 @@ class DashboardsController < ApplicationController
         'Individual Market Total Covered Lives' => 'health_covered_lives_by_year',
         'Individual Market Age Group' => 'health_covered_lives_by_age',
         'Individual Market Gender' => 'health_covered_lives_by_gender',
-        'Individual Market Covered Lives Zip Codes' => '',
+        'Individual Market Covered Lives Zip Codes' => 'health_covered_lives_by_zipcode',
       },
       "Health Plans" => {
         'Individual Market Total Plans' => 'health_plans_by_year',
@@ -236,8 +236,8 @@ class DashboardsController < ApplicationController
       },
       "Dental Covered Lives" => {
         'Individual Market Dental Total Covered Lives' => 'dental_covered_lives_by_year',
-        'Individual Market Dental Age Groups' => '',
-        'Individual Market Dental Gender' => '',
+        'Individual Market Dental Age Groups' => 'dental_covered_lives_by_age',
+        'Individual Market Dental Gender' => 'dental_covered_lives_by_gender',
       },
       "Dental Plans" => {
         'Individual Market Dental Total Plans' => 'dental_plans_by_year',

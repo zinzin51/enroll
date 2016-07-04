@@ -17,7 +17,43 @@
   </li>
 </ul>
 
-<% if @report_data.present? %>
+<% if @table_kind == 'zipcode' %>
+
+    <div id="map" style='height:100%;min-height:600px;'></div>
+    <script>
+      var map, heatmap;
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 13,
+          center: {lat: 38.8994614, lng: -77.0846063},
+          mapTypeId: google.maps.MapTypeId.MAP
+        });
+
+        heatmap = new google.maps.visualization.HeatmapLayer({
+          data: getPoints(),
+          map: map
+        });
+      }
+
+      function getPoints() {
+        var arr = <%= raw @location_arr.to_json %>;
+        points = [];
+        for (var i=0; i<arr.length; i++){
+          var lat = arr[i][0];
+          var lng = arr[i][1];
+          console.log('lat: '+ lat);
+          console.log('lng: ' + lng);
+          var point = new google.maps.LatLng(lat, lng);
+          points.push(point);
+        }
+        return points;
+      }
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn4mwkPYEmYyuaxcmQE-OUlYI9JCEvK5A&libraries=visualization&callback=initMap">
+    </script>
+<% else %>
 <div id="weekly_report" style: "height:400px"> </div>
 <script type="text/javascript">
   $(function () { 
@@ -66,6 +102,7 @@
       <% end %>
     </tbody>
   </table>
+<% elsif @table_kind == 'zipcode' %>
 <% else %>
   <table class="table table-striped">
     <thead>
@@ -88,6 +125,4 @@
     </tbody>
   </table>
 <% end %>
-<% else %>
-  <h4>Please Waiting</h4>
 <% end %>

@@ -192,7 +192,7 @@ module ReportSources
         {'$match': {coverage_kind: 'health'}}, 
         {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
         {'$match': {plan_id: {"$ne" => nil}}},
-        {'$match': {consumer_role_id: {"$ne" => nil}}},
+        {'$match': {consumer_role_id: {"$ne" => []}}},
         {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
         {'$project': {
           hbx_id: '$hbx_id',
@@ -218,7 +218,7 @@ module ReportSources
           age = age_on_next_effective_date(consumer_role.dob)
           age_hash.each do |key, value|
             if age >= value['range'].first && age <= value['range'].last
-              age_hash[key]['count'] += 1
+              age_hash[key]['count'] += re['distinctCount']
             end
           end
         end
@@ -235,7 +235,7 @@ module ReportSources
         {'$match': {coverage_kind: 'health'}}, 
         {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
         {'$match': {plan_id: {"$ne" => nil}}},
-        {'$match': {consumer_role_id: {"$ne" => nil}}},
+        {'$match': {consumer_role_id: {"$ne" => []}}},
         {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
         {'$project': {
           hbx_id: '$hbx_id',
@@ -252,18 +252,65 @@ module ReportSources
       }
       reports.each do |re|
         consumer_role = ConsumerRole.find(re["_id"]["consumer_role_id"].first) rescue nil
-        if consumer_role.present?
-          gender_hash.each do |key, value|
-            if key == consumer_role.gender
-              gender_hash[key] += 1
-            end
-          end
-        end
+        gender_hash[consumer_role.gender] += re['distinctCount'] if consumer_role.present?
       end
 
       options = gender_hash.keys
       report_data = [{name: 'Gender', data: gender_hash.values}]
       [options, report_data, 'Gender']
+    end
+
+    def self.health_covered_lives_by_zipcode
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$match': {market: 'individual'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {consumer_role_id: {"$ne" => []}}},
+        {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
+        {'$project': {
+          hbx_id: '$hbx_id',
+          consumer_role_id: '$consumer_role_id',
+        }},
+        {'$group': {_id:{hbx_id: '$hbx_id', consumer_role_id: '$consumer_role_id'}, count: {'$sum':1}}},
+        {'$group': {_id:{consumer_role_id: '$_id.consumer_role_id'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+      ],
+      :allow_disk_use => true).entries
+
+      zipcode_hash = {}
+      reports.each do |re|
+        consumer_role = ConsumerRole.find(re["_id"]["consumer_role_id"].first) rescue nil
+        if consumer_role.present?
+          zipcode = consumer_role.person.home_address.zip rescue nil
+          if zipcode.present?
+            if zipcode_hash[zipcode].present?
+              zipcode_hash[zipcode] += re['distinctCount']
+            else
+              zipcode_hash[zipcode] = re['distinctCount']
+            end
+          end
+        end
+      end
+      zips = zipcode_hash.keys.uniq
+      zip_site_hash = {}
+      zips.each do |zip|
+        geo = Geocoder.search(zip)
+        if geo.present?
+          zip_site_hash[zip] = geo.first.data['geometry']['location'].values
+        end
+      end
+
+      location_arr = []
+      zipcode_hash.each do |zipcode, count|
+        location = zip_site_hash[zipcode]
+        if zipcode.present?
+          count.to_i.times { location_arr << location }
+        end
+      end
+
+      options = zipcode_hash.keys
+      report_data = [{name: 'Zip Code', data: zipcode_hash.values}]
+      [options, report_data, 'zipcode', 'zipcode', location_arr]
     end
 
     def self.health_plans_by_year
@@ -540,6 +587,80 @@ module ReportSources
       end
 
       [options, report_data, 'Member Count', 'double dimensional']
+    end
+
+    def self.dental_covered_lives_by_age
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$match': {market: 'individual'}}, 
+        {'$match': {coverage_kind: 'dental'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {consumer_role_id: {"$ne" => []}}},
+        {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
+        {'$project': {
+          hbx_id: '$hbx_id',
+          consumer_role_id: '$consumer_role_id',
+        }},
+        {'$group': {_id:{hbx_id: '$hbx_id', consumer_role_id: '$consumer_role_id'}, count: {'$sum':1}}},
+        {'$group': {_id:{consumer_role_id: '$_id.consumer_role_id'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+      ],
+      :allow_disk_use => true).entries
+
+      age_hash = {
+        '<18'   => {'count'=>0, 'range'=>[0,17]},
+        '18-25' => {'count'=>0, 'range'=>[18,25]},
+        '26-34' => {'count'=>0, 'range'=>[26,34]},
+        '35-44' => {'count'=>0, 'range'=>[35,44]},
+        '45-54' => {'count'=>0, 'range'=>[45,54]},
+        '55-64' => {'count'=>0, 'range'=>[55,64]},
+        '65+'   => {'count'=>0, 'range'=>[65,150]}
+      }
+      reports.each do |re|
+        consumer_role = ConsumerRole.find(re["_id"]["consumer_role_id"].first) rescue nil
+        if consumer_role.present?
+          age = age_on_next_effective_date(consumer_role.dob)
+          age_hash.each do |key, value|
+            if age >= value['range'].first && age <= value['range'].last
+              age_hash[key]['count'] += re['distinctCount']
+            end
+          end
+        end
+      end
+
+      options = age_hash.keys
+      report_data = [{name: 'Age', data: age_hash.map{|k, v| v['count']}}]
+      [options, report_data, 'Age']
+    end
+
+    def self.dental_covered_lives_by_gender
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$match': {market: 'individual'}}, 
+        {'$match': {coverage_kind: 'dental'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {consumer_role_id: {"$ne" => []}}},
+        {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
+        {'$project': {
+          hbx_id: '$hbx_id',
+          consumer_role_id: '$consumer_role_id',
+        }},
+        {'$group': {_id:{hbx_id: '$hbx_id', consumer_role_id: '$consumer_role_id'}, count: {'$sum':1}}},
+        {'$group': {_id:{consumer_role_id: '$_id.consumer_role_id'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+      ],
+      :allow_disk_use => true).entries
+
+      gender_hash = {
+        'male' => 0,
+        'female' => 0
+      }
+      reports.each do |re|
+        consumer_role = ConsumerRole.find(re["_id"]["consumer_role_id"].first) rescue nil
+        gender_hash[consumer_role.gender] += re['distinctCount'] if consumer_role.present?
+      end
+
+      options = gender_hash.keys
+      report_data = [{name: 'Gender', data: gender_hash.values}]
+      [options, report_data, 'Gender']
     end
 
     def self.dental_plans_by_year
