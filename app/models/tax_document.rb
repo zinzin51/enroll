@@ -6,17 +6,12 @@ class TaxDocument < Document
   VERSION_TYPES = ['new', 'corrected', 'void']
 
   field :version_type, type: String, default: 'new'
-
-  field :policy_id, type: String
-
+  field :hbx_enrollment_id, type: String #policy id
   field :year, type: String
 
-  alias_attribute :policy_id, :hbx_enrollment_id
-
-
   validates_inclusion_of :version_type, in: VERSION_TYPES
-  validates_presence_of :policy_id, :version_type, :year
-  validates :valid_year
+  validates_presence_of :hbx_enrollment_id, :version_type, :year
+  validate :valid_year
 
   private
   def set_subject
@@ -24,7 +19,6 @@ class TaxDocument < Document
   end
 
   def valid_year
-    errors.add(:year, "year should be 4 digits long. e.g. 2016") if year.length != 4
+    errors.add(:year, "year should be 4 digits long, e.g. 2016") if year.length != 4
   end
-
 end
