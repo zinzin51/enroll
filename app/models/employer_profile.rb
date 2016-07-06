@@ -156,7 +156,19 @@ class EmployerProfile
     end
   end
 
+  def memoize_active_broker active_broker_memo
+    return unless account = active_broker_agency_account
+    if memo = active_broker_memo[account.broker_agency_profile_id] then return memo end
+    active_broker_memo[account.broker_agency_profile.id] = active_broker
+  end
+
   # for General Agency
+  def hashed_active_general_agency_legal_name gaps
+    return  unless account = active_general_agency_account
+    gap = gaps.detect{|gap| gap.id == account.general_agency_profile_id}
+    gap && gap.legal_name
+  end
+
   def active_general_agency_legal_name
     if active_general_agency_account
       active_general_agency_account.legal_name
@@ -407,6 +419,16 @@ class EmployerProfile
       })
     end
 
+    def organizations_for_force_publish(new_date)
+      Organization.where({
+        :'employer_profile.plan_years' => 
+        { :$elemMatch => {
+          :start_on => new_date.next_month.beginning_of_month, 
+          :aasm_state => 'renewing_draft'
+          }}
+      })
+    end
+
     def advance_day(new_date)
       if !Rails.env.test?
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
@@ -440,6 +462,13 @@ class EmployerProfile
         organizations_for_plan_year_end(new_date).each do |organization|
           employer_enroll_factory.employer_profile = organization.employer_profile
           employer_enroll_factory.end
+        end
+
+        if new_date.day == 11
+          organizations_for_force_publish(new_date).each do |organization|
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
+            plan_year.force_publish!
+          end
         end
       end
 

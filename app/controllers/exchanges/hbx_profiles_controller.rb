@@ -9,6 +9,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_csr_or_hbx_staff, only: [:family_index]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
+  layout 'single_column'
+  
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
@@ -33,7 +35,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organizations= Organization.where(:id.in => params[:employerId]).all
     @organizations.each do |org|
       @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify
+      @employer_invoice.save_and_notify_with_clean_up
     end
 
     respond_to do |format|
