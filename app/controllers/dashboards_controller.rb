@@ -225,29 +225,30 @@ class DashboardsController < ApplicationController
         'Individual Market Covered Lives Zip Codes' => 'health_covered_lives_by_zipcode',
       },
       "Health Plans" => {
-        'Individual Market Total Plans' => 'health_plans_by_year',
-        'Individual Market Count of People on Plan' => 'health_plans_by_member_count',
+        'Individual Market Total Enrollments' => 'health_plans_by_year',
+        'Individual Market New Enrollments' => 'health_plans_by_month',
+        'Individual Market Family Size' => 'health_plans_by_member_count',
         'Individual Market Standard Plans' => 'health_plans_by_standard',
         'Individual Market Carriers' => 'health_plans_by_carrier_profile',
         'Individual Market Metal Level' => 'health_plans_by_metal_level',
         'Individual Market Plan Type' => 'health_plans_by_plan_type',
         'Individual Market APTC and CSR' => 'health_plans_by_csr',
-        'Individual Market Plan Selection' => 'health_plans_by_name',
+        'Individual Market Plans' => 'health_plans_by_name',
       },
       "Dental Covered Lives" => {
-        'Individual Market Dental Total Covered Lives' => 'dental_covered_lives_by_year',
+        'Individual Market Dental Covered Lives' => 'dental_covered_lives_by_year',
         'Individual Market Dental Age Groups' => 'dental_covered_lives_by_age',
         'Individual Market Dental Gender' => 'dental_covered_lives_by_gender',
       },
       "Dental Plans" => {
-        'Individual Market Dental Total Plans' => 'dental_plans_by_year',
+        'Individual Market Dental Enrollment' => 'dental_plans_by_year',
+        'Individual Market Dental Family Size' => 'dental_plans_by_member_count',
         'Individual Market Dental Carriers' => 'dental_plans_by_carrier_profile',
-        'Individual Market Dental Count of People on Plan' => 'dental_plans_by_member_count',
+      },
+      "SHOP Enroll" => {
+        'SHOP Market Enrollments' => 'shop_enrollments_by_employer',
+        'SHOP Market New Enrollments' => 'shop_enrollments_by_month',
       }
     }
   end
 end
-
-
-
-

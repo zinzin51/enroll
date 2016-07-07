@@ -334,6 +334,51 @@ module ReportSources
       [options, report_data, 'Year']
     end
 
+    def self.health_plans_by_month
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$match': {market: 'individual'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {enrollment_kind: 'special_enrollment'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
+        {'$project': {
+          hbx_id: '$hbx_id',
+          month: {'$month': "$policy_start_on"},
+        }},
+        {'$group': {_id:{month: '$month', hbx_id: '$hbx_id'}, count: {'$sum':1}}},
+        #{'$group': {_id:{month: '$_id.month'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+        {'$sort': {'_id.month':1}}
+      ],
+      :allow_disk_use => true).entries
+
+      options = reports.map{|r| r['_id']['month']}.uniq
+      sep_hash = {}
+      reports.each do |re|
+        reason = HbxEnrollment.by_hbx_id(re['_id']['hbx_id']).last.special_enrollment_period.qualifying_life_event_kind.reason rescue 'other'
+        if sep_hash[reason]
+          month = re['_id']['month']
+          if sep_hash[reason][month]
+            sep_hash[reason][month] += re['count']
+          else
+            sep_hash[reason][month] = re['count']
+          end
+        else
+          sep_hash[reason] = {}
+          sep_hash[reason][month] = re['count']
+        end
+      end
+
+      report_data = []
+      sep_hash.each do |reason, values|
+        data = options.map {|m| values[m] || 0}
+        report_data << {name: reason, data: data}
+      end
+
+      #report_data = [{name: 'month', data: reports.map{|r| r['distinctCount']}}]
+      [options, report_data, 'Month', 'double dimensional']
+    end
+
     def self.health_plans_by_member_count
       reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
         {'$match': {market: 'individual'}}, 
@@ -549,7 +594,7 @@ module ReportSources
         }},
         {'$group': {_id:{plan_name: '$plan_name', plan_id: '$plan_id'}, count: {'$sum':1}}},
         {'$group': {_id:{plan_name: '$_id.plan_name'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
-        {'$sort': {'_id.plan_name':1}}
+        {'$sort': {'distinctCount':-1, '_id.plan_name':1}}
       ],
       :allow_disk_use => true).entries
 
@@ -749,6 +794,88 @@ module ReportSources
       end
 
       [options, report_data, 'Member Count', 'double dimensional']
+    end
+
+    def self.shop_enrollments_by_employer
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$unwind': "$benefit_group_id"},
+        {'$match': {market: 'shop'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {benefit_group_id: {"$ne" => nil}}},
+        {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
+        {'$project': {
+          hbx_id: '$hbx_id',
+          benefit_group_id: '$benefit_group_id',
+        }},
+        {'$group': {_id:{hbx_id: '$hbx_id', benefit_group_id: '$benefit_group_id'}, count: {'$sum':1}}},
+        {'$group': {_id:{benefit_group_id: '$_id.benefit_group_id'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+      ],
+      :allow_disk_use => true).entries
+
+      org_hash = {}
+      reports.each do |re|
+        bg_id = re['_id']['benefit_group_id']
+        bg_id = BSON::ObjectId.from_string(bg_id) if bg_id.is_a? String
+        org = Organization.where({hbx_id: {'$nin': ['536002522','526002523','536002558']}}).where({"employer_profile.plan_years.benefit_groups._id" => bg_id }).last rescue nil
+        if org.present?
+          if org_hash[org.fein].present?
+            org_hash[org.fein][1] += re['distinctCount']
+          else
+            org_hash[org.fein] = [org.legal_name, re['distinctCount']]
+          end
+        end
+      end
+
+      options = org_hash.map {|k, org| org.first }
+      report_data = [{name: 'Employer', data: org_hash.map{|k, org| org.last}}]
+      [options, report_data, 'Employer']
+    end
+
+    def self.shop_enrollments_by_month
+      except_bg_ids = Organization.where({hbx_id: {'$in': ['536002522','526002523','536002558']}}).map(&:employer_profile).map(&:plan_years).flatten.map(&:benefit_groups).flatten.map(&:id) rescue []
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$unwind': "$benefit_group_id"},
+        {'$match': {market: 'shop'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {benefit_group_id: {"$nin" => except_bg_ids}}},
+        {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
+        {'$project': {
+          hbx_id: '$hbx_id',
+          month: {'$month': "$policy_start_on"},
+        }},
+        {'$group': {_id:{hbx_id: '$hbx_id', month: '$month'}, count: {'$sum':1}}},
+        {'$sort': {'_id.month':1}}
+      ],
+      :allow_disk_use => true).entries
+
+      options = reports.map{|r| r['_id']['month']}.uniq
+      sep_hash = {}
+      reports.each do |re|
+        reason = HbxEnrollment.by_hbx_id(re['_id']['hbx_id']).last.special_enrollment_period.qualifying_life_event_kind.reason rescue 'other'
+        if sep_hash[reason]
+          month = re['_id']['month']
+          if sep_hash[reason][month]
+            sep_hash[reason][month] += re['count']
+          else
+            sep_hash[reason][month] = re['count']
+          end
+        else
+          sep_hash[reason] = {}
+          sep_hash[reason][month] = re['count']
+        end
+      end
+
+      report_data = []
+      sep_hash.each do |reason, values|
+        data = options.map {|m| values[m] || 0}
+        report_data << {name: reason, data: data}
+      end
+
+      [options, report_data, 'Month', 'double dimensional']
     end
 
     def self.age_on_next_effective_date(dob)
