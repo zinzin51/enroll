@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe DashboardController, type: :controller do
+RSpec.describe DashboardsController, type: :controller do
 
   describe "GET #plan_comparison" do
     it "returns http success" do

@@ -248,6 +248,12 @@ class DashboardsController < ApplicationController
       "SHOP Enroll" => {
         'SHOP Market Enrollments' => 'shop_enrollments_by_employer',
         'SHOP Market New Enrollments' => 'shop_enrollments_by_month',
+        'SHOP Market Age Groups' => 'shop_enrollments_by_age',
+        'SHOP Market Gender' => 'shop_enrollments_by_gender',
+        'SHOP Market Family Size' => 'shop_enrollments_by_member_count',
+        'SHOP Market Carriers' => 'shop_enrollments_by_carrier_profile',
+        'SHOP Market Metal Levels' => 'shop_enrollments_by_metal_level',
+        'SHOP Market Plans' => 'shop_enrollments_by_name',
       }
     }
   end

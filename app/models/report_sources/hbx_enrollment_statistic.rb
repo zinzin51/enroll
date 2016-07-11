@@ -839,6 +839,7 @@ module ReportSources
         {'$unwind': "$benefit_group_id"},
         {'$match': {market: 'shop'}}, 
         {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {enrollment_kind: 'special_enrollment'}}, 
         {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
         {'$match': {plan_id: {"$ne" => nil}}},
         {'$match': {benefit_group_id: {"$nin" => except_bg_ids}}},
@@ -878,8 +879,220 @@ module ReportSources
       [options, report_data, 'Month', 'double dimensional']
     end
 
-    def self.age_on_next_effective_date(dob)
-      today = TimeKeeper.date_of_record
+    def self.shop_enrollments_by_age
+      except_bg_ids = Organization.where({hbx_id: {'$in': ['536002522','526002523','536002558']}}).map(&:employer_profile).map(&:plan_years).flatten.map(&:benefit_groups).flatten.map(&:id) rescue []
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$unwind': "$benefit_group_id"},
+        {'$match': {market: 'shop'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {benefit_group_id: {"$nin" => except_bg_ids}}},
+        {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
+        {'$project': {
+          hbx_id: '$hbx_id',
+          family_id: '$family_id',
+          policy_start_on: '$policy_start_on'
+        }},
+        {'$group': {_id:{hbx_id: '$hbx_id', family_id: '$family_id', policy_start_on: '$policy_start_on'}, count: {'$sum':1}}},
+        {'$group': {_id:{family_id: '$_id.family_id', policy_start_on: '$_id.policy_start_on'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+      ],
+      :allow_disk_use => true).entries
+
+      age_hash = {
+        '<18'   => {'count'=>0, 'range'=>[0,17]},
+        '18-25' => {'count'=>0, 'range'=>[18,25]},
+        '26-34' => {'count'=>0, 'range'=>[26,34]},
+        '35-44' => {'count'=>0, 'range'=>[35,44]},
+        '45-54' => {'count'=>0, 'range'=>[45,54]},
+        '55-64' => {'count'=>0, 'range'=>[55,64]},
+        '65+'   => {'count'=>0, 'range'=>[65,150]}
+      }
+      reports.each do |re|
+        family_member = Family.find(re['_id']['family_id']).primary_family_member rescue nil
+        if family_member.present?
+          age = age_on_next_effective_date(family_member.dob, re['_id']['policy_start_on'])
+          age_hash.each do |key, value|
+            if age >= value['range'].first && age <= value['range'].last
+              age_hash[key]['count'] += re['distinctCount']
+            end
+          end
+        end
+      end
+
+      options = age_hash.keys
+      report_data = [{name: 'Age', data: age_hash.map{|k, v| v['count']}}]
+      [options, report_data, 'Age']
+    end
+
+    def self.shop_enrollments_by_gender
+      except_bg_ids = Organization.where({hbx_id: {'$in': ['536002522','526002523','536002558']}}).map(&:employer_profile).map(&:plan_years).flatten.map(&:benefit_groups).flatten.map(&:id) rescue []
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$unwind': "$benefit_group_id"},
+        {'$match': {market: 'shop'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {benefit_group_id: {"$nin" => except_bg_ids}}},
+        {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
+        {'$project': {
+          hbx_id: '$hbx_id',
+          family_id: '$family_id',
+        }},
+        {'$group': {_id:{hbx_id: '$hbx_id', family_id: '$family_id'}, count: {'$sum':1}}},
+        {'$group': {_id:{family_id: '$_id.family_id'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+      ],
+      :allow_disk_use => true).entries
+
+      gender_hash = {
+        'male' => 0,
+        'female' => 0
+      }
+      reports.each do |re|
+        family_member = Family.find(re['_id']['family_id']).primary_family_member rescue nil
+        gender_hash[family_member.gender] += re['distinctCount'] if family_member.present?
+      end
+
+      options = gender_hash.keys
+      report_data = [{name: 'Gender', data: gender_hash.values}]
+      [options, report_data, 'Gender']
+    end
+
+    def self.shop_enrollments_by_member_count
+      except_bg_ids = Organization.where({hbx_id: {'$in': ['536002522','526002523','536002558']}}).map(&:employer_profile).map(&:plan_years).flatten.map(&:benefit_groups).flatten.map(&:id) rescue []
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$unwind': "$benefit_group_id"},
+        {'$match': {market: 'shop'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {benefit_group_id: {"$nin" => except_bg_ids}}},
+        {'$project': {
+          plan_id: '$plan_id',
+          year: {'$year': "$policy_start_on"},
+          member_count: '$member_count',
+        }},
+        {'$group': {_id:{year: '$year', member_count: '$member_count', plan_id: '$plan_id'}, count: {'$sum':1}}},
+        {'$group': {_id:{year: '$_id.year', member_count: '$_id.member_count'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+        {'$sort': {'_id.year':1, '_id.member_count':1}}
+      ],
+      :allow_disk_use => true).entries
+
+      options = reports.map{|r| r['_id']['year']}.uniq
+      member_count_options = reports.map{|r| r['_id']['member_count']}.uniq.sort
+      report_data = []
+
+      member_count_options.each do |mc|
+        report_data_for_year = {name: mc, data:[]}
+        options.each do |year|
+          re = reports.detect{|r| r['_id']['year'] == year && r['_id']['member_count'] == mc}
+          re_count = re.present? ? re['distinctCount'] : 0
+          report_data_for_year[:data].push(re_count)
+        end
+        report_data.push(report_data_for_year)
+      end
+      [options, report_data, 'Member Count', 'double dimensional']
+    end
+
+    def self.shop_enrollments_by_carrier_profile
+      except_bg_ids = Organization.where({hbx_id: {'$in': ['536002522','526002523','536002558']}}).map(&:employer_profile).map(&:plan_years).flatten.map(&:benefit_groups).flatten.map(&:id) rescue []
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$unwind': "$benefit_group_id"},
+        {'$match': {market: 'shop'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {benefit_group_id: {"$nin" => except_bg_ids}}},
+        {'$project': {
+          plan_id: '$plan_id',
+          year: {'$year': "$policy_start_on"},
+          carrier_profile_id: '$carrier_profile_id',
+        }},
+        {'$group': {_id:{year: '$year', carrier_profile_id: '$carrier_profile_id', plan_id: '$plan_id'}, count: {'$sum':1}}},
+        {'$group': {_id:{year: '$_id.year', carrier_profile_id: '$_id.carrier_profile_id'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+        {'$sort': {'_id.year':1, '_id.carrier_profile_id':1}}
+      ],
+      :allow_disk_use => true).entries
+
+      options = reports.map{|r| r['_id']['year']}.uniq
+      carrier_options = reports.map{|r| r['_id']['carrier_profile_id']}.uniq
+      carrier_names = carrier_options.map{|c| CarrierProfile.find(c).try(:legal_name) || c }
+      report_data = []
+      carrier_options.each_with_index do |op, idx|
+        report_data_for_year = {name: carrier_names[idx], data:[]}
+        options.each do |year|
+          re = reports.detect{|r| r['_id']['year'] == year && r['_id']['carrier_profile_id'] == op}
+          re_count = re.present? ? re['distinctCount'] : 0
+          report_data_for_year[:data].push(re_count)
+        end
+        report_data.push(report_data_for_year)
+      end
+
+      [options, report_data, 'Carrier', 'double dimensional']
+    end
+
+    def self.shop_enrollments_by_metal_level
+      except_bg_ids = Organization.where({hbx_id: {'$in': ['536002522','526002523','536002558']}}).map(&:employer_profile).map(&:plan_years).flatten.map(&:benefit_groups).flatten.map(&:id) rescue []
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$unwind': "$benefit_group_id"},
+        {'$match': {market: 'shop'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {benefit_group_id: {"$nin" => except_bg_ids}}},
+        {'$project': {
+          plan_id: '$plan_id',
+          year: {'$year': "$policy_start_on"},
+          metal_level: '$metal_level',
+        }},
+        {'$group': {_id:{year: '$year', metal_level: '$metal_level', plan_id: '$plan_id'}, count: {'$sum':1}}},
+        {'$group': {_id:{year: '$_id.year', metal_level: '$_id.metal_level'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+        {'$sort': {'_id.year':1, '_id.metal_level':1}}
+      ],
+      :allow_disk_use => true).entries
+
+      options = reports.map{|r| r['_id']['year']}.uniq
+      metal_level_options = reports.map{|r| r['_id']['metal_level']}.uniq
+      report_data = []
+      metal_level_options.each do |op|
+        report_data_for_year = {name: op.to_s, data:[]}
+        options.each do |year|
+          re = reports.detect{|r| r['_id']['year'] == year && r['_id']['metal_level'] == op}
+          re_count = re.present? ? re['distinctCount'] : 0
+          report_data_for_year[:data].push(re_count)
+        end
+        report_data.push(report_data_for_year)
+      end
+
+      [options, report_data, 'Metal Level', 'double dimensional']
+    end
+
+    def self.shop_enrollments_by_name
+      except_bg_ids = Organization.where({hbx_id: {'$in': ['536002522','526002523','536002558']}}).map(&:employer_profile).map(&:plan_years).flatten.map(&:benefit_groups).flatten.map(&:id) rescue []
+      reports = ReportSources::HbxEnrollmentStatistic.collection.aggregate([
+        {'$unwind': "$benefit_group_id"},
+        {'$match': {market: 'shop'}}, 
+        {'$match': {coverage_kind: 'health'}}, 
+        {'$match': {aasm_state: {'$ne' => 'shopping'}}}, 
+        {'$match': {plan_id: {"$ne" => nil}}},
+        {'$match': {benefit_group_id: {"$nin" => except_bg_ids}}},
+        {'$match': {policy_start_on: {"$gte" => TimeKeeper.date_of_record.at_beginning_of_year}}},
+        {'$project': {
+          plan_id: '$plan_id',
+          plan_name: '$plan_name',
+        }},
+        {'$group': {_id:{plan_name: '$plan_name', plan_id: '$plan_id'}, count: {'$sum':1}}},
+        {'$group': {_id:{plan_name: '$_id.plan_name'}, 'totalCount': {'$sum': '$count'}, 'distinctCount': {'$sum':1}}},
+        {'$sort': {'distinctCount':-1, '_id.plan_name':1}}
+      ],
+      :allow_disk_use => true).entries
+
+      options = reports.map{|r| r['_id']['plan_name']}
+      report_data = [{name: 'Plan Name', data: reports.map{|r| r['distinctCount']}}]
+      [options, report_data, 'Plan Name']
+    end
+
+    def self.age_on_next_effective_date(dob, today=TimeKeeper.date_of_record)
       today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
       age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
     end
