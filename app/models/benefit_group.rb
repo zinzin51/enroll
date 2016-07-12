@@ -328,6 +328,7 @@ class BenefitGroup
   end
 
   def self.find(id)
+    id = BSON::ObjectId.from_string(id) if id.is_a? String
     organizations = Organization.where({"employer_profile.plan_years.benefit_groups._id" => id })
     organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
       bg.id == id

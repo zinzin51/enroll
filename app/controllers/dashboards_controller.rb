@@ -254,6 +254,9 @@ class DashboardsController < ApplicationController
         'SHOP Market Carriers' => 'shop_enrollments_by_carrier_profile',
         'SHOP Market Metal Levels' => 'shop_enrollments_by_metal_level',
         'SHOP Market Plans' => 'shop_enrollments_by_name',
+        'SHOP Market Employee Choice' => 'shop_enrollments_by_choice',
+        'SHOP Market Employer Contribution' => 'shop_enrollments_by_contribution',
+        'SHOP Market Benefit Start' => 'shop_enrollments_by_bg_start',
       }
     }
   end
