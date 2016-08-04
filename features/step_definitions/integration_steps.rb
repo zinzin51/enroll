@@ -453,11 +453,11 @@ Then(/^.+ should see the new dependent form$/) do
   expect(page).to have_content('Confirm Member')
 end
 
-When(/^.+ enters? the dependent info of Sorens daughter$/) do
+When(/^.+ enters? the dependent info of Sorens daughter$/) do 
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
-  find(:xpath, "//p[@class='label'][contains(., 'RELATION')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
   find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
   find(:xpath, "//label[@for='radio_female']").click
 end
@@ -654,6 +654,7 @@ When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  find(".navbar-brand").click #to stop datepicker blocking shit
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end
