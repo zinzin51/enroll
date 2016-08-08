@@ -201,8 +201,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
     let(:organization) {
       o = FactoryGirl.create(:employer)
-      o.primary_office_location.address.address_1 = '500 Employers-Api Avenue'      
-      o.primary_office_location.address.address_2 = '#555' 
+      a = o.primary_office_location.address
+      a.address_1 = '500 Employers-Api Avenue'
+      a.address_2 = '#555'
+      a.city = 'Washington'
+      a.state = 'DC'
+      a.zip = '20001'
       o.primary_office_location.phone = Phone.new(:kind => 'main', :area_code => '202', :number => '555-9999')
       o.save
       o
@@ -280,7 +284,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(office.address_2).to eq '#555'
       expect(office.city).to eq 'Washington'
       expect(office.state).to eq 'DC'
-      expect(office.zip).to eq '11117'
+      expect(office.zip).to eq '20001'
 
       
       allow_any_instance_of(EmployerProfile).to receive(:enrollments_for_billing).and_call_original
