@@ -114,16 +114,11 @@ class CensusEmployeeImport
       row = Hash[[@column_header_row, @roster.row(i)].transpose]
       record = parse_row(row)
 
-      if record[:termination_date].present?
-        terminate_employee(record)
-        census_employee = add_or_update_census_member(record)
+      if record[:employee_relationship].nil?
+        self.errors.add :base, "Row #{index + 4}: Relationship is required"
+        break
       else
-        if record[:employee_relationship].nil?
-          self.errors.add :base, "Row #{index + 4}: Relationship is required"
-          break
-        else
-          census_employee = add_or_update_census_member(record)
-        end
+        census_employee = add_or_update_census_member(record)
       end
 
       census_employee ||= nil
@@ -180,6 +175,7 @@ class CensusEmployeeImport
     member.name_sfx = record[:name_sfx].to_s if record[:name_sfx]
     member.dob = record[:dob] if record[:dob]
     member.hired_on = record[:hire_date] if record[:hire_date]
+    member.employment_terminated_on = record[:termination_date] if record[:termination_date]
     if ["1", "true", "yes"].include? record[:is_business_owner].to_s
       member.is_business_owner = true
     else
