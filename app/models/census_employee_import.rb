@@ -115,7 +115,8 @@ class CensusEmployeeImport
       record = parse_row(row)
 
       if record[:termination_date].present?
-        census_employee = terminate_employee(record)
+        terminate_employee(record)
+        census_employee = add_or_update_census_member(record)
       else
         if record[:employee_relationship].nil?
           self.errors.add :base, "Row #{index + 4}: Relationship is required"
@@ -145,7 +146,7 @@ class CensusEmployeeImport
   def add_or_update_census_member(record)
     # Process Employee
     if record[:employee_relationship].downcase == "self"
-      member = CensusEmployee.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).active.first || CensusEmployee.new
+      member = CensusEmployee.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).first || CensusEmployee.new
       member = assign_census_employee_attributes(member, record)
       member.terminate_employment(member.employment_terminated_on) if member.employment_terminated_on.present?
       @last_ee_member = member
@@ -179,10 +180,10 @@ class CensusEmployeeImport
     member.name_sfx = record[:name_sfx].to_s if record[:name_sfx]
     member.dob = record[:dob] if record[:dob]
     member.hired_on = record[:hire_date] if record[:hire_date]
-    if ["0", "false"].include? record[:is_business_owner].to_s
-      member.is_business_owner = false
-    else
+    if ["1", "true", "yes"].include? record[:is_business_owner].to_s
       member.is_business_owner = true
+    else
+      member.is_business_owner = false
     end
     member.gender = record[:gender].to_s if record[:gender]
     member.email = Email.new({address: record[:email].to_s, kind: "home"}) if record[:email]
@@ -302,7 +303,17 @@ class CensusEmployeeImport
   end
 
   def parse_ssn(cell)
-    cell.blank? ? nil : cell.to_s.gsub(/\D/, '')
+    if cell.blank?
+      nil
+    else
+      cell = cell.to_s
+      # due to user formatting if ssn is received as a Numeric then cell.to_s will append a .0 (e.g. 111111111.0),
+      # we need to remove it
+      if cell.length == 11 && cell[9] == "."
+        cell = cell.split('.').first
+      end
+      cell
+    end
   end
 
   def parse_boolean(cell)
