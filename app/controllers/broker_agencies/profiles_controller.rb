@@ -51,6 +51,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def update
+    authorize HbxProfile, :modify_admin_tabs?
     sanitize_broker_profile_params
     params.permit!
 
@@ -214,6 +215,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def set_default_ga
+    authorize HbxProfile, :modify_admin_tabs?
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
 
     if @broker_agency_profile.present?
@@ -238,6 +240,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def assign
+
     page_string = params.permit(:employers_page)[:employers_page]
     page_no = page_string.blank? ? nil : page_string.to_i
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
@@ -254,6 +257,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def update_assign
+    authorize HbxProfile, :modify_admin_tabs?
     if params[:general_agency_id].present? && params[:employer_ids].present?
       general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_id])
       case params[:type]
@@ -299,6 +303,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def clear_assign_for_employer
+    authorize HbxProfile, :modify_admin_tabs?
     @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
     if @employer_profile.present?
       send_general_agency_assign_msg(@employer_profile.general_agency_profile, @employer_profile, 'Terminate')
