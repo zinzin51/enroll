@@ -204,6 +204,7 @@ Rails.application.routes.draw do
         get 'search'
         post 'match'
         get 'inbox'
+        get 'employee_roster_api'
       end
       resources :plan_years do
         get 'reference_plans'
