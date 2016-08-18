@@ -627,8 +627,13 @@ class Person
             employer_profile_id: {  "$in": employer_ids },
             :aasm_state.ne => :is_closed
         }
-        }).group_by {|s| s.employer_id } 
-        #TODO employer_id isn't a property of person, so we need a projection
+        })
+      employer_ids.inject({}) do |result, id| 
+        result[id] = staff.select do |s| 
+          s.staff_roles.any? { |r| r.employer_profile_id == id } 
+        end
+        result
+      end
     end
 
     # Adds employer staff role to person
@@ -652,7 +657,7 @@ class Person
     def deactivate_employer_staff_role(person_id, employer_profile_id)
 
       begin
-        person = Person.find(person_id)
+        person = Personstaff_for_employers(person_id)
       rescue
         return false, 'Person not found'
       end
