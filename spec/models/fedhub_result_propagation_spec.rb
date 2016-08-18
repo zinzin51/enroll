@@ -41,13 +41,29 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
 
     describe "when the enrollment is terminated" do
       before :each do
+        person.consumer_role.revert!(denial_information)
         enrollment.terminate_coverage!
-        person.consumer_role.ssn_invalid!(denial_information)
       end
 
       it "does not change the state of the enrollment" do
-          enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
-          expect(enroll.aasm_state).to eql "coverage_terminated"
+        person.consumer_role.coverage_purchased!("args")
+        enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
+        expect(enroll.aasm_state).to eql "coverage_terminated"
+      end
+
+      it "moves unverified member to withdrawn status" do
+        expect(person.consumer_role.withdrawn?).to be_truthy
+      end
+    end
+
+    describe "when enrollment is terminated with fully verified member" do
+      before :each do
+        person.consumer_role.import!
+        enrollment.terminate_coverage!
+      end
+
+      it "moves unverified member to withdrawn status" do
+        expect(person.consumer_role.fully_verified?).to be_truthy
       end
     end
   end
