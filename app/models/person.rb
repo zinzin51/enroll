@@ -624,7 +624,7 @@ class Person
     def staff_for_employers_including_pending(employer_ids)
       staff = self.where(:employer_staff_roles => {
         '$elemMatch' => {
-            employer_profile_id: {  "$in": employer_ids },
+            { employer_profile_id.in =>  employer_ids },
             :aasm_state.ne => :is_closed
         }
         })
