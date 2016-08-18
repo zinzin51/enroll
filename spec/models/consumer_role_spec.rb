@@ -250,6 +250,7 @@ context "Verification process and notices" do
     let(:consumer) { person.consumer_role }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
+
     context "import" do
       all_states.each do |state|
         it "changes #{state} to fully_verified" do
@@ -334,7 +335,6 @@ context "Verification process and notices" do
         expect(consumer).to transition_from(:dhs_pending).to(:verification_outstanding).on_event(:fail_dhs, verification_attr)
         expect(consumer.lawful_presence_determination.verification_outstanding?).to eq true
       end
-
     end
 
     context "pass_dhs" do
@@ -355,7 +355,18 @@ context "Verification process and notices" do
         expect(consumer).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:pass_dhs, verification_attr)
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
       end
+    end
 
+    context "move_to_withdrawn" do
+      it "changes state from ssa_pending to withdrawn" do
+        expect(consumer).to transition_from(:ssa_pending).to(:withdrawn).on_event(:move_to_withdrawn, verification_attr)
+      end
+      it "changes state from dhs_pending to withdrawn" do
+        expect(consumer).to transition_from(:dhs_pending).to(:withdrawn).on_event(:move_to_withdrawn, verification_attr)
+      end
+      it "changes state from verification_outstanding to withdrawn" do
+        expect(consumer).to transition_from(:verification_outstanding).to(:withdrawn).on_event(:move_to_withdrawn, verification_attr)
+      end
     end
 
     context "revert" do
@@ -389,6 +400,29 @@ context "Verification process and notices" do
       end
     end
   end
+
+  describe "#ivl_withdrawn" do
+    let(:consumer) { person.consumer_role }
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
+    states_to_move = %w(ssa_pending dhs_pending verification_outstanding)
+    states_to_not_move = %w(unverified fully_verified verification_period_ended ineligible)
+
+    states_to_move.each do |state|
+      it "changes #{state} to withdrawn" do
+        consumer.aasm_state = state
+        consumer.ivl_withdrawn
+        expect(consumer.withdrawn?).to be_truthy
+      end
+    end
+
+    states_to_not_move.each do |state|
+      it "changes #{state} to withdrawn" do
+        consumer.aasm_state = state
+        consumer.ivl_withdrawn
+        expect(consumer.withdrawn?).to be_falsey
+      end
+    end
+  end
 end
 
 RSpec.shared_examples "a consumer role unchanged by ivl_coverage_selected" do |c_state|
@@ -412,9 +446,19 @@ describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
     end
   end
 
+  describe "in withdrawn status" do
+    let(:current_state) { "withdrawn" }
+    it "fires coverage_selected!" do
+      expect(subject).to receive(:coverage_purchased!)
+      subject.ivl_coverage_selected
+    end
+  end
+
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :ssa_pending
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :dhs_pending
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_outstanding
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :fully_verified
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_period_ended
+  it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :ineligible
 end
+

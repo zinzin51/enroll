@@ -124,9 +124,13 @@ class ConsumerRole
   before_validation :ensure_ssn_validation_status
 
   def ivl_coverage_selected
-    if unverified?
+    if unverified? || withdrawn?
       coverage_purchased!
     end
+  end
+
+  def ivl_withdrawn
+    move_to_withdrawn! if unverified_contingent_state?
   end
 
   def ensure_ssn_validation_status
@@ -357,15 +361,19 @@ class ConsumerRole
     state :verification_outstanding
     state :fully_verified
     state :verification_period_ended
+    state :ineligible
+    state :withdrawn
 
     before_all_events :ensure_ssn_validation_status
 
+    #for curam users
     event :import, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :fully_verified
       transitions from: :ssa_pending, to: :fully_verified
       transitions from: :dhs_pending, to: :fully_verified
       transitions from: :verification_outstanding, to: :fully_verified
       transitions from: :verification_period_ended, to: :fully_verified
+      transitions from: :withdrawn, to: :fully_verified
       transitions from: :fully_verified, to: :fully_verified
     end
 
@@ -373,6 +381,9 @@ class ConsumerRole
       transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn, :record_transition, :notify_of_eligibility_change]
       transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?], :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change]
       transitions from: :unverified, to: :ssa_pending, :guard => [:call_ssa?], :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change]
+      transitions from: :withdrawn, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn, :record_transition, :notify_of_eligibility_change]
+      transitions from: :withdrawn, to: :dhs_pending, :guard => [:call_dhs?], :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change]
+      transitions from: :withdrawn, to: :ssa_pending, :guard => [:call_ssa?], :after => [:invoke_verification!, :record_transition, :notify_of_eligibility_change]
     end
 
     event :ssn_invalid, :after => [:fail_ssn, :fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
@@ -388,6 +399,7 @@ class ConsumerRole
       transitions from: :unverified, to: :fully_verified, :guard => [:call_ssa?]
       transitions from: :ssa_pending, to: :fully_verified
       transitions from: :verification_outstanding, to: :fully_verified
+      transitions from: :withdrawn, to: :fully_verified, :guard => [:call_ssa?]
       transitions from: :fully_verified, to: :fully_verified
     end
 
@@ -398,21 +410,32 @@ class ConsumerRole
     event :pass_dhs, :after => [:pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :fully_verified, :guard => [:call_dhs?]
       transitions from: :dhs_pending, to: :fully_verified
+      transitions from: :withdrawn, to: :fully_verified, :guard => [:call_dhs?]
       transitions from: :verification_outstanding, to: :fully_verified
     end
 
-    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
+    #only for terminated enrollment
+    event :move_to_withdrawn, :after => [:record_transition] do
+      transitions from: :dhs_pending, to: :withdrawn
+      transitions from: :ssa_pending, to: :withdrawn
+      transitions from: :verification_outstanding, to: :withdrawn
+    end
+
+    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change, :record_transition] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
       transitions from: :dhs_pending, to: :unverified
       transitions from: :verification_outstanding, to: :unverified
+      transitions from: :withdrawn, to: :unverified
       transitions from: :fully_verified, to: :unverified
       transitions from: :verification_period_ended, to: :unverified
     end
 
-    event :redetermine, :after => [:invoke_verification!, :revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
+    event :redetermine, :after => [:invoke_verification!, :revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change, :record_transition] do
       transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :unverified, to: :ssa_pending, :guard => [:call_ssa?]
+      transitions from: :withdrawn, to: :dhs_pending, :guard => [:call_dhs?]
+      transitions from: :withdrawn, to: :ssa_pending, :guard => [:call_ssa?]
       transitions from: :verification_outstanding, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :verification_outstanding, to: :ssa_pending, :guard => [:call_ssa?]
       transitions from: :ssa_pending, to: :ssa_pending, :guard => [:call_ssa?]
@@ -529,7 +552,7 @@ class ConsumerRole
 
   private
   def notify_of_eligibility_change(*args)
-    CoverageHousehold.update_individual_eligibilities_for(self)
+    CoverageHouseholdMember.update_individual_eligibilities_for(self)
   end
 
   def mark_residency_denied(*args)
@@ -631,5 +654,9 @@ class ConsumerRole
     OpenStruct.new({:determined_at => Time.now,
                     :vlp_authority => "hbx"
                    })
+  end
+
+  def unverified_contingent_state?
+    dhs_pending? || ssa_pending? || verification_outstanding?
   end
 end

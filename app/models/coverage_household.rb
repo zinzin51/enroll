@@ -2,7 +2,6 @@ class CoverageHousehold
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
-  include AASM
   include HasFamilyMembers
 
   # The pool of all applicants eligible for enrollment during a certain time period
@@ -21,7 +20,6 @@ class CoverageHousehold
   # Broker agent credited for enrollment and transmitted on 834
   field :writing_agent_id, type: BSON::ObjectId
 
-  field :aasm_state, type: String, default: "applicant"
   field :submitted_at, type: DateTime
 
   embeds_many :coverage_household_members, cascade_callbacks: true
@@ -29,8 +27,6 @@ class CoverageHousehold
 
   validates_presence_of :is_immediate_family
   validate :presence_of_coverage_household_members
-
-  embeds_many :workflow_state_transitions, as: :transitional
 
   # belongs_to writing agent (broker_role)
   def writing_agent=(new_writing_agent)
@@ -107,63 +103,6 @@ class CoverageHousehold
     end
   end
 
-  aasm do
-    state :unverified, initial: true
-    state :enrollment_submitted
-    state :enrolled_contingent
-    state :enrolled
-    state :canceled
-    state :terminated
-
-    event :move_to_contingent!, :after => :record_transition do
-      transitions from: :terminated, to: :terminated
-      transitions from: :canceled, to: :canceled
-      transitions from: :unverified, to: :enrolled_contingent, after: :notify_verification_outstanding
-      transitions from: :enrollment_submitted, to: :enrolled_contingent, after: :notify_verification_outstanding
-      transitions from: :enrolled_contingent, to: :enrolled_contingent
-      transitions from: :enrolled, to: :enrolled_contingent, after: :notify_verification_outstanding
-    end
-
-    event :move_to_enrolled!, :after => :record_transition do
-      transitions from: :terminated, to: :terminated
-      transitions from: :canceled, to: :canceled
-      transitions from: :unverified, to: :enrolled, after: :notify_verification_success
-      transitions from: :enrolled_contingent, to: :enrolled, after: :notify_verification_success
-      transitions from: :enrolled, to: :enrolled
-      transitions from: :enrollment_submitted, to: :enrolled, after: :notify_verification_success
-    end
-
-    event :move_to_pending!, :after => :record_transition do
-      transitions from: :terminated, to: :terminated
-      transitions from: :canceled, to: :canceled
-      transitions from: :unverified, to: :unverified
-      transitions from: :enrolled_contingent, to: :unverified
-      transitions from: :enrolled, to: :unverified
-      transitions from: :enrollment_submitted, to: :unverified
-    end
-  end
-
-  def self.update_individual_eligibilities_for(consumer_role)
-    found_families = Family.find_all_by_person(consumer_role.person)
-    found_families.each do |ff|
-      ff.households.each do |hh|
-        hh.coverage_households.each do |ch|
-          ch.evaluate_individual_market_eligiblity
-        end
-        hh.hbx_enrollments.each do |he|
-          he.evaluate_individual_market_eligiblity
-        end
-      end
-    end
-  end
-
-  def evaluate_individual_market_eligiblity
-    eligibility_ruleset = ::RuleSet::CoverageHousehold::IndividualMarketVerification.new(self)
-    if eligibility_ruleset.applicable?
-      self.send(eligibility_ruleset.determine_next_state)
-    end
-  end
-
   def active_individual_enrollments
     household.hbx_enrollments.select do |he|
       (he.coverage_household_id == self.id.to_s) &&
@@ -172,24 +111,10 @@ class CoverageHousehold
     end
   end
 
-  def notify_verification_outstanding
-  end
-
-  def notify_verification_success
-  end
-
 private
   def presence_of_coverage_household_members
     if self.coverage_household_members.size == 0 && is_immediate_family
       self.errors.add(:base, "Should have at least one coverage_household_member")
     end
   end
-
-  def record_transition(*args)
-    workflow_state_transitions << WorkflowStateTransition.new(
-      from_state: aasm.from_state,
-      to_state: aasm.to_state
-    )
-  end
-
 end
