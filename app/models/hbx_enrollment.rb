@@ -322,15 +322,8 @@ class HbxEnrollment
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on ||= term_date
-    if benefit_group_assignment
-      benefit_group_assignment.end_benefit(terminated_on)
-      benefit_group_assignment.save
-    end
-
-    if should_transmit_update?
-      notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
-    end
+    callback_context = { :hbx_enrollment => self, :term_date => term_date }
+    HandleCoverageTerminated.call(callback_context)
   end
 
   def propogate_waiver

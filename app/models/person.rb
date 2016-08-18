@@ -257,7 +257,7 @@ class Person
 
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
 
-  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
+  delegate :ivl_coverage_selected, :ivl_withdrawn, :to => :consumer_role, :allow_nil => true
 
   # before_save :notify_change
   # def notify_change
