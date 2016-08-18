@@ -112,6 +112,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:person) { double("Person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+    let(:search_params){{"value"=>""}}
 
     before :each do
       allow(user).to receive(:person).and_return(person)
@@ -128,7 +129,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
     it "renders employer_invoice datatable payload" do
-      xhr :post, :employer_invoice_datatable
+      xhr :post, :employer_invoice_datatable, :search => search_params
       expect(response).to have_http_status(:success)
     end
 
@@ -407,6 +408,24 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
       expect(TimeKeeper).not_to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:error]).to match(/Access not allowed/)
+    end
+
+    it "update setting" do
+      Setting.individual_market_monthly_enrollment_due_on
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+      sign_in(user)
+
+      post :update_setting, :setting => {'name' => 'individual_market_monthly_enrollment_due_on', 'value' => 15}
+      expect(response).to have_http_status(:redirect)
+      expect(Setting.individual_market_monthly_enrollment_due_on).to eq 15
+    end
+
+    it "update setting fails because not updateable" do
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
+      sign_in(user)
+      post :update_setting, :setting => {'name' => 'individual_market_monthly_enrollment_due_on', 'value' => 19}
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to match(/Access not allowed/)
     end
