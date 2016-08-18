@@ -621,14 +621,14 @@ class Person
     end
 
     # returns a hash of arrays of staff members, keyed by employer id
-    def staff_for_employers_including_pending(employer_ids)
+    def staff_for_employers_including_pending(employer_profile_ids)
       staff = self.where(:employer_staff_roles => {
         '$elemMatch' => {
-            { employer_profile_id.in =>  employer_ids },
+            { employer_profile_id.in =>  employer_profile_ids },
             :aasm_state.ne => :is_closed
         }
         })
-      employer_ids.inject({}) do |result, id| 
+      employer_profile_ids.inject({}) do |result, id| 
         result[id] = staff.select do |s| 
           s.staff_roles.any? { |r| r.employer_profile_id == id } 
         end
