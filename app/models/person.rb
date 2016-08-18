@@ -620,6 +620,17 @@ class Person
         })
     end
 
+    # returns a hash of arrays of staff members, keyed by employer id
+    def staff_for_employers_including_pending(employer_ids)
+      staff = self.where(:employer_staff_roles => {
+        '$elemMatch' => {
+            employer_profile_id: {  "$in": employer_ids },
+            :aasm_state.ne => :is_closed
+        }
+        }).group_by {|s| s.employer_id } 
+        #TODO employer_id isn't a property of person, so we need a projection
+    end
+
     # Adds employer staff role to person
     # Returns status and message if failed
     # Returns status and person if successful

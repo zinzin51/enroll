@@ -175,8 +175,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     @renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
 
-    @employer_details = @employer_profiles.map do |er| 
+    employer_ids = @employer_profiles.map { |er| er.id }
+    all_staff_by_employer_id = Person.staff_for_employers_including_pending(employer_ids)
 
+    @employer_details = @employer_profiles.map do |er| 
         #discover the appropriate month to provide premium info for
         billing_plan_year, billing_report_date = er.billing_plan_year
 
@@ -185,7 +187,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
         employee_cost_total = enrollments.map(&:total_employee_cost).sum
         employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
 
-        staff = Person.staff_for_employer_including_pending(er)
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
         result = {
           :profile => er,
@@ -193,17 +194,19 @@ class BrokerAgencies::ProfilesController < ApplicationController
           :total_premium => premium_amt_total,
           :employee_contribution => employee_cost_total,
           :employer_contribution => employer_contribution_total,
-          :contacts => staff.map do |s| 
+          :contacts => all_staff[er.id].map do |s| 
               contact_struct(first: s.first_name, last: s.last_name, phone: s.work_phone.to_s,
                              mobile: s.mobile_phone.to_s, emails: [s.work_email_or_best])
               end + offices.map do |loc|
                 contact_struct(first: loc.address.kind.capitalize, last: "Office", phone: loc.phone.to_s,
                   address_1: loc.address.address_1, address_2: loc.address.address_2, city: loc.address.city,
                   state: loc.address.state, zip: loc.address.zip)
-              end,
-          :emails => staff.map { |s| s.work_email_or_best } || []
+              end
         }
     end    
+
+    #maybe the query is only executed here, when its elements are needed in the erb?
+    #that's how Linq would do it anyway
   end
 
 
