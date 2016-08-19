@@ -204,9 +204,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
               end
         }
     end    
-
-    #maybe the query is only executed here, when its elements are needed in the erb?
-    #that's how Linq would do it anyway
   end
 
 
