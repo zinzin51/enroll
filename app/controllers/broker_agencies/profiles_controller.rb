@@ -194,7 +194,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
           :total_premium => premium_amt_total,
           :employee_contribution => employee_cost_total,
           :employer_contribution => employer_contribution_total,
-          :contacts => all_staff[er.id].map do |s| 
+          :contacts => all_staff_by_employer_id[er.id].map do |s| 
               contact_struct(first: s.first_name, last: s.last_name, phone: s.work_phone.to_s,
                              mobile: s.mobile_phone.to_s, emails: [s.work_email_or_best])
               end + offices.map do |loc|

@@ -624,13 +624,13 @@ class Person
     def staff_for_employers_including_pending(employer_profile_ids)
       staff = self.where(:employer_staff_roles => {
         '$elemMatch' => {
-            { employer_profile_id.in =>  employer_profile_ids },
+            employer_profile_id: {  "$in": employer_profile_ids },
             :aasm_state.ne => :is_closed
         }
         })
       employer_profile_ids.inject({}) do |result, id| 
         result[id] = staff.select do |s| 
-          s.staff_roles.any? { |r| r.employer_profile_id == id } 
+          s.employer_staff_roles.any? { |r| r.employer_profile_id == id } 
         end
         result
       end
@@ -657,7 +657,7 @@ class Person
     def deactivate_employer_staff_role(person_id, employer_profile_id)
 
       begin
-        person = Personstaff_for_employers(person_id)
+        person = Person.find(person_id)
       rescue
         return false, 'Person not found'
       end
