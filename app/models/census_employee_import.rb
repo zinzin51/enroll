@@ -299,17 +299,16 @@ class CensusEmployeeImport
   end
 
   def parse_ssn(cell)
+
     if cell.blank?
-      nil
+      cell = nil
+    elsif cell.is_a? Numeric
+      cell = cell.floor.to_s.gsub(/\D/, '')
     else
-      cell = cell.to_s
-      # due to user formatting if ssn is received as a Numeric then cell.to_s will append a .0 (e.g. 111111111.0),
-      # we need to remove it
-      if cell.length == 11 && cell[9] == "."
-        cell = cell.split('.').first
-      end
-      cell
+      cell = cell.to_s.gsub(/\D/, '')
     end
+
+    cell
   end
 
   def parse_boolean(cell)
