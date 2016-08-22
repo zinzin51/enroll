@@ -54,6 +54,46 @@ module Employers::EmployerHelper
   end
 
 
+
+  def self.render_employee_contact_json(first: "", last: "", phone: "", mobile: "", emails: [], address_1: "", address_2: "", 
+                      city: "", state: "", zip: "")
+    OpenStruct.new({ :first => first, :last => last, :phone => phone, :mobile => mobile,
+            :emails => emails, :address_1 => address_1, :address_2 => address_2, :city => city,
+            :state => state, :zip => zip }) 
+  end
+
+  def self.render_employee_contacts_json(staff, offices)
+      #TODO null handling
+      staff.map do |s| 
+             self.render_employee_contact_json(first: s.first_name, last: s.last_name, phone: s.work_phone.to_s,
+                            mobile: s.mobile_phone.to_s, emails: [s.work_email_or_best])
+             end + offices.map do |loc|
+               self.render_employee_contact_json(first: loc.address.kind.capitalize, last: "Office", phone: loc.phone.to_s,
+                 address_1: loc.address.address_1, address_2: loc.address.address_2, city: loc.address.city,
+                 state: loc.address.state, zip: loc.address.zip)
+             end
+  end
+
+  def self.render_employer_summary_json(employer_profile, year, staff, offices, subscriber_count, renewals_offset_in_months)
+    er = employer_profile
+    { 
+      employer_name: er.legal_name,
+      employees_total: er.roster_size,   
+      employees_enrolled:             subscriber_count,  
+      employees_waived:               year ? year.waived_count                             : nil,
+      open_enrollment_begins:         year ? year.open_enrollment_start_on                 : nil,
+      open_enrollment_ends:           year ? year.open_enrollment_end_on                   : nil,
+      plan_year_begins:               year ? year.start_on                                 : nil,
+      renewal_in_progress:            year ? year.is_renewing?                             : nil,
+      renewal_application_available:  year ? (year.start_on >> renewals_offset_in_months)  : nil,
+      renewal_application_due:        year ? year.due_date_for_publish                     : nil,
+      binder_payment_due:             "",
+      minimum_participation_required: year ? year.minimum_enrolled_count                   : nil,
+      contact_info:                   self.render_employee_contacts_json(staff, offices), 
+      active_general_agency:          er.active_general_agency_legal_name 
+    }
+  end
+
   def invoice_formated_date(date)
     date.strftime("%m/%d/%Y")
   end

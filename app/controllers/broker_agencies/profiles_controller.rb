@@ -154,15 +154,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
-
-  def contact_struct(first: "", last: "", phone: "", mobile: "", emails: [], address_1: "", address_2: "", 
-                      city: "", state: "", zip: "")
-    OpenStruct.new({ :first => first, :last => last, :phone => phone, :mobile => mobile,
-            :emails => emails, :address_1 => address_1, :address_2 => address_2, :city => city,
-            :state => state, :zip => zip }) 
-  end
-
   def employers_api
+
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
       @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
     else
@@ -174,36 +167,53 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role)
 
     @renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
-
-    employer_ids = @employer_profiles.map { |er| er.id }
-    all_staff_by_employer_id = Person.staff_for_employers_including_pending(employer_ids)
+       
+    all_staff_by_employer_id = Person.staff_for_employers_including_pending(@employer_profiles.map(&:id))
 
     @employer_details = @employer_profiles.map do |er| 
         #discover the appropriate month to provide premium info for
-        billing_plan_year, billing_report_date = er.billing_plan_year
+        billing_plan_year, billing_report_date = er.billing_plan_year #TODO do we need this? is it the right date for enrollments?
 
-        enrollments = er.enrollments_for_billing(billing_report_date)
-        premium_amt_total   = enrollments.map(&:total_premium).sum
-        employee_cost_total = enrollments.map(&:total_employee_cost).sum
-        employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
 
-        offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
-        result = {
-          :profile => er,
-          :billing_report_date => billing_report_date,
-          :total_premium => premium_amt_total,
-          :employee_contribution => employee_cost_total,
-          :employer_contribution => employer_contribution_total,
-          :contacts => all_staff_by_employer_id[er.id].map do |s| 
-              contact_struct(first: s.first_name, last: s.last_name, phone: s.work_phone.to_s,
-                             mobile: s.mobile_phone.to_s, emails: [s.work_email_or_best])
-              end + offices.map do |loc|
-                contact_struct(first: loc.address.kind.capitalize, last: "Office", phone: loc.phone.to_s,
-                  address_1: loc.address.address_1, address_2: loc.address.address_2, city: loc.address.city,
-                  state: loc.address.state, zip: loc.address.zip)
-              end
-        }
-    end    
+      # TODO move to detail API  
+      #  enrollments = er.enrollments_for_billing(billing_report_date)
+      #  premium_amt_total, employee_cost_total, employer_contribution_total = enrollments.inject([0,0,0]) do |(pt, eec, erc), en|
+      #    info = en.decorated_hbx_enrollment
+      #    [ pt + info.total_premium, eec + info.total_employee_cost, erc + info.total_employer_contribution]
+      #  end
+
+       
+       # TODO move this block to plan_year 
+       subscribers_already_counted = {}
+       if er.show_plan_year.nil? then
+         subscriber_count = nil
+       else 
+         show_plan_year_enrollments = er.show_plan_year.hbx_enrollments_by_month(billing_report_date).compact
+         subscriber_count = show_plan_year_enrollments.inject(0) do |subs, en|
+
+           if (!subscribers_already_counted[en.subscriber.applicant_id]) then
+             subscribers_already_counted[en.subscriber.applicant_id] = true
+             subs += 1
+           end
+           print " >>>> Enrollment for: #{ en.subscriber.inspect } \n"
+           subs 
+         end
+       end
+
+       staff = all_staff_by_employer_id[er.id] || [] ##
+       offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
+       Employers::EmployerHelper.render_employer_summary_json(er, er.show_plan_year, staff, offices, subscriber_count, 
+        @renewals_offset_in_months) 
+    end   
+                                              
+   respond_to do |format|                       
+      format.json { 
+        render json: {
+           broker_agency: @broker_agency_profile.legal_name,
+           broker_clients: @employer_details
+        } 
+      } 
+    end                                          
   end
 
 
