@@ -122,6 +122,7 @@ class Person
   index({hbx_id: 1}, {sparse:true, unique: true})
   index({user_id: 1}, {sparse:true, unique: true})
 
+  index({last_name:  1, :broker_role => 1, "broker_role.broker_agency_profile_id" => 1, "broker_role.workflow_state_transitions.transition_at" => -1}, {name: "broker_applicant_transition_search_index"})
   index({last_name:  1})
   index({first_name: 1})
   index({last_name: 1, first_name: 1})
