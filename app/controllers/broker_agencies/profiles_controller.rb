@@ -41,7 +41,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
       respond_to do |format|
       format.html {}
-      format.json { render json: {id: @id, first: @provider.first_name } }
+      format.json {
+        render json: {
+          id: @id,
+          api_url: "#{employers_api_broker_agencies_profiles_path}?id=#{@id}", 
+          first: @provider.first_name
+        }
+      }
     end
   end
 
