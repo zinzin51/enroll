@@ -166,6 +166,13 @@ class PlanYear
     (open_enrollment_start_on <= date) && (date <= open_enrollment_end_on)
   end
 
+  def safe_open_enrollment_contains?(date)
+    (not open_enrollment_start_on.blank?) &&
+      (not open_enrollment_end_on.blank?) &&
+        (not date.blank?) &&
+      open_enrollment_contains?(date)
+  end
+
   def coverage_period_contains?(date)
     return (start_on <= date) if (end_on.blank?)
     (start_on <= date) && (date <= end_on)

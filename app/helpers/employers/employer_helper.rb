@@ -76,6 +76,7 @@ module Employers::EmployerHelper
 
   def self.render_employer_summary_json(employer_profile, year, staff, offices, subscriber_count, renewals_offset_in_months)
     er = employer_profile
+    staff ||= []
     { 
       employer_name: er.legal_name,
       employees_total: er.roster_size,   
@@ -92,6 +93,21 @@ module Employers::EmployerHelper
       contact_info:                   self.render_employee_contacts_json(staff, offices), 
       active_general_agency:          er.active_general_agency_legal_name 
     }
+  end
+
+  def self.count_enrolled_subscribers(plan_year, report_date)  
+     subscribers_already_counted = {}
+     if not plan_year.nil? then
+       enrollments = plan_year.hbx_enrollments_by_month(report_date).compact
+       enrollments.inject(0) do |subs, en|
+         subscriber_id = en.subscriber.applicant_id
+         if not subscribers_already_counted[subscriber_id] then
+           subscribers_already_counted[subscriber_id] = true
+           subs += 1
+         end
+         subs 
+       end
+     end
   end
 
   def invoice_formated_date(date)
