@@ -98,8 +98,8 @@ module Employers::EmployerHelper
   def self.count_enrolled_subscribers(plan_year, report_date)  
      subscribers_already_counted = {}
      if not plan_year.nil? then
-       enrollments = plan_year.hbx_enrollments_by_month(report_date).compact
-       enrollments.inject(0) do |subs, en|
+       enrollments = plan_year.hbx_enrollments_by_month(report_date)
+       enrollments.select { |e| e.coverage_kind == 'health' }.inject(0) do |subs, en|
          subscriber_id = en.subscriber.applicant_id
          if not subscribers_already_counted[subscriber_id] then
            subscribers_already_counted[subscriber_id] = true
