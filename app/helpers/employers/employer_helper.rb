@@ -53,8 +53,6 @@ module Employers::EmployerHelper
     end
   end
 
-
-
   def self.render_employee_contact_json(first: "", last: "", phone: "", mobile: "", emails: [], address_1: "", address_2: "", 
                       city: "", state: "", zip: "")
     OpenStruct.new({ :first => first, :last => last, :phone => phone, :mobile => mobile,
@@ -93,6 +91,9 @@ module Employers::EmployerHelper
       active_general_agency:          er.active_general_agency_legal_name 
     }
   end
+
+ 
+
 
   def invoice_formated_date(date)
     date.strftime("%m/%d/%Y")

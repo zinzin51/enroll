@@ -205,6 +205,7 @@ Rails.application.routes.draw do
         post 'match'
         get 'inbox'
       end
+      get 'employer_summary_api'   #, to: :employee_summary_api
       resources :plan_years do
         get 'reference_plans'
         get 'dental_reference_plans'
@@ -325,6 +326,9 @@ Rails.application.routes.draw do
         collection do
           post :plan
         end
+      end
+      namespace :mobile_api do
+        get 'employers_list'
       end
     end
   end
