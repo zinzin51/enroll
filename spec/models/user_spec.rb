@@ -20,24 +20,29 @@ RSpec.describe User, :type => :model do
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "user+name"})}
       it 'contains invalid characters' do
-        expect(User.create(**params).errors[:login].any?).to be_truthy
-        expect(User.create(**params).errors[:login]).to eq ["username cannot contain special charcters ; # % = | + , \" > < \\ \/"]
+        expect(User.create(**params).errors[:oim_id].any?).to be_truthy
+        expect(User.create(**params).errors[:oim_id]).to eq ["cannot contain special charcters ; # % = | + , \" > < \\ \/"]
       end
     end
 
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "user"})}
       it 'is too short' do
-        expect(User.create(**params).errors[:login].any?).to be_truthy
-        expect(User.create(**params).errors[:login]).to eq ["username must be at least 8 characters"]
+        expect(User.create(**params).errors[:oim_id].any?).to be_truthy
+        expect(User.create(**params).errors[:oim_id]).to eq ["must be at least 8 characters"]
       end
+    end
+
+    context 'oim_id validation' do
+      let(:params){valid_params}
+      it {should validate_uniqueness_of(:oim_id).case_insensitive }
     end
 
     context 'when oim_id' do
       let(:params){valid_params.deep_merge!({oim_id: "useruseruseruseruseruseruseruseruseruseruseruseruseruseruseruser"})}
       it 'is too long' do
-        expect(User.create(**params).errors[:login].any?).to be_truthy
-        expect(User.create(**params).errors[:login]).to eq ["username can NOT exceed 60 characters"]
+        expect(User.create(**params).errors[:oim_id].any?).to be_truthy
+        expect(User.create(**params).errors[:oim_id]).to eq ["can NOT exceed 60 characters"]
       end
     end
 
@@ -59,18 +64,34 @@ RSpec.describe User, :type => :model do
     end
 
     context 'when password' do
-      let(:params){valid_params.deep_merge!({password: valid_params[:oim_id] + "aA1!"})}
+      let(:params){valid_params.deep_merge!({password: valid_params[:oim_id].capitalize + "aA1!"})}
       it 'contains username' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["password cannot contain username"]
+        expect(User.create(**params).errors[:password]).to eq ["cannot contain username"]
       end
     end
 
     context 'when password' do
-      let(:params){valid_params.deep_merge!({password: "1234566746464DDss"})}
+      let(:params){valid_params.deep_merge!({password: "123456 6746464DDss"})}
       it 'does not contain valid complexity' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"]
+        expect(User.create(**params).errors[:password]).to eq ["must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"]
+      end
+    end
+
+    context 'when password' do
+      let(:params){valid_params.deep_merge!({password: "11E11@1ss"})}
+      it 'has a character more than 4 times' do
+        expect(User.create(**params).errors[:password].any?).to be_truthy
+        expect(User.create(**params).errors[:password]).to eq ["cannot repeat any character more than 4 times"]
+      end
+    end
+
+    context 'when password' do
+      let(:params){valid_params.deep_merge!({password: "11E11@ss"})}
+      it 'has only 3 alphabetical characters' do
+        expect(User.create(**params).errors[:password].any?).to be_truthy
+        expect(User.create(**params).errors[:password]).to eq ["must have at least 4 alphabetical characters"]
       end
     end
 
@@ -87,7 +108,7 @@ RSpec.describe User, :type => :model do
       it 'does not match' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password_confirmation].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["is too short (minimum is 8 characters)"]
+        expect(User.create(**params).errors[:password]).to eq ["must have at least 4 alphabetical characters", "is too short (minimum is 8 characters)"]
         expect(User.create(**params).errors[:password_confirmation]).to eq ["doesn't match Password"]
       end
     end
@@ -250,6 +271,33 @@ describe User do
       it "with broker agency portal" do
         user.roles = ['consumer', 'broker']
         expect(user.get_announcements_by_roles_and_portal("dc.org/broker_agencies")).to eq ["msg for Broker"]
+      end
+    end
+  end
+
+  describe "orphans" do
+    context "when users have person associated" do
+      before do
+        user = FactoryGirl.create :user
+        user.person = FactoryGirl.create :person
+      end
+      it "should return no orphans" do
+        expect(User.orphans).to eq []
+      end
+    end
+
+    context "when some users does NOT have person associated", dbclean: :after_each do
+      before do
+        user_with_person = FactoryGirl.create :user
+        user_with_person.person = FactoryGirl.create :person
+        @user1_without_person = FactoryGirl.create :user , :email => "aaa@aaa.com"
+        @user2_without_person = FactoryGirl.create :user , :email => "zzz@zzz.com"
+      end
+      it "should return orphans" do
+        expect(User.orphans).to eq [@user1_without_person,@user2_without_person]
+      end
+      it "should return orphans with email ASC" do
+        expect(User.orphans.first.email).to eq "aaa@aaa.com"
       end
     end
   end
