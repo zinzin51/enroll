@@ -74,8 +74,10 @@ module Employers::EmployerHelper
              end
   end
 
-  def self.render_employer_summary_json(employer_profile, year, staff, offices, subscriber_count)
+  def self.render_employer_summary_json(employer_profile, year, staff, offices, subscriber_count,
+    include_details_url)
     renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.renewals_offset_in_months
+
     er = employer_profile
     staff ||= []
     summary = { 
@@ -96,11 +98,14 @@ module Employers::EmployerHelper
     if staff or offices then
       summary[contact_info] = self.render_employee_contacts_json(staff, offices)
     end
+    if include_details_url then
+      summary[employer_details_url] = Rails.application.routes.url_helpers.employers_employer_profile_employer_details_api_path(er.id)
+    end
     summary
   end
 
   def self.render_employer_details_json(employer_profile, year, subscriber_count, total_premium, employer_contribution, employee_contribution)
-    details = render_employer_summary_json(employer_profile, year, nil, nil, subscriber_count, renewals_offset_in_months)
+    details = render_employer_summary_json(employer_profile, year, nil, nil, subscriber_count, false)
     details[total_premium] = total_premium
     details[employer_contribution] = employer_contribution
     details[employee_contribution] = employee_contribution
@@ -119,6 +124,16 @@ module Employers::EmployerHelper
        end
        subs 
      end
+    end
+  end
+
+  # as a performance optimization, in the mobile summary API (list of all employers for a broker)
+  # we only bother counting the subscribers if the employer is currently in OE
+  def self.count_enrolled_subscribers_if_in_open_enrollment(plan_year, report_date)
+    if plan_year && plan_year.safe_open_enrollment_contains?(report_date) then
+      Employers::EmployerHelper.count_enrolled_subscribers(plan_year, report_date) 
+    else
+      nil
     end
   end
 

@@ -170,14 +170,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
     
     report_date = params[:report_date] || TimeKeeper.date_of_record.next_month   
-    
+
     all_staff_by_employer_id = Person.staff_for_employers_including_pending(@employer_profiles.map(&:id))
     @employer_details = @employer_profiles.map do |er|   
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
         staff = all_staff_by_employer_id[er.id]
-         plan_year = er.show_plan_year
-         subscriber_count = Employers::EmployerHelper.count_enrolled_subscribers_if_in_open_enrollment(plan_year, report_date)
-        Employers::EmployerHelper.render_employer_summary_json(er, plan_year, staff, offices, subscriber_count) 
+        plan_year = er.show_plan_year
+        subscriber_count = Employers::EmployerHelper.count_enrolled_subscribers_if_in_open_enrollment(plan_year, report_date)
+        Employers::EmployerHelper.render_employer_summary_json(er, plan_year, subscriber_count, staff, offices, true) 
     end   
                                               
     respond_to do |format|                       
