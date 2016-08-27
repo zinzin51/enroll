@@ -76,10 +76,9 @@ module Employers::EmployerHelper
 
   def self.render_employer_summary_json(employer_profile, year, subscriber_count, staff, offices, 
     include_details_url)
-    renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.renewals_offset_in_months
+    renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
 
     er = employer_profile
-    staff ||= []
     summary = { 
       employer_name: er.legal_name,
       employees_total: er.roster_size,   
@@ -96,19 +95,19 @@ module Employers::EmployerHelper
       active_general_agency:          er.active_general_agency_legal_name 
     }
     if staff or offices then
-      summary[contact_info] = self.render_employee_contacts_json(staff, offices)
+      summary[:contact_info] = self.render_employee_contacts_json(staff || [], offices || [])
     end
     if include_details_url then
-      summary[employer_details_url] = Rails.application.routes.url_helpers.employers_employer_profile_employer_details_api_path(er.id)
+      summary[:employer_details_url] = Rails.application.routes.url_helpers.employers_employer_profile_employer_details_api_path(er.id)
     end
     summary
   end
 
   def self.render_employer_details_json(employer_profile, year, subscriber_count, total_premium, employer_contribution, employee_contribution)
     details = render_employer_summary_json(employer_profile, year, subscriber_count, nil, nil, false)
-    details[total_premium] = total_premium
-    details[employer_contribution] = employer_contribution
-    details[employee_contribution] = employee_contribution
+    details[:total_premium] = total_premium
+    details[:employer_contribution] = employer_contribution
+    details[:employee_contribution] = employee_contribution
     details
   end
 
