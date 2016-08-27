@@ -74,10 +74,11 @@ module Employers::EmployerHelper
              end
   end
 
-  def self.render_employer_summary_json(employer_profile, year, staff, offices, subscriber_count, renewals_offset_in_months)
+  def self.render_employer_summary_json(employer_profile, year, staff, offices, subscriber_count)
+    renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.renewals_offset_in_months
     er = employer_profile
     staff ||= []
-    { 
+    summary = { 
       employer_name: er.legal_name,
       employees_total: er.roster_size,   
       employees_enrolled:             subscriber_count,  
@@ -90,24 +91,35 @@ module Employers::EmployerHelper
       renewal_application_due:        year ? year.due_date_for_publish                     : nil,
       binder_payment_due:             "",
       minimum_participation_required: year ? year.minimum_enrolled_count                   : nil,
-      contact_info:                   self.render_employee_contacts_json(staff, offices), 
       active_general_agency:          er.active_general_agency_legal_name 
     }
+    if staff or offices then
+      summary[contact_info] = self.render_employee_contacts_json(staff, offices)
+    end
+    summary
+  end
+
+  def self.render_employer_details_json(employer_profile, year, subscriber_count, total_premium, employer_contribution, employee_contribution)
+    details = render_employer_summary_json(employer_profile, year, nil, nil, subscriber_count, renewals_offset_in_months)
+    details[total_premium] = total_premium
+    details[employer_contribution] = employer_contribution
+    details[employee_contribution] = employee_contribution
+    details
   end
 
   def self.count_enrolled_subscribers(plan_year, report_date)  
-     subscribers_already_counted = {}
-     if not plan_year.nil? then
-       enrollments = plan_year.hbx_enrollments_by_month(report_date)
-       enrollments.select { |e| e.coverage_kind == 'health' }.inject(0) do |subs, en|
-         subscriber_id = en.subscriber.applicant_id
-         if not subscribers_already_counted[subscriber_id] then
-           subscribers_already_counted[subscriber_id] = true
-           subs += 1
-         end
-         subs 
+    subscribers_already_counted = {}
+    if not plan_year.nil? then
+     enrollments = plan_year.hbx_enrollments_by_month(report_date)
+     enrollments.select { |e| e.coverage_kind == 'health' }.inject(0) do |subs, en|
+       subscriber_id = en.subscriber.applicant_id
+       if not subscribers_already_counted[subscriber_id] then
+         subscribers_already_counted[subscriber_id] = true
+         subs += 1
        end
+       subs 
      end
+    end
   end
 
   def invoice_formated_date(date)

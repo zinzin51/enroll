@@ -1,7 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :employee_roster_api]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -262,6 +262,18 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
+  def employer_details_api
+    report_date = params[:report_date] || TimeKeeper.date_of_record.next_month   
+    plan_year = @employer_profile.show_plan_year
+    enrollments = @employer_profile.enrollments_for_billing
+    premium_amt_total   = enrollments.map(&:total_premium).sum
+    employee_cost_total = enrollments.map(&:total_employee_cost).sum
+    employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+    subscriber_count = Employers::EmployerHelper.count_enrolled_subscribers(plan_year, report_date)    
+    render json: Employers::EmployerHelper.render_employer_details_json(@employer_profile, 
+                          plan_year, subscriber_count, premium_amt_total, 
+                          employer_contribution_total , employee_cost_total)
+  end
 
   private
 

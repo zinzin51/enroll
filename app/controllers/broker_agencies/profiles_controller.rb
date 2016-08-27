@@ -169,20 +169,15 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
     @employer_profiles = @orgs.map {|o| o.employer_profile} unless @orgs.blank?
     
-    renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
     report_date = params[:report_date] || TimeKeeper.date_of_record.next_month   
+    
     all_staff_by_employer_id = Person.staff_for_employers_including_pending(@employer_profiles.map(&:id))
-
     @employer_details = @employer_profiles.map do |er|   
-        plan_year = er.show_plan_year
-        if plan_year && plan_year.safe_open_enrollment_contains?(report_date) then
-          subscriber_count = Employers::EmployerHelper.count_enrolled_subscribers(plan_year, report_date) 
-        else
-          subscriber_count = nil
-        end
-        
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
-        Employers::EmployerHelper.render_employer_summary_json(er, plan_year, all_staff_by_employer_id[er.id], offices, subscriber_count, renewals_offset_in_months) 
+        staff = all_staff_by_employer_id[er.id]
+         plan_year = er.show_plan_year
+         subscriber_count = Employers::EmployerHelper.count_enrolled_subscribers_if_in_open_enrollment(plan_year, report_date)
+        Employers::EmployerHelper.render_employer_summary_json(er, plan_year, staff, offices, subscriber_count) 
     end   
                                               
     respond_to do |format|                       
