@@ -74,7 +74,7 @@ module Employers::EmployerHelper
              end
   end
 
-  def self.render_employer_summary_json(employer_profile, year, staff, offices, subscriber_count,
+  def self.render_employer_summary_json(employer_profile, year, subscriber_count, staff, offices, 
     include_details_url)
     renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.renewals_offset_in_months
 
@@ -105,7 +105,7 @@ module Employers::EmployerHelper
   end
 
   def self.render_employer_details_json(employer_profile, year, subscriber_count, total_premium, employer_contribution, employee_contribution)
-    details = render_employer_summary_json(employer_profile, year, nil, nil, subscriber_count, false)
+    details = render_employer_summary_json(employer_profile, year, subscriber_count, nil, nil, false)
     details[total_premium] = total_premium
     details[employer_contribution] = employer_contribution
     details[employee_contribution] = employee_contribution
