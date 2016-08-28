@@ -53,24 +53,19 @@ module Employers::EmployerHelper
     end
   end
 
-
-
-  def self.render_employee_contact_json(first: "", last: "", phone: "", mobile: "", emails: [], address_1: "", address_2: "", 
-                      city: "", state: "", zip: "")
-    OpenStruct.new({ :first => first, :last => last, :phone => phone, :mobile => mobile,
-            :emails => emails, :address_1 => address_1, :address_2 => address_2, :city => city,
-            :state => state, :zip => zip }) 
-  end
-
   def self.render_employee_contacts_json(staff, offices)
       #TODO null handling
       staff.map do |s| 
-             render_employee_contact_json(first: s.first_name, last: s.last_name, phone: s.work_phone.to_s,
-                            mobile: s.mobile_phone.to_s, emails: [s.work_email_or_best])
+                { 
+                  first: s.first_name, last: s.last_name, phone: s.work_phone.to_s,
+                  mobile: s.mobile_phone.to_s, emails: [s.work_email_or_best]
+                }
              end + offices.map do |loc|
-               self.render_employee_contact_json(first: loc.address.kind.capitalize, last: "Office", phone: loc.phone.to_s,
-                 address_1: loc.address.address_1, address_2: loc.address.address_2, city: loc.address.city,
-                 state: loc.address.state, zip: loc.address.zip)
+                {
+                  first: loc.address.kind.capitalize, last: "Office", phone: loc.phone.to_s, 
+                  address_1: loc.address.address_1, address_2: loc.address.address_2,
+                  city: loc.address.city, state: loc.address.state, zip: loc.address.zip
+                }
              end
   end
 
