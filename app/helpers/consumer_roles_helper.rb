@@ -64,7 +64,7 @@ module ConsumerRolesHelper
 
   def show_consumer_role_state(consumer_role)
     return "" if consumer_role.blank?
-    if consumer_role.verifications_pending?
+    if consumer_role.unverified? || consumer_role.ssa_pending? || consumer_role.dhs_pending?
       "Pending"
     elsif consumer_role.fully_verified?
       "Verified"

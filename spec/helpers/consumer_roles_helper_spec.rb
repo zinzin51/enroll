@@ -166,8 +166,8 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
       expect(helper.show_consumer_role_state(nil)).to eq ""
     end
 
-    it "should return Pending when consumer_role is verifications_pending" do
-      allow(consumer_role).to receive(:aasm_state).and_return "verifications_pending"
+    it "should return Pending when consumer_role is unverified" do
+      allow(consumer_role).to receive(:aasm_state).and_return "unverified"
       expect(helper.show_consumer_role_state(consumer_role)).to eq "Pending"
     end
 
