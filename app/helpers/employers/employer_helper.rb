@@ -65,7 +65,7 @@ module Employers::EmployerHelper
   def self.render_employee_contacts_json(staff, offices)
       #TODO null handling
       staff.map do |s| 
-             self.render_employee_contact_json(first: s.first_name, last: s.last_name, phone: s.work_phone.to_s,
+             render_employee_contact_json(first: s.first_name, last: s.last_name, phone: s.work_phone.to_s,
                             mobile: s.mobile_phone.to_s, emails: [s.work_email_or_best])
              end + offices.map do |loc|
                self.render_employee_contact_json(first: loc.address.kind.capitalize, last: "Office", phone: loc.phone.to_s,
@@ -78,10 +78,9 @@ module Employers::EmployerHelper
     include_details_url)
     renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
 
-    er = employer_profile
     summary = { 
-      employer_name: er.legal_name,
-      employees_total: er.roster_size,   
+      employer_name: employer_profile.legal_name,
+      employees_total: employer_profile.roster_size,   
       employees_enrolled:             subscriber_count,  
       employees_waived:               year ? year.waived_count                             : nil,
       open_enrollment_begins:         year ? year.open_enrollment_start_on                 : nil,
@@ -92,13 +91,13 @@ module Employers::EmployerHelper
       renewal_application_due:        year ? year.due_date_for_publish                     : nil,
       binder_payment_due:             "",
       minimum_participation_required: year ? year.minimum_enrolled_count                   : nil,
-      active_general_agency:          er.active_general_agency_legal_name 
+      active_general_agency:          employer_profile.active_general_agency_legal_name 
     }
     if staff or offices then
-      summary[:contact_info] = self.render_employee_contacts_json(staff || [], offices || [])
+      summary[:contact_info] = render_employee_contacts_json(staff || [], offices || [])
     end
     if include_details_url then
-      summary[:employer_details_url] = Rails.application.routes.url_helpers.employers_employer_profile_employer_details_api_path(er.id)
+      summary[:employer_details_url] = Rails.application.routes.url_helpers.employers_employer_profile_employer_details_api_path(employer_profile.id)
     end
     summary
   end
@@ -130,11 +129,31 @@ module Employers::EmployerHelper
   # we only bother counting the subscribers if the employer is currently in OE
   def self.count_enrolled_subscribers_if_in_open_enrollment(plan_year, report_date)
     if plan_year && plan_year.safe_open_enrollment_contains?(report_date) then
-      Employers::EmployerHelper.count_enrolled_subscribers(plan_year, report_date) 
+      count_enrolled_subscribers(plan_year, report_date) 
     else
       nil
     end
   end
+
+  def self.marshall_employer_details_json(employer_profile, report_date)
+    plan_year = employer_profile.show_plan_year
+    if plan_year then
+      print ">>> found plan year #{plan_year} for #{employer_profile.legal_name}"
+      enrollments = plan_year.hbx_enrollments_by_month(report_date)
+      premium_amt_total   = enrollments.map(&:total_premium).sum 
+      employee_cost_total = enrollments.map(&:total_employee_cost).sum
+      employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+      subscriber_count = count_enrolled_subscribers(plan_year, report_date)
+     # or alternatively (more expensive, but guaranteed to match the web):
+     # subscriber_count = year.total_enrolled_count - year.waived_count 
+      render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
+                            employer_contribution_total , employee_cost_total)
+    else
+      print ">> no plan year for #{employer_profile.legal_name}"
+      render_employer_details_json(employer_profile, nil, nil, nil, nil, nil)
+    end
+  end
+
 
   def invoice_formated_date(date)
     date.strftime("%m/%d/%Y")
