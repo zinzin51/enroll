@@ -133,7 +133,6 @@ module Employers::EmployerHelper
   def self.marshall_employer_details_json(employer_profile, report_date)
     plan_year = employer_profile.show_plan_year
     if plan_year then
-      print ">>> found plan year #{plan_year} for #{employer_profile.legal_name}"
       enrollments = plan_year.hbx_enrollments_by_month(report_date)
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
@@ -144,7 +143,6 @@ module Employers::EmployerHelper
       render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
                             employer_contribution_total , employee_cost_total)
     else
-      print ">> no plan year for #{employer_profile.legal_name}"
       render_employer_details_json(employer_profile, nil, nil, nil, nil, nil)
     end
   end
