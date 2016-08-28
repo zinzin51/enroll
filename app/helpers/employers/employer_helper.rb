@@ -154,7 +154,6 @@ module Employers::EmployerHelper
     end
   end
 
-
   def invoice_formated_date(date)
     date.strftime("%m/%d/%Y")
   end
