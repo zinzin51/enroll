@@ -106,29 +106,35 @@ module Employers::EmployerHelper
   end
 
   def self.count_enrolled_subscribers(plan_year, report_date)  
-    subscribers_already_counted = {}
-    if not plan_year.nil? then
-     enrollments = plan_year.hbx_enrollments_by_month(report_date)
-     enrollments.select { |e| e.coverage_kind == 'health' }.inject(0) do |subs, en|
-       subscriber_id = en.subscriber.applicant_id
-       if not subscribers_already_counted[subscriber_id] then
-         subscribers_already_counted[subscriber_id] = true
-         subs += 1
-       end
-       subs 
-     end
+    plan_year ? plan_year.total_enrolled_count - plan_year.waived_count : nil
+
+    # possible variation, needs debugging
+    # subscribers_already_counted = {}
+    # if not plan_year.nil? then
+    # enrollments = plan_year.hbx_enrollments_by_month(report_date)
+    # enrollments.select { |e| e.coverage_kind == 'health' }.inject(0) do |subs, en|
+    #   subscriber_id = en.subscriber.applicant_id
+    #   if not subscribers_already_counted[subscriber_id] then
+    #     subscribers_already_counted[subscriber_id] = true
+    #     subs += 1
+    #   end
+    #   subs 
+    # end
+    #end
+  end
+  
+  # as a performance optimization, in the mobile summary API (list of all employers for a broker)
+  # we only bother counting the subscribers if the employer is currently in OE
+  def self.count_enrolled_subscribers_if_in_open_enrollment(plan_year, as_of, report_date)
+    if plan_year && as_of && 
+       plan_year.open_enrollment_start_on && plan_year.open_enrollment_end_on &&
+       plan_year.open_enrollment_contains?(as_of) then
+        count_enrolled_subscribers(plan_year, report_date) 
+    else
+        nil
     end
   end
 
-  # as a performance optimization, in the mobile summary API (list of all employers for a broker)
-  # we only bother counting the subscribers if the employer is currently in OE
-  def self.count_enrolled_subscribers_if_in_open_enrollment(plan_year, report_date)
-    if plan_year && plan_year.safe_open_enrollment_contains?(report_date) then
-      count_enrolled_subscribers(plan_year, report_date) 
-    else
-      nil
-    end
-  end
 
   def self.marshall_employer_summaries_json(employer_profiles, report_date) 
     employer_profiles ||= []
@@ -137,7 +143,7 @@ module Employers::EmployerHelper
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
         staff = all_staff_by_employer_id[er.id]
         plan_year = er.show_plan_year
-        subscriber_count = count_enrolled_subscribers_if_in_open_enrollment(plan_year, report_date)
+        subscriber_count = count_enrolled_subscribers_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record, report_date)
         render_employer_summary_json(er, plan_year, subscriber_count, staff, offices, true) 
     end  
   end
@@ -149,9 +155,7 @@ module Employers::EmployerHelper
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-      subscriber_count = plan_year.total_enrolled_count - plan_year.waived_count 
-      # this  (more expensive, but guaranteed to match the web):
-      # subscriber_count = count_enrolled_subscribers(plan_year, report_date)
+      subscriber_count = count_enrolled_subscribers(plan_year, report_date)
       render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
                             employer_contribution_total , employee_cost_total)
     else
