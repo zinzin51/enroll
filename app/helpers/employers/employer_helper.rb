@@ -130,6 +130,18 @@ module Employers::EmployerHelper
     end
   end
 
+  def self.marshall_employer_summaries_json(employer_profiles, report_date) 
+    employer_profiles ||= []
+    all_staff_by_employer_id = Person.staff_for_employers_including_pending(employer_profiles.map(&:id))
+    employer_profiles.map do |er|   
+        offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
+        staff = all_staff_by_employer_id[er.id]
+        plan_year = er.show_plan_year
+        subscriber_count = count_enrolled_subscribers_if_in_open_enrollment(plan_year, report_date)
+        render_employer_summary_json(er, plan_year, subscriber_count, staff, offices, true) 
+    end  
+  end
+
   def self.marshall_employer_details_json(employer_profile, report_date)
     plan_year = employer_profile.show_plan_year
     if plan_year then
@@ -137,9 +149,9 @@ module Employers::EmployerHelper
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-      subscriber_count = count_enrolled_subscribers(plan_year, report_date)
-     # or alternatively (more expensive, but guaranteed to match the web):
-     # subscriber_count = year.total_enrolled_count - year.waived_count 
+      subscriber_count = year.total_enrolled_count - year.waived_count 
+      # this  (more expensive, but guaranteed to match the web):
+      # subscriber_count = count_enrolled_subscribers(plan_year, report_date)
       render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
                             employer_contribution_total , employee_cost_total)
     else
