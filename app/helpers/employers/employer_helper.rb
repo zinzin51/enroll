@@ -149,7 +149,7 @@ module Employers::EmployerHelper
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-      subscriber_count = year.total_enrolled_count - year.waived_count 
+      subscriber_count = plan_year.total_enrolled_count - plan_year.waived_count 
       # this  (more expensive, but guaranteed to match the web):
       # subscriber_count = count_enrolled_subscribers(plan_year, report_date)
       render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
