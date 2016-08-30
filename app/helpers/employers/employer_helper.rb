@@ -107,20 +107,6 @@ module Employers::EmployerHelper
 
   def self.count_enrolled_subscribers(plan_year, report_date)  
     plan_year ? plan_year.total_enrolled_count - plan_year.waived_count : nil
-
-    # possible variation, needs debugging
-    # subscribers_already_counted = {}
-    # if not plan_year.nil? then
-    # enrollments = plan_year.hbx_enrollments_by_month(report_date)
-    # enrollments.select { |e| e.coverage_kind == 'health' }.inject(0) do |subs, en|
-    #   subscriber_id = en.subscriber.applicant_id
-    #   if not subscribers_already_counted[subscriber_id] then
-    #     subscribers_already_counted[subscriber_id] = true
-    #     subs += 1
-    #   end
-    #   subs 
-    # end
-    #end
   end
   
   # as a performance optimization, in the mobile summary API (list of all employers for a broker)
