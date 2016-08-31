@@ -105,17 +105,33 @@ module Employers::EmployerHelper
     details
   end
 
-  def self.count_enrolled_subscribers(plan_year, report_date)  
-    plan_year ? plan_year.total_enrolled_count - plan_year.waived_count : nil
+  def self.count_enrolled_employees(plan_year)  
+    if plan_year && plan_year.employer_profile.census_employees.count < 100 then
+      
+      # alternative, faster way to calcuate total_enrolled_count
+      #instead of: plan_year.total_enrolled_count - plan_year.waived_count
+
+      eligible = plan_year.eligible_to_enroll
+      benefit_group_assignments = eligible.map do |e| 
+        e.active_or_renewal_benefit_group_assignment_for plan_year
+      end.select(&:present?) 
+
+      #TODO replace with batch query  
+      total_enrolled_count = benefit_group_assignments.count do |a|
+        HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(a).present?
+      end  
+
+      total_enrolled_count - plan_year.waived_count
+    end
   end
   
   # as a performance optimization, in the mobile summary API (list of all employers for a broker)
   # we only bother counting the subscribers if the employer is currently in OE
-  def self.count_enrolled_subscribers_if_in_open_enrollment(plan_year, as_of, report_date)
+  def self.count_enrolled_employees_if_in_open_enrollment(plan_year, as_of)
     if plan_year && as_of && 
        plan_year.open_enrollment_start_on && plan_year.open_enrollment_end_on &&
        plan_year.open_enrollment_contains?(as_of) then
-        count_enrolled_subscribers(plan_year, report_date) 
+        count_enrolled_employees(plan_year) 
     else
         nil
     end
@@ -129,7 +145,7 @@ module Employers::EmployerHelper
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
         staff = all_staff_by_employer_id[er.id]
         plan_year = er.show_plan_year
-        subscriber_count = count_enrolled_subscribers_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record, report_date)
+        subscriber_count = count_enrolled_employees_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record) #TODO report_date?
         render_employer_summary_json(er, plan_year, subscriber_count, staff, offices, true) 
     end  
   end
@@ -142,7 +158,7 @@ module Employers::EmployerHelper
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-      subscriber_count = count_enrolled_subscribers(plan_year, report_date)
+      subscriber_count = count_enrolled_employees(plan_year)
       render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
                             employer_contribution_total , employee_cost_total)
     else
