@@ -101,7 +101,7 @@ module Employers::EmployerHelper
     details[:total_premium] = total_premium
     details[:employer_contribution] = employer_contribution
     details[:employee_contribution] = employee_contribution
-    details[:active_general_agency] = employer_profile.active_general_agency_name # Note: queries DB
+    details[:active_general_agency] = employer_profile.active_general_agency_legal_name # Note: queries DB
     details
   end
 
