@@ -152,11 +152,11 @@ module Employers::EmployerHelper
   def self.marshall_employer_details_json(employer_profile, report_date)
     plan_year = employer_profile.show_plan_year
     if plan_year then
-      #enrollments = plan_year.hbx_enrollments_by_month(report_date)
       enrollments = employer_profile.enrollments_for_billing(report_date)
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+
       subscriber_count = count_enrolled_subscribers(plan_year, report_date)
 
       render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
