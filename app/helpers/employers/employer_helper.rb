@@ -86,7 +86,6 @@ module Employers::EmployerHelper
       renewal_application_due:        year ? year.due_date_for_publish                     : nil,
       binder_payment_due:             "",
       minimum_participation_required: year ? year.minimum_enrolled_count                   : nil,
-      active_general_agency:          employer_profile.active_general_agency_legal_name 
     }
     if staff or offices then
       summary[:contact_info] = render_employee_contacts_json(staff || [], offices || [])
@@ -102,6 +101,7 @@ module Employers::EmployerHelper
     details[:total_premium] = total_premium
     details[:employer_contribution] = employer_contribution
     details[:employee_contribution] = employee_contribution
+    details[:active_general_agency] = employer_profile.active_general_agency_legal_name # Note: queries DB
     details
   end
 
@@ -143,7 +143,12 @@ module Employers::EmployerHelper
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
         staff = all_staff_by_employer_id[er.id]
         plan_year = er.show_plan_year
+<<<<<<< HEAD
         subscriber_count = count_enrolled_employees_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record) #TODO report_date?
+=======
+        subscriber_count = count_enrolled_subscribers_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record, report_date)
+
+>>>>>>> b281d1a0e1a302331ed890f99ba629a9063cb0a8
         render_employer_summary_json(er, plan_year, subscriber_count, staff, offices, true) 
     end  
   end
@@ -156,9 +161,14 @@ module Employers::EmployerHelper
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+<<<<<<< HEAD
       subscriber_count = count_enrolled_employees(plan_year)
+=======
+      subscriber_count = count_enrolled_subscribers(plan_year, report_date)
+
+>>>>>>> b281d1a0e1a302331ed890f99ba629a9063cb0a8
       render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
-                            employer_contribution_total , employee_cost_total)
+                            employer_contribution_total, employee_cost_total)
     else
       render_employer_details_json(employer_profile, nil, nil, nil, nil, nil)
     end
