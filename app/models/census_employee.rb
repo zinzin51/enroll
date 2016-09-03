@@ -401,6 +401,7 @@ class CensusEmployee < CensusMember
       query.to_a
     end
 
+
   end
 
   aasm do

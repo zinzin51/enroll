@@ -127,6 +127,8 @@ group :development, :test do
   gem 'email_spec', '2.0.0'
   gem 'byebug', '8.2.2'
   gem 'rspec_junit_formatter', '0.2.3'
+
+  gem 'rbtrace'
 end
 
 group :test do

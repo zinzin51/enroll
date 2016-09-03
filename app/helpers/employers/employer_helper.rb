@@ -112,15 +112,13 @@ module Employers::EmployerHelper
       #instead of: plan_year.total_enrolled_count - plan_year.waived_count
 
       eligible = plan_year.eligible_to_enroll
-      benefit_group_assignments = eligible.map do |e| 
+      assignments = eligible.map do |e| 
         e.active_or_renewal_benefit_group_assignment_for plan_year
-      end.select(&:present?) 
+      end.select(&:present?)  
+      enrollments = HbxEnrollment.find_shop_and_health_by_benefit_group_assignments(assignments)
+      total_enrolled_count = enrollments.count(&:present?)
 
-      #TODO replace with batch query  
-      total_enrolled_count = benefit_group_assignments.count do |a|
-        HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(a).present?
-      end  
-
+      print "\n>>> got #{total_enrolled_count} from new method\n\n"
       total_enrolled_count - plan_year.waived_count
     end
   end

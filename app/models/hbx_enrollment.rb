@@ -881,6 +881,17 @@ class HbxEnrollment
   end
 
   def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
+    find_by_benefit_group_assignments_with_scope(benefit_group_assignments) { |e| e.active } 
+  end
+
+  def self.find_shop_and_health_by_benefit_group_assignments(benefit_group_assignments = [])
+    find_by_benefit_group_assignments_with_scope(benefit_group_assignments) do |e|
+      e.show_enrollments_sans_canceled.shop_market.by_coverage_kind("health")
+    end
+  end
+
+   def self.find_by_benefit_group_assignments_with_scope(benefit_group_assignments = [], 
+                                                          &apply_enrollments_scope)
     return [] if benefit_group_assignments.blank?
     id_list = benefit_group_assignments.collect(&:_id).uniq
     families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
@@ -888,7 +899,7 @@ class HbxEnrollment
     enrollment_list = []
     families.each do |family|
       family.households.each do |household|
-        household.hbx_enrollments.active.each do |enrollment|
+        apply_enrollments_scope.call(household.hbx_enrollments).each do |enrollment|
           enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
         end
       end
