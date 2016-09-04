@@ -302,7 +302,6 @@ GEM
     mongoid-versioning (2.0.0)
       activesupport (~> 4.0)
       mongoid (>= 4.0.0, <= 6.0.0)
-    msgpack (1.0.0)
     multi_json (1.12.1)
     multi_test (0.1.2)
     net-scp (1.2.1)
@@ -379,10 +378,6 @@ GEM
       thor (>= 0.18.1, < 2.0)
     raindrops (0.16.0)
     rake (11.1.2)
-    rbtrace (0.4.8)
-      ffi (>= 1.0.6)
-      msgpack (>= 0.4.3)
-      trollop (>= 1.16.2)
     rdoc (4.2.2)
       json (~> 1.4)
     recaptcha (1.1.0)
@@ -483,7 +478,6 @@ GEM
     tilt (1.4.1)
     timers (4.1.1)
       hitimes
-    trollop (2.1.2)
     ttfunk (1.0.3)
     turbolinks (2.5.3)
       coffee-rails
@@ -586,7 +580,6 @@ DEPENDENCIES
   pundit (~> 1.0.1)
   rails (= 4.2.3)
   rails-i18n (= 4.0.8)
-  rbtrace
   recaptcha (= 1.1.0)
   redis-rails
   roo (~> 2.1.0)
@@ -612,4 +605,4 @@ DEPENDENCIES
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 BUNDLED WITH
-   1.12.5
+   1.12.1
