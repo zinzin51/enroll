@@ -881,17 +881,6 @@ class HbxEnrollment
   end
 
   def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
-    find_by_benefit_group_assignments_with_scope(benefit_group_assignments) { |e| e.active } 
-  end
-
-  def self.find_shop_and_health_by_benefit_group_assignments(benefit_group_assignments = [])
-    find_by_benefit_group_assignments_with_scope(benefit_group_assignments) do |e|
-      e.show_enrollments_sans_canceled.shop_market.by_coverage_kind("health")
-    end
-  end
-
-   def self.find_by_benefit_group_assignments_with_scope(benefit_group_assignments = [], 
-                                                          &apply_enrollments_scope)
     return [] if benefit_group_assignments.blank?
     id_list = benefit_group_assignments.collect(&:_id).uniq
     families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
@@ -899,12 +888,51 @@ class HbxEnrollment
     enrollment_list = []
     families.each do |family|
       family.households.each do |household|
-        apply_enrollments_scope.call(household.hbx_enrollments).each do |enrollment|
+        household.hbx_enrollments.active.each do |enrollment|
           enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
         end
       end
     end
-    enrollment_list
+    enrollment_list 
+  end
+
+  def self.count_shop_and_health_enrolled_by_benefit_group_assignments(benefit_group_assignments = [])
+    enrolled_or_renewal = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
+
+    return [] if benefit_group_assignments.blank?
+    id_list = benefit_group_assignments.collect(&:_id).uniq
+    families = Family.where(:"households.hbx_enrollments".elem_match => { 
+      :"benefit_group_assignment_id".in => id_list, 
+      :aasm_state.in => enrolled_or_renewal, 
+      :kind => "employer_sponsored", 
+      :coverage_kind => "health"  } )
+
+
+    map = %Q{ 
+      function() { 
+        var enrolled_or_renewal = #{enrolled_or_renewal};
+
+        for(var h = 0, len = this.households.length; h < len;  h++) { 
+          for (var e =0, len2 = this.households[h].hbx_enrollments.length; e < len2; e++) { 
+            var enrollment = this.households[h].hbx_enrollments[e];
+            if (enrollment.kind == "employer_sponsored" &&
+                enrollment.coverage_kind == "health" &&
+                enrolled_or_renewal.indexOf(enrollment.aasm_state) != -1
+            ) {
+              emit(enrollment.benefit_group_assignment_id, 1) 
+            }
+          } 
+        }    
+      }
+    } 
+
+    reduce = %Q{ 
+      function(key, values) { return values.reduce( function(a,b) { return a + b; }, 0); } 
+    }
+
+    #distinct benefit group assignment ids with at least one valid enrollment
+    found_ids = families.map_reduce(map, reduce).out(inline: true).map{|o| o[:_id]}
+    (found_ids & id_list).count
   end
 
   # def self.covered(enrollments)

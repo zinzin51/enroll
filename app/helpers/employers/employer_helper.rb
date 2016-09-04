@@ -111,15 +111,11 @@ module Employers::EmployerHelper
       # alternative, faster way to calcuate total_enrolled_count
       #instead of: plan_year.total_enrolled_count - plan_year.waived_count
 
-      eligible = plan_year.eligible_to_enroll
-      assignments = eligible.map do |e| 
+      assignments = plan_year.eligible_to_enroll.map do |e| 
         e.active_or_renewal_benefit_group_assignment_for plan_year
       end.select(&:present?)  
-      enrollments = HbxEnrollment.find_shop_and_health_by_benefit_group_assignments(assignments)
-      total_enrolled_count = enrollments.count(&:present?)
 
-      print "\n>>> got #{total_enrolled_count} from new method\n\n"
-      total_enrolled_count - plan_year.waived_count
+      HbxEnrollment.count_shop_and_health_enrolled_by_benefit_group_assignments(assignments)
     end
   end
   
@@ -135,7 +131,6 @@ module Employers::EmployerHelper
     end
   end
 
-
   def self.marshall_employer_summaries_json(employer_profiles, report_date) 
     employer_profiles ||= []
     all_staff_by_employer_id = Person.staff_for_employers_including_pending(employer_profiles.map(&:id))
@@ -143,12 +138,7 @@ module Employers::EmployerHelper
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
         staff = all_staff_by_employer_id[er.id]
         plan_year = er.show_plan_year
-<<<<<<< HEAD
         subscriber_count = count_enrolled_employees_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record) #TODO report_date?
-=======
-        subscriber_count = count_enrolled_subscribers_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record, report_date)
-
->>>>>>> b281d1a0e1a302331ed890f99ba629a9063cb0a8
         render_employer_summary_json(er, plan_year, subscriber_count, staff, offices, true) 
     end  
   end
@@ -161,12 +151,7 @@ module Employers::EmployerHelper
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-<<<<<<< HEAD
       subscriber_count = count_enrolled_employees(plan_year)
-=======
-      subscriber_count = count_enrolled_subscribers(plan_year, report_date)
-
->>>>>>> b281d1a0e1a302331ed890f99ba629a9063cb0a8
       render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
                             employer_contribution_total, employee_cost_total)
     else
