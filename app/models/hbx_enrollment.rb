@@ -896,6 +896,13 @@ class HbxEnrollment
     enrollment_list 
   end
 
+  #
+  # A faster way of counting employees who are enrolled (not waived) 
+  # where enrolled + waived = counting towards SHOP minimum healthcare participation
+  # We first do the query to find families with appropriate enrollments,
+  # then check again inside the map/reduce to get only those enrollments.
+  # This avoids undercounting, e.g. two family members working for the same employer. 
+  #
   def self.count_shop_and_health_enrolled_by_benefit_group_assignments(benefit_group_assignments = [])
     enrolled_or_renewal = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
 

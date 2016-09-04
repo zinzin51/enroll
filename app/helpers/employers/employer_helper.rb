@@ -138,7 +138,7 @@ module Employers::EmployerHelper
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
         staff = all_staff_by_employer_id[er.id]
         plan_year = er.show_plan_year
-        subscriber_count = count_enrolled_employees_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record) #TODO report_date?
+        subscriber_count = count_enrolled_employees_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record) 
         render_employer_summary_json(er, plan_year, subscriber_count, staff, offices, true) 
     end  
   end
