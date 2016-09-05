@@ -896,20 +896,17 @@ class HbxEnrollment
     enrollment_list 
   end
 
-  #
   # A faster way of counting employees who are enrolled (not waived) 
   # where enrolled + waived = counting towards SHOP minimum healthcare participation
   # We first do the query to find families with appropriate enrollments,
   # then check again inside the map/reduce to get only those enrollments.
   # This avoids undercounting, e.g. two family members working for the same employer. 
   #
-  #def self.count_shop_and_health_enrolled_by_benefit_group_assignments(benefit_group_assignments = [])
-  def self.count_shop_and_health_enrolled_by_benefit_group_assignment_ids(id_list = [])
+  def self.count_shop_and_health_enrolled_by_benefit_group_assignments(benefit_group_assignments = [])
     enrolled_or_renewal = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
 
-    #return [] if benefit_group_assignments.blank?
-    return [] if id_list.blank?
-    #id_list = benefit_group_assignments.collect(&:_id).uniq
+    return [] if benefit_group_assignments.blank?
+    id_list = benefit_group_assignments.map(&:id) #.uniq
     families = Family.where(:"households.hbx_enrollments".elem_match => { 
       :"benefit_group_assignment_id".in => id_list, 
       :aasm_state.in => enrolled_or_renewal, 

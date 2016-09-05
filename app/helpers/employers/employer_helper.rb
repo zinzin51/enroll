@@ -105,76 +105,27 @@ module Employers::EmployerHelper
     details
   end
 
+  # alternative, faster way to calcuate total_enrolled_count & total_waived. 
+  # returns a list of number enrolled (actually enrolled, not waived), and number waived
   def self.count_enrolled_and_waived_employees(plan_year)  
-    num_enrolled = 0
-    num_waived = 0
-
-    enrolled_or_renewal_statuses = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
-
     if plan_year && plan_year.employer_profile.census_employees.count < 100 then
-
       #check if the plan year is in renewal without triggering an additional query
       #possibly move this to the model
-      in_renewal = PlanYear::RENEWING_PUBLISHED_STATE.include?(plan_year[:aasm_state])
-      
-      benefit_group_ids = plan_year['benefit_groups'].map{ |py| py['_id']}
-   
-      use_map_reduce = true
-      if use_map_reduce then
-        assignments = CensusMember.where({
-          "benefit_group_assignments.benefit_group_id" => { "$in" => benefit_group_ids },
-          :aasm_state => { '$in' => ['eligible', 'employee_role_linked']}
-          }).map do |cm|
-              cm[:benefit_group_assignments].select do |bga| 
-                  benefit_group_ids.include?(bga[:benefit_group_id]) && (in_renewal || bga[:is_active])
-              end
-          end.flatten
-        assignment_ids = assignments.map { |a| a[:_id] }    
-        num_enrolled =  HbxEnrollment.count_shop_and_health_enrolled_by_benefit_group_assignment_ids(assignment_ids)
-        num_waived = assignments.count {|bga| bga[:is_active] && (bga[:aasm_state] == "coverage_waived") }
-      else
-        #find employees by benefit groups of the active plan year 
-        CensusMember.where({
-          "benefit_group_assignments.benefit_group_id" => { "$in" => benefit_group_ids },
-          :aasm_state => { '$in' => ['eligible', 'employee_role_linked']}
-          }).each do |census|
-
-          census[:benefit_group_assignments].select do |bga| 
-            benefit_group_ids.include?(bga[:benefit_group_id]) && (in_renewal || bga[:is_active])
-          end.each do |bga| 
-              if bga[:is_active] && (bga[:aasm_state] == "coverage_waived")
-                num_waived += 1 
-              else
-              Family.where('households.hbx_enrollments' => { "$elemMatch" => { 
-                  :benefit_group_assignment_id => bga['_id'],
-                  :aasm_state=> { "$in" => enrolled_or_renewal_statuses }, 
-                    :kind => "employer_sponsored", 
-                    :coverage_kind => "health"}
-                 }).each do |f| 
-                    f['households'].compact.each do |hh|
-                        num_enrolled += 1 if  hh[:hbx_enrollments].detect do |en|
-                          en[:benefit_group_assignment_id] == bga['_id'] &&
-                            enrolled_or_renewal_statuses.include?(en[:aasm_state]) &&
-                            en[:kind] == "employer_sponsored" &&
-                              en[:coverage_kind] == "health"
-                        end  #enrollments           
-                    end  #households
-                end #families
-            end #benefit group assignments
-          end #census members
-        end
-    end #plan year 
-
-    [num_enrolled, num_waived]
-
-    #  # alternative, faster way to calcuate total_enrolled_count
-    #  #instead of: plan_year.total_enrolled_count - plan_year.waived_count
-    #  assignments = plan_year.eligible_to_enroll.map do |e| 
-    #    e.active_or_renewal_benefit_group_assignment_for plan_year
-    #  end.select(&:present?)  
-    #  HbxEnrollment.count_shop_and_health_enrolled_by_benefit_group_assignments(assignments)
-
-    end
+      in_renewal = plan_year.is_renewing_published?
+      benefit_group_ids = plan_year.benefit_groups.map(&:id)
+      employees = CensusMember.where({
+        "benefit_group_assignments.benefit_group_id" => { "$in" => benefit_group_ids },
+        :aasm_state => { '$in' => ['eligible', 'employee_role_linked']}
+        })
+      assignments = employees.map do |ee|
+            ee.benefit_group_assignments.select do |bga| 
+                benefit_group_ids.include?(bga.benefit_group_id) && (in_renewal || bga.is_active)
+            end
+      end.flatten
+      num_enrolled =  HbxEnrollment.count_shop_and_health_enrolled_by_benefit_group_assignments(assignments)
+      num_waived = assignments.count {|bga| bga[:is_active] && (bga[:aasm_state] == "coverage_waived") }
+      [num_enrolled, num_waived]
+    end 
   end
   
   # as a performance optimization, in the mobile summary API (list of all employers for a broker)

@@ -175,6 +175,10 @@ class PlanYear
     RENEWING.include?(aasm_state)
   end
 
+  def is_renewing_published?
+    RENEWING_PUBLISHED_STATE.include?(aasm_state)
+  end
+
   def is_published?
     PUBLISHED.include?(aasm_state)
   end
