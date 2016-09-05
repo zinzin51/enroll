@@ -358,10 +358,10 @@ class CensusEmployee < CensusMember
 
   def has_active_health_coverage?(plan_year)
     benefit_group_ids = plan_year.benefit_groups.map(&:id)
-    
+
     bg_assignment = active_benefit_group_assignment if benefit_group_ids.include?(active_benefit_group_assignment.try(:benefit_group_id))
     bg_assignment = renewal_benefit_group_assignment if benefit_group_ids.include?(renewal_benefit_group_assignment.try(:benefit_group_id))
-    
+
     bg_assignment.present? && HbxEnrollment.find_shop_and_health_by_benefit_group_assignment(bg_assignment).present?
   end
 
