@@ -163,7 +163,7 @@ module Employers::EmployerHelper
       render_employer_details_json(employer_profile, plan_year, enrolled, waived, premium_amt_total, 
                             employer_contribution_total, employee_cost_total)
     else
-      render_employer_details_json(employer_profile, nil, nil, nil, nil, nil)
+      render_employer_details_json(employer_profile, nil, nil, nil, nil, nil, nil)
     end
   end
 
