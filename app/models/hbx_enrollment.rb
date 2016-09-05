@@ -903,16 +903,19 @@ class HbxEnrollment
   # then check again inside the map/reduce to get only those enrollments.
   # This avoids undercounting, e.g. two family members working for the same employer. 
   #
-  def self.count_shop_and_health_enrolled_by_benefit_group_assignments(benefit_group_assignments = [])
+  #def self.count_shop_and_health_enrolled_by_benefit_group_assignments(benefit_group_assignments = [])
+  def self.count_shop_and_health_enrolled_by_benefit_group_assignment_ids(id_list = [])
     enrolled_or_renewal = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
 
-    return [] if benefit_group_assignments.blank?
-    id_list = benefit_group_assignments.collect(&:_id).uniq
+    #return [] if benefit_group_assignments.blank?
+    return [] if id_list.blank?
+    #id_list = benefit_group_assignments.collect(&:_id).uniq
     families = Family.where(:"households.hbx_enrollments".elem_match => { 
       :"benefit_group_assignment_id".in => id_list, 
       :aasm_state.in => enrolled_or_renewal, 
       :kind => "employer_sponsored", 
-      :coverage_kind => "health"  } )
+      :coverage_kind => "health"  
+    } )
 
 
     map = %Q{ 
