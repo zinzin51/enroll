@@ -1721,3 +1721,41 @@ context "A cancelled external enrollment", :dbclean => :after_each do
     expect(family.enrollments_for_display.to_a).to eq([])
   end
 end
+
+
+describe HbxEnrollment, type: :model, dbclean: :after_all do
+
+
+       let(:employer_profile)                        { FactoryGirl.create(:employer_profile) }
+       let(:plan_year_start_on)                      { TimeKeeper.date_of_record.next_month.end_of_month + 1.day }
+       let(:plan_year_end_on)                        { (plan_year_start_on + 1.year) - 1.day }
+
+
+       let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on,
+                                                      end_on: plan_year_end_on,
+                                                      open_enrollment_start_on: TimeKeeper.date_of_record,
+                                                      open_enrollment_end_on: TimeKeeper.date_of_record + 5.days,
+                                                      employer_profile: employer_profile
+                                                    )
+                                              
+                                                    py.save
+                                                    py.publish!
+                                                    py
+                                                  }
+      
+        
+      
+context "count_shop_and_health_enrolled_by_benefit_group_assignments" do
+
+      it "should count enrollment for two people in same family who works for same employer" do
+        puts "*******#{plan_year.inspect}******"/n
+        puts "*******#{employer_profile.inspect}"
+      #   expect(HbxEnrollment.count_shop_and_health_enrolled_by_benefit_group_assignments().count).to be 
+       end
+
+      it "should count enrollment for two people in different households in the same family" do
+      
+      end
+    end
+end
