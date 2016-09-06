@@ -69,15 +69,15 @@ module Employers::EmployerHelper
              end
   end
 
-  def self.render_employer_summary_json(employer_profile, year, subscriber_count, staff, offices, 
+  def self.render_employer_summary_json(employer_profile, year, num_enrolled, num_waived, staff, offices, 
     include_details_url)
     renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
 
     summary = { 
       employer_name: employer_profile.legal_name,
       employees_total: employer_profile.roster_size,   
-      employees_enrolled:             subscriber_count,  
-      employees_waived:               year ? year.waived_count                             : nil,
+      employees_enrolled:             num_enrolled,  
+      employees_waived:               num_waived,
       open_enrollment_begins:         year ? year.open_enrollment_start_on                 : nil,
       open_enrollment_ends:           year ? year.open_enrollment_end_on                   : nil,
       plan_year_begins:               year ? year.start_on                                 : nil,
@@ -96,8 +96,8 @@ module Employers::EmployerHelper
     summary
   end
 
-  def self.render_employer_details_json(employer_profile, year, subscriber_count, total_premium, employer_contribution, employee_contribution)
-    details = render_employer_summary_json(employer_profile, year, subscriber_count, nil, nil, false)
+  def self.render_employer_details_json(employer_profile, year, num_enrolled, num_waived, total_premium, employer_contribution, employee_contribution)
+    details = render_employer_summary_json(employer_profile, year, num_enrolled, num_waived, nil, nil, false)
     details[:total_premium] = total_premium
     details[:employer_contribution] = employer_contribution
     details[:employee_contribution] = employee_contribution
@@ -105,36 +105,40 @@ module Employers::EmployerHelper
     details
   end
 
-  def self.count_enrolled_subscribers(plan_year, report_date)  
-    plan_year ? plan_year.total_enrolled_count - plan_year.waived_count : nil
-
-    # possible variation, needs debugging
-    # subscribers_already_counted = {}
-    # if not plan_year.nil? then
-    # enrollments = plan_year.hbx_enrollments_by_month(report_date)
-    # enrollments.select { |e| e.coverage_kind == 'health' }.inject(0) do |subs, en|
-    #   subscriber_id = en.subscriber.applicant_id
-    #   if not subscribers_already_counted[subscriber_id] then
-    #     subscribers_already_counted[subscriber_id] = true
-    #     subs += 1
-    #   end
-    #   subs 
-    # end
-    #end
+  # alternative, faster way to calcuate total_enrolled_count & total_waived. 
+  # returns a list of number enrolled (actually enrolled, not waived), and number waived
+  def self.count_enrolled_and_waived_employees(plan_year)  
+    if plan_year && plan_year.employer_profile.census_employees.count < 100 then
+      #check if the plan year is in renewal without triggering an additional query
+      #possibly move this to the model
+      in_renewal = plan_year.is_renewing_published?
+      benefit_group_ids = plan_year.benefit_groups.map(&:id)
+      employees = CensusMember.where({
+        "benefit_group_assignments.benefit_group_id" => { "$in" => benefit_group_ids },
+        :aasm_state => { '$in' => ['eligible', 'employee_role_linked']}
+        })
+      assignments = employees.map do |ee|
+            ee.benefit_group_assignments.select do |bga| 
+                benefit_group_ids.include?(bga.benefit_group_id) && (in_renewal || bga.is_active)
+            end
+      end.flatten
+      num_enrolled =  HbxEnrollment.count_shop_and_health_enrolled_by_benefit_group_assignments(assignments)
+      num_waived = assignments.count {|bga| bga[:is_active] && (bga[:aasm_state] == "coverage_waived") }
+      [num_enrolled, num_waived]
+    end 
   end
   
   # as a performance optimization, in the mobile summary API (list of all employers for a broker)
   # we only bother counting the subscribers if the employer is currently in OE
-  def self.count_enrolled_subscribers_if_in_open_enrollment(plan_year, as_of, report_date)
+  def self.count_enrolled_and_waived_employees_if_in_open_enrollment(plan_year, as_of)
     if plan_year && as_of && 
        plan_year.open_enrollment_start_on && plan_year.open_enrollment_end_on &&
        plan_year.open_enrollment_contains?(as_of) then
-        count_enrolled_subscribers(plan_year, report_date) 
+        count_enrolled_and_waived_employees(plan_year) 
     else
         nil
     end
   end
-
 
   def self.marshall_employer_summaries_json(employer_profiles, report_date) 
     employer_profiles ||= []
@@ -143,26 +147,23 @@ module Employers::EmployerHelper
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
         staff = all_staff_by_employer_id[er.id]
         plan_year = er.show_plan_year
-        subscriber_count = count_enrolled_subscribers_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record, report_date)
-
-        render_employer_summary_json(er, plan_year, subscriber_count, staff, offices, true) 
+        enrolled, waived = count_enrolled_and_waived_employees_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record) 
+        render_employer_summary_json(er, plan_year, enrolled, waived, staff, offices, true) 
     end  
   end
 
   def self.marshall_employer_details_json(employer_profile, report_date)
     plan_year = employer_profile.show_plan_year
     if plan_year then
-      #enrollments = plan_year.hbx_enrollments_by_month(report_date)
       enrollments = employer_profile.enrollments_for_billing(report_date)
       premium_amt_total   = enrollments.map(&:total_premium).sum 
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
-      subscriber_count = count_enrolled_subscribers(plan_year, report_date)
-
-      render_employer_details_json(employer_profile, plan_year, subscriber_count, premium_amt_total, 
+      enrolled, waived = count_enrolled_and_waived_employees(plan_year)
+      render_employer_details_json(employer_profile, plan_year, enrolled, waived, premium_amt_total, 
                             employer_contribution_total, employee_cost_total)
     else
-      render_employer_details_json(employer_profile, nil, nil, nil, nil, nil)
+      render_employer_details_json(employer_profile, nil, nil, nil, nil, nil, nil)
     end
   end
 
