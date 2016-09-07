@@ -902,7 +902,7 @@ class HbxEnrollment
   # then check again inside the map/reduce to get only those enrollments.
   # This avoids undercounting, e.g. two family members working for the same employer. 
   #
-  def self.count_shop_and_health_enrolled_by_benefit_group_assignments(benefit_group_assignments = [])
+  def self.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignments = [])
     enrolled_or_renewal = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
 
     return [] if benefit_group_assignments.blank?
@@ -939,7 +939,7 @@ class HbxEnrollment
 
     #distinct benefit group assignment ids with at least one valid enrollment
     found_ids = families.map_reduce(map, reduce).out(inline: true).map{|o| o[:_id]}
-    (found_ids & id_list).count
+    [(found_ids & id_list).count, 0] #TODO waived
   end
 
   # def self.covered(enrollments)
