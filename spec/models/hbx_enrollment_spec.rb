@@ -1847,7 +1847,7 @@ describe HbxEnrollment, "Scenarios for count_shop_and_health_enrolled_by_benefit
           #there is one person working at the salon, none waived    
           expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(salon_benefit_groups)).to eq [1, 0]
 
-
+          
 
            
          end
@@ -1860,4 +1860,50 @@ describe HbxEnrollment, "Scenarios for count_shop_and_health_enrolled_by_benefit
        # TODO not enrolled this year but already enrolled for next year
        # TODO someone enrolled in two policies -- for instance one via SHOP, and another one privately -- if that's possible -- maybe some kind of enhanced coverage?
     end
+
+
+context "should count enrollment for two people in different households in the same family" do
+    include_context "BradyWorkAfterAll"
+
+  before :all do
+    create_brady_census_families
+  end
+
+  context "is created from an employer_profile, benefit_group, and coverage_household" do
+    attr_reader :enrollment, :household, :coverage_household
+    before(:all) do
+
+      @household = mikes_family.households.first
+      @coverage_household = household.coverage_households.first
+
+        @enrollment1 = household.create_hbx_enrollment_from(
+          employee_role: mikes_employee_role,
+          coverage_household: coverage_household,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment1.save
+        @enrollment2 = household.create_hbx_enrollment_from(
+          employee_role: mikes_employee_role,
+          coverage_household: coverage_household,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment2.save
+        @enrollment1.waive_coverage_by_benefit_group_assignment("start a new job")
+        @enrollment2.reload
+
+    end
+    
+
+    it "should count enrollement for one waived in the same family" do 
+        benefit_group_assignment = [@mikes_benefit_group_assignments]
+        expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 1]
+    end
+
+  end
+end
+
+
+
 end
