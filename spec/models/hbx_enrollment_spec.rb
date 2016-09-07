@@ -1853,11 +1853,24 @@ describe HbxEnrollment, "Scenarios for count_shop_and_health_enrolled_by_benefit
          end
 
        # TODO it "should count enrollment for two people in different households in the same family" do
-       # TODO it - two people in the same family/household that work for the same employer
-       # TODO two people in different households in the same family (e.g Bradys)
-       # TODO people with shopped-for-but-not-bought or terminated policies
-       # TODO valid dental but no valid health - waived
-       # TODO not enrolled this year but already enrolled for next year
-       # TODO someone enrolled in two policies -- for instance one via SHOP, and another one privately -- if that's possible -- maybe some kind of enhanced coverage?
+       # -> both enrolled, none waived: [2,0]
+       # -> both waived: [0,2]
+       # -> one each: [1,1]
+
+       # TODO people with shopped-for-but-not-bought or terminated policies - see UI for values
+       # -> one shopped but didn't buy, one enrolled but terminated (e.g. got fired) [0, 0]
+
+       # TODO 2 waived in the same family
+       # -> [0,2]
+
+       # TODO not enrolled this year but already enrolled for next year (2 plan years for same employer)
+       # -> [1,0] if looking at next year
+
+       # TODO enrolled this year but already waived for next year
+       # -> [0,1] if looking at next year
+
+       # TODO someone enrolled in two policies -- for instance one via SHOP, and another one privately -- if that's possible -- maybe some kind of enhanced coverage? 
+       # the person has 1 health policy from employer, 1 dental policy from employer, and 1 policy from individual/non-SHOP
+       # -> [1, 0]
     end
 end
