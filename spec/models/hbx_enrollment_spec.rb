@@ -2117,17 +2117,76 @@ describe HbxEnrollment, "Scenarios for count_shop_and_health_enrolled_by_benefit
           #there is one person working at the salon, none waived    
           expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(salon_benefit_groups)).to eq [1, 0]
 
-
+          
 
            
          end
 
        # TODO it "should count enrollment for two people in different households in the same family" do
-       # TODO it - two people in the same family/household that work for the same employer
-       # TODO two people in different households in the same family (e.g Bradys)
-       # TODO people with shopped-for-but-not-bought or terminated policies
-       # TODO valid dental but no valid health - waived
-       # TODO not enrolled this year but already enrolled for next year
-       # TODO someone enrolled in two policies -- for instance one via SHOP, and another one privately -- if that's possible -- maybe some kind of enhanced coverage?
+       # -> both enrolled, none waived: [2,0]
+       # -> both waived: [0,2]
+       # -> one each: [1,1]
+
+       # TODO people with shopped-for-but-not-bought or terminated policies - see UI for values
+       # -> one shopped but didn't buy, one enrolled but terminated (e.g. got fired) [0, 0]
+
+       # TODO 2 waived in the same family
+       # -> [0,2]
+
+       # TODO not enrolled this year but already enrolled for next year (2 plan years for same employer)
+       # -> [1,0] if looking at next year
+
+       # TODO enrolled this year but already waived for next year
+       # -> [0,1] if looking at next year
+
+       # TODO someone enrolled in two policies -- for instance one via SHOP, and another one privately -- if that's possible -- maybe some kind of enhanced coverage? 
+       # the person has 1 health policy from employer, 1 dental policy from employer, and 1 policy from individual/non-SHOP
+       # -> [1, 0]
     end
+
+
+context "should count enrollment for two people in different households in the same family" do
+    include_context "BradyWorkAfterAll"
+
+  before :all do
+    create_brady_census_families
+  end
+
+  context "is created from an employer_profile, benefit_group, and coverage_household" do
+    attr_reader :enrollment, :household, :coverage_household
+    before(:all) do
+
+      @household = mikes_family.households.first
+      @coverage_household = household.coverage_households.first
+
+        @enrollment1 = household.create_hbx_enrollment_from(
+          employee_role: mikes_employee_role,
+          coverage_household: coverage_household,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment1.save
+        @enrollment2 = household.create_hbx_enrollment_from(
+          employee_role: mikes_employee_role,
+          coverage_household: coverage_household,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment2.save
+        @enrollment1.waive_coverage_by_benefit_group_assignment("start a new job")
+        @enrollment2.reload
+
+    end
+    
+
+    it "should count enrollement for one waived in the same family" do 
+        benefit_group_assignment = [@mikes_benefit_group_assignments]
+        expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 1]
+    end
+
+  end
+end
+
+
+
 end
