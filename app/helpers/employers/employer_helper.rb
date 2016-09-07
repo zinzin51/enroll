@@ -109,23 +109,26 @@ module Employers::EmployerHelper
     details
   end
 
-  # alternative, faster way to calcuate total_enrolled_count 
-  # returns a list of number enrolled (actually enrolled, not waived)
-  def self.count_enrolled_and_waived_employees(plan_year)  
-    if plan_year && plan_year.employer_profile.census_employees.count < 100 then
+  def self.get_benefit_group_assignments_for_plan_year(plan_year)
       #check if the plan year is in renewal without triggering an additional query
-      #possibly move this to the model
       in_renewal = plan_year.is_renewing_published?
       benefit_group_ids = plan_year.benefit_groups.map(&:id)
       employees = CensusMember.where({
         "benefit_group_assignments.benefit_group_id" => { "$in" => benefit_group_ids },
         :aasm_state => { '$in' => ['eligible', 'employee_role_linked']}
         })
-      assignments = employees.map do |ee|
+      employees.map do |ee|
             ee.benefit_group_assignments.select do |bga| 
                 benefit_group_ids.include?(bga.benefit_group_id) && (in_renewal || bga.is_active)
             end
       end.flatten
+  end
+
+  # alternative, faster way to calcuate total_enrolled_count 
+  # returns a list of number enrolled (actually enrolled, not waived)
+  def self.count_enrolled_and_waived_employees(plan_year)  
+    if plan_year && plan_year.employer_profile.census_employees.count < 100 then
+      assignments = get_benefit_group_assignments_for_plan_year(plan_year)
       HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(assignments)
     end 
   end
