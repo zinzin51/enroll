@@ -1995,7 +1995,7 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
 end
 
 
-describe HbxEnrollment, type: :model, dbclean: :after_each do
+describe HbxEnrollment, "Scenarios for count_shop_and_health_enrolled_by_benefit_group_assignments", type: :model, dbclean: :after_each do
    
     let!(:employer_profile_cafe)      { FactoryGirl.create(:employer_profile) }
     let!(:employer_profile_salon)     { FactoryGirl.create(:employer_profile) }
@@ -2100,7 +2100,7 @@ describe HbxEnrollment, type: :model, dbclean: :after_each do
           end
     end
       
-    context "count_shop_and_health_enrolled_by_benefit_group_assignments" do
+    context "count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments" do
 
         it "should count enrollment for three people in the same family who work for the same employer, but one has only dental" do
           
@@ -2113,15 +2113,23 @@ describe HbxEnrollment, type: :model, dbclean: :after_each do
           cafe_benefit_groups = [benefit_group_assignment_barista, benefit_group_assignment_manager,
             benefit_group_assignment_janitor] 
 
-          #there are three people working at the cafe, but only two have health insurance    
-          expect(HbxEnrollment.count_shop_and_health_enrolled_by_benefit_group_assignments(cafe_benefit_groups)).to be 2
+          #there are three people working at the cafe, but only two have health insurance; none waived    
+          expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(cafe_benefit_groups)).to eq [2, 0]
 
-          #there is one person working at the salon    
-          expect(HbxEnrollment.count_shop_and_health_enrolled_by_benefit_group_assignments(salon_benefit_groups)).to be 1
+          #there is one person working at the salon, none waived    
+          expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(salon_benefit_groups)).to eq [1, 0]
+
+
 
            
          end
 
        # TODO it "should count enrollment for two people in different households in the same family" do
+       # TODO it - two people in the same family/household that work for the same employer
+       # TODO two people in different households in the same family (e.g Bradys)
+       # TODO people with shopped-for-but-not-bought or terminated policies
+       # TODO valid dental but no valid health - waived
+       # TODO not enrolled this year but already enrolled for next year
+       # TODO someone enrolled in two policies -- for instance one via SHOP, and another one privately -- if that's possible -- maybe some kind of enhanced coverage?
     end
 end
