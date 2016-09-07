@@ -69,8 +69,9 @@ module Employers::EmployerHelper
              end
   end
 
-  def self.render_employer_summary_json(employer_profile, year, num_enrolled, num_waived, staff, offices, 
-    include_details_url)
+  def self.render_employer_summary_json(employer_profile: nil, year: nil, num_enrolled: nil, 
+                                        num_waived: nil, staff: nil, offices: nil, 
+                                        include_details_url: false)
     renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
 
     summary = { 
@@ -96,8 +97,11 @@ module Employers::EmployerHelper
     summary
   end
 
-  def self.render_employer_details_json(employer_profile, year, num_enrolled,  num_waived, total_premium, employer_contribution, employee_contribution)
-    details = render_employer_summary_json(employer_profile, year, num_enrolled, num_waived, nil, nil, false)
+  def self.render_employer_details_json(employer_profile: nil, year: nil, num_enrolled: nil, 
+                                        num_waived: nil, total_premium: nil, 
+                                        employer_contribution: nil, employee_contribution: nil)
+    details = render_employer_summary_json(employer_profile: employer_profile, year: year, 
+                                           num_enrolled: num_enrolled, num_waived: num_waived)
     details[:total_premium] = total_premium
     details[:employer_contribution] = employer_contribution
     details[:employee_contribution] = employee_contribution
@@ -146,7 +150,9 @@ module Employers::EmployerHelper
         staff = all_staff_by_employer_id[er.id]
         plan_year = er.show_plan_year
         enrolled, waived = count_enrolled_and_waived_employees_if_in_open_enrollment(plan_year, TimeKeeper.date_of_record) 
-        render_employer_summary_json(er, plan_year, enrolled, waived, staff, offices, true) 
+        render_employer_summary_json(employer_profile: er, year: plan_year, 
+                                     num_enrolled: enrolled, num_waived: waived, 
+                                     staff: staff, offices: offices, include_details_url: true) 
     end  
   end
 
@@ -158,10 +164,16 @@ module Employers::EmployerHelper
       employee_cost_total = enrollments.map(&:total_employee_cost).sum
       employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
       enrolled, waived = count_enrolled_and_waived_employees(plan_year)
-      render_employer_details_json(employer_profile, plan_year, enrolled, waived, premium_amt_total, 
-                            employer_contribution_total, employee_cost_total)
+      
+      render_employer_details_json(employer_profile: employer_profile, 
+                                   year: plan_year,  
+                                   num_enrolled: enrolled, 
+                                   num_waived: waived, 
+                                   total_premium: premium_amt_total, 
+                                   employer_contribution: employer_contribution_total, 
+                                   employee_contribution: employee_cost_total)
     else
-      render_employer_details_json(employer_profile, nil, nil, nil, nil, nil, nil, nil)
+      render_employer_details_json(employer_profile: employer_profile)
     end
   end
 
