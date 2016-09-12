@@ -440,6 +440,24 @@ describe Person do
 
   end
 
+  describe "staff_for_employers_including_pending", :dbclean => :after_all do
+   
+   before(:each) do 
+    employer_profile = FactoryGirl.build(:employer_profile)
+    person1 = FactoryGirl.build(:person)
+    person2 = FactoryGirl.build(:person)
+    person3 = FactoryGirl.build(:person)
+    FactoryGirl.create(:employer_staff_role, person: person1, employer_profile_id: employer_profile.id, aasm_state: "is_applicant")
+    FactoryGirl.create(:employer_staff_role, person: person2, employer_profile_id: employer_profile.id, aasm_state: "is_active")
+    FactoryGirl.create(:employer_staff_role, person: person3, employer_profile_id: employer_profile.id, aasm_state: "is_closed")
+    @employer_profile_ids = employer_profile.to_a.map(&:id)
+   end
+   
+   it "Should give the correct count of staff members" do
+    expect(Person.staff_for_employers_including_pending(@employer_profile_ids)[@employer_profile_ids[0]].count).to eql 2
+   end
+  end
+
   describe "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
     include_context "BradyBunchAfterAll"
 
