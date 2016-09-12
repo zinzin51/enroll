@@ -603,4 +603,48 @@ RSpec.describe Employers::EmployerProfilesController do
    end
 
   end
+
+describe "GET employer_details_api" do
+    
+ let(:user) { double("user", :person => person) }
+    let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
+    let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
+    let(:plan_year) { FactoryGirl.create(:plan_year) }
+    let(:employer_profile) { plan_year.employer_profile}
+
+    
+    before(:each) do 
+     sign_in(user)
+    end
+
+      it "should render 200 with valid ID" do
+      get :employer_details_api, {employer_profile_id: employer_profile.id.to_s}
+      expect(response).to have_http_status(200)
+      end
+    
+      it "should render 404 with Invalid ID" do
+      get :employer_details_api, {employer_profile_id: "Invalid Id"}
+      expect(response).to have_http_status(404)
+      end
+
+      it "should match with the expected result set" do
+      get :employer_details_api, {employer_profile_id: employer_profile.id.to_s}
+      output = JSON.parse(response.body)
+      puts "#{employer_profile.inspect}"
+      expect(output["employer_name"]).to eq(employer_profile.legal_name)
+      expect(output["employees_total"]).to eq(employer_profile.roster_size)
+      expect(output["active_general_agency"]).to eq(employer_profile.active_general_agency_legal_name)
+
+      if employer_profile.show_plan_year
+      expect(output["employees_waived"]).to eq(employer_profile.show_plan_year.waived_count)
+      expect(output["open_enrollment_begins"]).to eq(employer_profile.show_plan_year.open_enrollment_start_on) 
+      expect(output["open_enrollment_ends"]).to eq(employer_profile.show_plan_year.open_enrollment_end_on) 
+      expect(output["plan_year_begins"]).to eq(employer_profile.show_plan_year.start_on) 
+      expect(output["renewal_in_progress"]).to eq(employer_profile.show_plan_year.is_renewing?) 
+      expect(output["renewal_application_due"]).to eq(employer_profile.show_plan_year.due_date_for_publish) 
+      expect(output["minimum_participation_required"]).to eq(employer_profile.show_plan_year.minimum_enrolled_count) 
+      end
+      end
+     
+  end
 end

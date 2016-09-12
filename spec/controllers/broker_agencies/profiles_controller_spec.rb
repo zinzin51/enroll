@@ -248,12 +248,21 @@ RSpec.describe BrokerAgencies::ProfilesController do
     
     it "should get details for employers where broker_agency_account is active" do
 
-      allow_any_instance_of(EmployerProfile).to receive(:enrollments_for_billing).and_return(
+      allow_any_instance_of(PlanYear).to receive(:hbx_enrollments_by_month).and_return(
         [
-          double("enrollment", :total_premium => 500, :total_employee_cost => 200, :total_employer_contribution => 300 ),
-          double("enrollment",  :total_premium => 5000, :total_employee_cost => 2000, :total_employer_contribution => 3000 )
+          double("enrollment", coverage_kind: "health", 
+                  subscriber: double("subscriber", applicant_id: 1) ),
+          double("enrollment", coverage_kind: "dental", 
+                  subscriber: double("subscriber", applicant_id: 1) ),
+          double("enrollment", coverage_kind: "health", 
+                  subscriber: double("subscriber", applicant_id: 2) ),
+          double("enrollment", coverage_kind: "health", 
+                  subscriber: double("subscriber", applicant_id: 2) ),
         ]
       )
+      allow_any_instance_of(PlanYear).to receive(:waived_count).and_return(3)
+      
+      #TODO tests for open_enrollment_start_on, open_enrollment_end_on, start_on, is_renewing?, etc              
 
       staff.employer_staff_roles << FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
       staff2.employer_staff_roles << FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
@@ -264,30 +273,27 @@ RSpec.describe BrokerAgencies::ProfilesController do
       details = assigns[:employer_details]
       detail = details[0]
       expect(details.count).to eq 1
-      expect(detail[:profile]).to eq employer_profile
-      expect(detail[:total_premium]).to eq 5500
-      expect(detail[:employee_contribution]).to eq 2200
-      expect(detail[:employer_contribution]).to eq 3300
-      contacts = detail[:contacts]
+      expect(detail[:employer_name]).to eq employer_profile.legal_name
+      contacts = detail[:contact_info]
 
-      seymour = contacts.detect { |c| c.first == 'Seymour' }
-      beatrice = contacts.detect { |c| c.first == 'Beatrice' }
-      office = contacts.detect { |c| c.first == 'Primary' }
-      expect(seymour.mobile).to eq '(202) 555-0000'
-      expect(seymour.phone).to eq ''
-      expect(beatrice.phone).to eq '(202) 555-0001'
-      expect(beatrice.mobile).to eq '(202) 555-0002'
-      expect(seymour.emails).to include('seymour@example.com')
-      expect(beatrice.emails).to include('beatrice@example.com')
-      expect(office.phone).to eq '(202) 555-9999'
-      expect(office.address_1).to eq '500 Employers-Api Avenue'
-      expect(office.address_2).to eq '#555'
-      expect(office.city).to eq 'Washington'
-      expect(office.state).to eq 'DC'
-      expect(office.zip).to eq '20001'
+      seymour = contacts.detect  { |c| c[:first] == 'Seymour' }
+      beatrice = contacts.detect { |c| c[:first] == 'Beatrice' }
+      office = contacts.detect   { |c| c[:first] == 'Primary' }
+      expect(seymour[:mobile]).to eq '(202) 555-0000'
+      expect(seymour[:phone]).to eq ''
+      expect(beatrice[:phone]).to eq '(202) 555-0001'
+      expect(beatrice[:mobile]).to eq '(202) 555-0002'
+      expect(seymour[:emails]).to include('seymour@example.com')
+      expect(beatrice[:emails]).to include('beatrice@example.com')
+      expect(office[:phone]).to eq '(202) 555-9999'
+      expect(office[:address_1]).to eq '500 Employers-Api Avenue'
+      expect(office[:address_2]).to eq '#555'
+      expect(office[:city]).to eq 'Washington'
+      expect(office[:state]).to eq 'DC'
+      expect(office[:zip]).to eq '20001'
 
-      
-      allow_any_instance_of(EmployerProfile).to receive(:enrollments_for_billing).and_call_original
+      allow_any_instance_of(PlanYear).to receive(:hbx_enrollments_by_month).and_call_original
+      allow_any_instance_of(PlanYear).to receive(:waived_count).and_call_original
     end
   end
 

@@ -73,6 +73,7 @@ class Family
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.hbx_id" => 1})
   index({"households.hbx_enrollments.kind" => 1})
+  index({"households.hbx_enrollments.coverage_kind" => 1})
   index({"households.hbx_enrollments.submitted_at" => 1})
   index({"households.hbx_enrollments.effective_on" => 1})
   index({"households.hbx_enrollments.terminated_on" => 1}, { sparse: true })

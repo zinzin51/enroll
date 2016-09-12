@@ -893,7 +893,62 @@ class HbxEnrollment
         end
       end
     end
-    enrollment_list
+    enrollment_list 
+  end
+
+  # A faster way of counting employees who are enrolled (not waived) 
+  # where enrolled + waived = counting towards SHOP minimum healthcare participation
+  # We first do the query to find families with appropriate enrollments,
+  # then check again inside the map/reduce to get only those enrollments.
+  # This avoids undercounting, e.g. two family members working for the same employer. 
+  #
+  def self.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignments = [])
+    enrolled_or_renewal = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
+    waived = HbxEnrollment::WAIVED_STATUSES
+
+    return [] if benefit_group_assignments.blank?
+    id_list = benefit_group_assignments.map(&:id) #.uniq
+    families = Family.where(:"households.hbx_enrollments".elem_match => { 
+      :"benefit_group_assignment_id".in => id_list, 
+      :aasm_state.in => enrolled_or_renewal + waived, 
+      :kind => "employer_sponsored", 
+      :coverage_kind => "health",
+      :is_active => true #???  
+    } )
+
+
+    map = %Q{ 
+      function() { 
+        var enrolled_or_renewal = #{enrolled_or_renewal};
+
+        for(var h = 0, len = this.households.length; h < len;  h++) { 
+          for (var e =0, len2 = this.households[h].hbx_enrollments.length; e < len2; e++) { 
+            var enrollment = this.households[h].hbx_enrollments[e];
+            if (enrollment.kind == "employer_sponsored" &&
+                enrollment.coverage_kind == "health" &&
+                enrollment.is_active) {
+                emit(enrollment.benefit_group_assignment_id, enrollment.aasm_state)
+            }
+          } 
+        }    
+      }
+    } 
+
+    #there should really only be one active shop health enrollment per benefit group assignment
+    #so we simply ignore collisons by taking the first one we find 
+    reduce = %Q{ 
+      function(key, values) { return values.length ? values[0] : null } 
+    }
+
+    items = families.map_reduce(map, reduce).out(inline: true)
+
+    [enrolled_or_renewal, waived].map do |statuses|
+        found_ids = items.map do |item| 
+                    item[:_id] if statuses.include? item[:value] 
+        end.compact
+
+        (found_ids & id_list).count
+    end
   end
 
   # def self.covered(enrollments)

@@ -631,8 +631,6 @@ class Person
         }
         })
 
-      print "\n%%%%%%%%%%% constructed staff query in #{Time.now - start}sec"
-
       result = {}
       staff.each do |s| 
         s.employer_staff_roles.each do |r|
@@ -642,7 +640,6 @@ class Person
           result[r.employer_profile_id] <<= s  
         end
       end
-      print "\n%%%%%%%%%%% executed staff query in #{Time.now - start}sec"
       result.compact
     end
 
