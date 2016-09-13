@@ -2,11 +2,13 @@ module Api
   module V1
     class MobileApiController < ApplicationController
     
+      include MobileApiHelper
+
       def employers_list
         employer_profiles, broker_agency_profile = fetch_employers_and_broker_agency(current_user, params[:id])
         if broker_agency_profile
           employer_details =
-                Employers::EmployerHelper.marshall_employer_summaries_json(employer_profiles, params[:report_date])
+                marshall_employer_summaries_json(employer_profiles, params[:report_date])
           end                                 
           render json: {
                  broker_agency:  broker_agency_profile.legal_name,
@@ -26,7 +28,7 @@ module Api
         if employer_profile.blank?
           render json: { file: 'public/404.html', status: :not_found 
         else
-          render json: Employers::EmployerHelper.marshall_employer_details_json(employer_profile, 
+          render json: marshall_employer_details_json(employer_profile, 
                                                                            params[:report_date])
         end
       rescue Exception => e 
@@ -43,6 +45,9 @@ module Api
         if submitted_id && (user.has_broker_agency_staff_role? || user.has_hbx_staff_role?)
             broker_agency_profile = BrokerAgencyProfile.find(submitted_id)
             employer_query = Organization.by_broker_agency_profile(@broker_agency_profile._id)
+
+#@broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
+
          else
             broker_role = user.person.broker_role
             broker_agency_profile = broker_role.broker_agency_profile_id

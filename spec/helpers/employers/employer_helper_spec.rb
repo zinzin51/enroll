@@ -242,6 +242,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
   end
 end
 
+#### TODO remove after synching branches
 RSpec.describe Employers::EmployerHelper, "Scenarios for get_benefit_group_assignments_for_plan_year", type: :helper, dbclean: :after_each do
    
     let!(:employer_profile_cafe)      { FactoryGirl.create(:employer_profile) }
@@ -354,4 +355,5 @@ RSpec.describe Employers::EmployerHelper, "Scenarios for get_benefit_group_assig
           expect(Employers::EmployerHelper.get_benefit_group_assignments_for_plan_year(plan_year_salon)).to eq [benefit_group_assignment_hairdresser]      
         end
     end
+#### END TODO remove after synching branches
 end

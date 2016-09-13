@@ -53,6 +53,8 @@ module Employers::EmployerHelper
     end
   end
 
+#### TODO remove these after synching branches
+
   def self.render_employee_contacts_json(staff, offices)
       #TODO null handling
       staff.map do |s| 
@@ -185,7 +187,7 @@ module Employers::EmployerHelper
       render_employer_details_json(employer_profile: employer_profile)
     end
   end
-
+#### END TODO remove these after sync
  
 
 

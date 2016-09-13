@@ -604,6 +604,8 @@ RSpec.describe Employers::EmployerProfilesController do
 
   end
 
+### TODO remove after synching branches
+
 describe "GET employer_details_api" do
     
  let(:user) { double("user", :person => person) }
@@ -645,6 +647,8 @@ describe "GET employer_details_api" do
       expect(output["minimum_participation_required"]).to eq(employer_profile.show_plan_year.minimum_enrolled_count) 
       end
       end
-     
   end
+#### END TODO remove after synching branches
+
+
 end
