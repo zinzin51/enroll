@@ -485,7 +485,7 @@ class EmployerProfile
         if new_date.day == 11
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
-            plan_year.force_publish!
+            plan_year.force_publish! if plan_year.present? && plan_year.may_force_publish?
           end
         end
       end
