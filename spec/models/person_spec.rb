@@ -440,6 +440,38 @@ describe Person do
 
   end
 
+  describe "staff_for_employers_including_pending", :dbclean => :after_all do
+   
+   before(:each) do
+    employer_profile = []
+    person = []
+   
+   3.times do
+      employer_profile << FactoryGirl.build(:employer_profile)
+   end
+
+   6.times do
+      person << FactoryGirl.build(:person)
+   end
+
+    FactoryGirl.create(:employer_staff_role, person: person[0], employer_profile_id: employer_profile[0].id, aasm_state: "is_applicant")
+    FactoryGirl.create(:employer_staff_role, person: person[1], employer_profile_id: employer_profile[0].id, aasm_state: "is_active")
+    FactoryGirl.create(:employer_staff_role, person: person[2], employer_profile_id: employer_profile[0].id, aasm_state: "is_closed")
+    FactoryGirl.create(:employer_staff_role, person: person[3], employer_profile_id: employer_profile[1].id, aasm_state: "is_applicant")
+    FactoryGirl.create(:employer_staff_role, person: person[4], employer_profile_id: employer_profile[1].id, aasm_state: "is_closed")
+    FactoryGirl.create(:employer_staff_role, person: person[5], employer_profile_id: employer_profile[2].id, aasm_state: "is_active")
+    
+    @employer_profile_ids = [employer_profile[0].id, employer_profile[1].id, employer_profile[2].id] 
+    @res = Person.staff_for_employers_including_pending(@employer_profile_ids)  
+   end
+   
+   it "Should give the correct count of staff members across multiple employers" do
+    expect(@res[@employer_profile_ids[0]].count).to eql 2
+    expect(@res[@employer_profile_ids[1]].count).to eql 1
+    expect(@res[@employer_profile_ids[2]].count).to eql 1
+   end
+  end
+
   describe "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
     include_context "BradyBunchAfterAll"
 
