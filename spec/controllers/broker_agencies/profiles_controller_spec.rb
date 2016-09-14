@@ -195,6 +195,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
+#### TODO remove after synching branches
    describe "get employers_api" do
     let(:broker_role) {FactoryGirl.build(:broker_role)}
     let(:person) {double("person", broker_role: broker_role)}
@@ -296,6 +297,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       allow_any_instance_of(PlanYear).to receive(:waived_count).and_call_original
     end
   end
+#### END TODO remove after synching branches
 
   describe "family_index" do
     before :all do
