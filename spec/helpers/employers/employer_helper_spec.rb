@@ -241,4 +241,3 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
     end
   end
 end
-

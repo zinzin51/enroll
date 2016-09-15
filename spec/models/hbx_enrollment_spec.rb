@@ -1721,4 +1721,3 @@ context "A cancelled external enrollment", :dbclean => :after_each do
     expect(family.enrollments_for_display.to_a).to eq([])
   end
 end
-

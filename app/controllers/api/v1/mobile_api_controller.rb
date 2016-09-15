@@ -51,7 +51,7 @@ module Api
         else
           broker_role = user.person.broker_role
           if broker_role
-            broker_agency_profile = broker_role.broker_agency_profile_id
+            broker_agency_profile = broker_role.broker_agency_profile
             employer_query = Organization.by_broker_role(broker_role.id) 
           end
         end

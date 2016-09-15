@@ -205,7 +205,6 @@ Rails.application.routes.draw do
         post 'match'
         get 'inbox'
       end
-      get :employer_details_api
       resources :plan_years do
         get 'reference_plans'
         get 'dental_reference_plans'
@@ -262,7 +261,6 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :employers
-        get :employers_api
         get :messages
         get :staff_index
         get :agency_messages
