@@ -274,7 +274,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
   fill_in 'census_employee[ssn]', :with => person[:ssn]
 
-  find(:xpath, '//label[@for="radio_male"]').click
+  find('label[for=census_employee_gender_male]').click
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
   find(:xpath, '//label[input[@name="census_employee[is_business_owner]"]]').click
 
@@ -354,7 +354,7 @@ When(/^(.*) creates an HBX account$/) do |named_person|
 
   person = people[named_person]
 
-  fill_in "user[email]", :with => person[:email]
+  fill_in "user[oim_id]", :with => person[:email]
   fill_in "user[password_confirmation]", :with => person[:password]
   fill_in "user[password]", :with => person[:password]
   screenshot("create_account")
@@ -408,15 +408,15 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # find('.interaction-click-control-close').click
   screenshot("after modal")
 
-  sleep 3
-  wait_for_ajax
+  expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
+  wait_for_ajax(3)
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
   # find("#person_addresses_attributes_0_address_1").trigger('click')
   # find("#person_addresses_attributes_0_address_2").trigger('click')
   # there is a flickering failure here due to over-lapping modals
   # find("#person_addresses_attributes_0_city").trigger('click')
   # find("#person_addresses_attributes_0_zip").trigger('click')
-  find_by_id("person_phones_attributes_0_full_phone_number")
+  find_by_id("person_phones_attributes_0_full_phone_number", wait: 10)
   fill_in "person[phones_attributes][0][full_phone_number]", :with => person[:home_phone]
 
   screenshot("personal_info_complete")
@@ -456,7 +456,7 @@ Then(/^.+ should see the new dependent form$/) do
   expect(page).to have_content('Confirm Member')
 end
 
-When(/^.+ enters? the dependent info of Sorens daughter$/) do 
+When(/^.+ enters? the dependent info of Sorens daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
@@ -666,7 +666,7 @@ end
 Then(/^I should see confirmation and continue$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
-  find(:xpath, '//*[@id="qle_message"]/div[1]/div[2]/input').click
+  click_button "Continue"
 end
 
 Then(/^I should see the dependents and group selection page$/) do
