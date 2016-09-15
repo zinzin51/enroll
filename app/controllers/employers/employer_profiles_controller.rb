@@ -262,10 +262,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
+#TODO REMOVE after synching branches
   def employer_details_api
     report_date = params[:report_date] || TimeKeeper.date_of_record.next_month   
     render json: Employers::EmployerHelper.marshall_employer_details_json(@employer_profile, report_date)
   end
+#END TODO REMOVE after synching branches
 
   private
 

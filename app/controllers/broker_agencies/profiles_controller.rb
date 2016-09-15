@@ -160,6 +160,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
+
+#TODO remove after synching branches
   def employers_api
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
       @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
@@ -181,6 +183,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       } 
     end                                          
   end
+#TODO end remove after synching branches
 
 
   def general_agency_index

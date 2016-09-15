@@ -41,7 +41,6 @@ module Api::V1::MobileApiHelper
     if include_details_url then
       summary[:employer_details_url] = Rails.application.routes.url_helpers.employers_employer_profile_employer_details_api_path(employer_profile.id)
     end
-    print "$$$$$$$$$ returning #{summary}\n$$$$$$$\n\n"
     summary
   end
 
@@ -65,7 +64,8 @@ module Api::V1::MobileApiHelper
 
   def get_benefit_group_assignments_for_plan_year(plan_year)
       #check if the plan year is in renewal without triggering an additional query
-      in_renewal = plan_year.is_renewing_published?
+      in_renewal = PlanYear::RENEWING_PUBLISHED_STATE.include?(plan_year.aasm_state)
+
       benefit_group_ids = plan_year.benefit_groups.map(&:id)
       employees = CensusMember.where({
         "benefit_group_assignments.benefit_group_id" => { "$in" => benefit_group_ids },
@@ -83,7 +83,7 @@ module Api::V1::MobileApiHelper
   def count_enrolled_and_waived_employees(plan_year)  
     if plan_year && plan_year.employer_profile.census_employees.count < 100 then
       assignments = get_benefit_group_assignments_for_plan_year(plan_year)
-      HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(assignments)
+      count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(assignments)
     end 
   end
   
@@ -100,9 +100,8 @@ module Api::V1::MobileApiHelper
   end
 
   def marshall_employer_summaries_json(employer_profiles, report_date) 
-    print "$$$$$$$ marshall_employer_summaries_json(#{employer_profiles}, #{report_date})$$$$\n\n"
     return [] if employer_profiles.blank?
-    all_staff_by_employer_id = Person.staff_for_employers_including_pending(employer_profiles.map(&:id))
+    all_staff_by_employer_id = staff_for_employers_including_pending(employer_profiles.map(&:id))
     employer_profiles.map do |er|  
         #print "$$$$ in map with #{er} \n\n" 
         offices = er.organization.office_locations.select { |loc| loc.primary_or_branch? }
@@ -133,6 +132,83 @@ module Api::V1::MobileApiHelper
                                    employee_contribution: employee_cost_total)
     else
       render_employer_details_json(employer_profile: employer_profile)
+    end
+  end
+
+  # returns a hash of arrays of staff members, keyed by employer id
+  def staff_for_employers_including_pending(employer_profile_ids)
+      
+      staff = Person.where(:employer_staff_roles => {
+        '$elemMatch' => {
+            employer_profile_id: {  "$in": employer_profile_ids },
+            :aasm_state.ne => :is_closed
+        }
+        })
+
+      result = {}
+      staff.each do |s| 
+        s.employer_staff_roles.each do |r|
+          if (!result[r.employer_profile_id]) then 
+            result[r.employer_profile_id] = [] 
+          end
+          result[r.employer_profile_id] <<= s  
+        end
+      end
+      result.compact
+  end
+
+   # A faster way of counting employees who are enrolled (not waived) 
+  # where enrolled + waived = counting towards SHOP minimum healthcare participation
+  # We first do the query to find families with appropriate enrollments,
+  # then check again inside the map/reduce to get only those enrollments.
+  # This avoids undercounting, e.g. two family members working for the same employer. 
+  #
+  def count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignments = [])
+    enrolled_or_renewal = HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
+    waived = HbxEnrollment::WAIVED_STATUSES
+
+    return [] if benefit_group_assignments.blank?
+    id_list = benefit_group_assignments.map(&:id) #.uniq
+    families = Family.where(:"households.hbx_enrollments".elem_match => { 
+      :"benefit_group_assignment_id".in => id_list, 
+      :aasm_state.in => enrolled_or_renewal + waived, 
+      :kind => "employer_sponsored", 
+      :coverage_kind => "health",
+      :is_active => true #???  
+    } )
+
+
+    map = %Q{ 
+      function() { 
+        var enrolled_or_renewal = #{enrolled_or_renewal};
+
+        for(var h = 0, len = this.households.length; h < len;  h++) { 
+          for (var e =0, len2 = this.households[h].hbx_enrollments.length; e < len2; e++) { 
+            var enrollment = this.households[h].hbx_enrollments[e];
+            if (enrollment.kind == "employer_sponsored" &&
+                enrollment.coverage_kind == "health" &&
+                enrollment.is_active) {
+                emit(enrollment.benefit_group_assignment_id, enrollment.aasm_state)
+            }
+          } 
+        }    
+      }
+    } 
+
+    #there should really only be one active shop health enrollment per benefit group assignment
+    #so we simply ignore collisons by taking the first one we find 
+    reduce = %Q{ 
+      function(key, values) { return values.length ? values[0] : null } 
+    }
+
+    items = families.map_reduce(map, reduce).out(inline: true)
+
+    [enrolled_or_renewal, waived].map do |statuses|
+        found_ids = items.map do |item| 
+                    item[:_id] if statuses.include? item[:value] 
+        end.compact
+
+        (found_ids & id_list).count
     end
   end
 
