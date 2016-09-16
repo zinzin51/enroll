@@ -15,8 +15,7 @@ class HandleCoverageTerminated
     end
 
     enrollment.hbx_enrollment_members.each do |hem|
-      hem.ivl_withdrawn
+      hem.ivl_withdrawn unless hem.any_other_active_enrollments?
     end
-
   end
 end

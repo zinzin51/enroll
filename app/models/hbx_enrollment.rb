@@ -1215,4 +1215,8 @@ class HbxEnrollment
       false
     end
   end
+
+  def any_other_active_enrollments?
+    household.hbx_enrollments.reject{ |enrollment| enrollment == self }.any?{ |enrollment| enrollment.is_active? }
+  end
 end
