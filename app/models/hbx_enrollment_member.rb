@@ -23,6 +23,7 @@ class HbxEnrollmentMember
 
   validate :end_date_gt_start_date
   delegate :ivl_coverage_selected, :ivl_withdrawn, to: :family_member
+  delegate :any_other_active_enrollments?, to: :hbx_enrollment
 
   def family
     hbx_enrollment.family if hbx_enrollment.present?

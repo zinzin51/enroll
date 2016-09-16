@@ -31,6 +31,8 @@ describe HandleCoverageTerminated do
       allow(benefit_group_assignment).to receive(:save)
       allow(hbx_enrollment).to receive(:terminated_on=)
       allow(hbx_enrollment).to receive(:should_transmit_update?).and_return true
+      allow(enrollment_member_1).to receive(:any_other_active_enrollments?)
+      allow(enrollment_member_2).to receive(:any_other_active_enrollments?)
     end
 
     it "has a successful result" do
