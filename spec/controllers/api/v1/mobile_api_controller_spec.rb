@@ -4,7 +4,7 @@ RSpec.describe Api::V1::MobileApiController do
 
  describe "get employers_list" do
     let!(:broker_role) {FactoryGirl.create(:broker_role)}
-    let(:person) {double("person", broker_role: broker_role)}
+    let(:person) {double("person", broker_role: broker_role, first_name: "Brunhilde")}
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
     let(:organization) {
       o = FactoryGirl.create(:employer)
@@ -60,31 +60,18 @@ RSpec.describe Api::V1::MobileApiController do
     end
     
     before(:each) do 
-     sign_in(user)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+      sign_in(user)
     end
 
     it "should get summaries for employers where broker_agency_account is active" do
-
-  #   allow_any_instance_of(PlanYear).to receive(:hbx_enrollments_by_month).and_return(
-  #     [
-  #       double("enrollment", coverage_kind: "health", 
-  #               subscriber: double("subscriber", applicant_id: 1) ),
-  #       double("enrollment", coverage_kind: "dental", 
-  #               subscriber: double("subscriber", applicant_id: 1) ),
-  #       double("enrollment", coverage_kind: "health", 
-  #               subscriber: double("subscriber", applicant_id: 2) ),
-  #       double("enrollment", coverage_kind: "health", 
-  #               subscriber: double("subscriber", applicant_id: 2) ),
-  #     ]
-  #   )
-  #   allow_any_instance_of(PlanYear).to receive(:waived_count).and_return(3)
       
       #TODO tests for open_enrollment_start_on, open_enrollment_end_on, start_on, is_renewing?, etc              
 
       staff.employer_staff_roles << FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
       staff2.employer_staff_roles << FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
-      allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
-      sign_in user
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       xhr :get, :employers_list, id: broker_agency_profile.id, format: :json
       expect(response).to have_http_status(:success), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
       details = assigns[:employer_details]
@@ -108,13 +95,23 @@ RSpec.describe Api::V1::MobileApiController do
       expect(office[:city]).to eq 'Washington'
       expect(office[:state]).to eq 'DC'
       expect(office[:zip]).to eq '20001'
+   
+      output = JSON.parse(response.body)
 
-      allow_any_instance_of(PlanYear).to receive(:hbx_enrollments_by_month).and_call_original
-      allow_any_instance_of(PlanYear).to receive(:waived_count).and_call_original
-    end
-
-    it "should be rendered correctly to JSON" do
-
+      expect(output["broker_name"]                  ).to eq("Brunhilde")
+      employer = output["broker_clients"][0]
+      expect(employer).not_to be(nil), "in #{output}"
+      expect(employer["employer_name"]                ).to eq(employer_profile.legal_name)
+      expect(employer["employees_total"]              ).to eq(employer_profile.roster_size)   
+      expect(employer["employees_enrolled"]           ).to be(nil)
+      expect(employer["employees_waived"]             ).to be(nil)
+      expect(employer["open_enrollment_begins"]       ).to be(nil)
+      expect(employer["open_enrollment_ends"]         ).to be(nil)
+      expect(employer["plan_year_begins"]             ).to be(nil)
+      expect(employer["renewal_in_progress"]          ).to be(nil)
+      expect(employer["renewal_application_available"]).to be(nil)
+      expect(employer["renewal_application_due"]      ).to be(nil)
+      expect(employer["employer_details_url"]         ).to end_with("mobile_api/employer_details/#{employer_profile.id}")
     end
   end
 

@@ -40,7 +40,7 @@ module Api::V1::MobileApiHelper
     end
     if include_details_url then
       summary[:employer_details_url] = Rails.application.routes.url_helpers.api_v1_mobile_api_employer_details_path(employer_profile.id)
-      summary[:employer_roster_url] = Rails.application.routes.url_helpers.api_v1_mobile_api_employee_roster_path(employer_profile.id)
+      summary[:employee_roster_url] = Rails.application.routes.url_helpers.api_v1_mobile_api_employee_roster_path(employer_profile.id)
     end
     summary
   end

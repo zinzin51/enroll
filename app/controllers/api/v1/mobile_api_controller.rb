@@ -5,12 +5,14 @@ module Api
       include MobileApiHelper
 
       def employers_list
-        employer_profiles, broker_agency_profile = self.class.fetch_employers_and_broker_agency(current_user, params[:id])
+        employer_profiles, broker_agency_profile, broker_name = self.class.fetch_employers_and_broker_agency(current_user, params[:id])
         if broker_agency_profile
           @employer_details =
                 marshall_employer_summaries_json(employer_profiles, params[:report_date])
           render json: {
+                 broker_name: broker_name,
                  broker_agency:  broker_agency_profile.legal_name,
+                 broker_agency_id:  broker_agency_profile.id,
                  broker_clients: @employer_details 
           } 
         else
@@ -42,6 +44,9 @@ module Api
 
       def self.fetch_employers_and_broker_agency(user, submitted_id)
         #print ("$$$$ fetch_employers_and_broker_agency(#{user}, #{submitted_id})\n")
+         broker_role = user.person.broker_role
+         broker_name = user.person.first_name if broker_role 
+
         if submitted_id && (user.has_broker_agency_staff_role? || user.has_hbx_staff_role?)
           broker_agency_profile = BrokerAgencyProfile.find(submitted_id)
           employer_query = Organization.by_broker_agency_profile(broker_agency_profile._id) if broker_agency_profile
@@ -49,14 +54,13 @@ module Api
 #@broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
 
         else
-          broker_role = user.person.broker_role
           if broker_role
-            broker_agency_profile = broker_role.broker_agency_profile
+            broker_agency_profile = broker_role.broker_agency_profile 
             employer_query = Organization.by_broker_role(broker_role.id) 
           end
         end
         employer_profiles = (employer_query || []).map {|o| o.employer_profile}  
-        [employer_profiles, broker_agency_profile] if employer_query
+        [employer_profiles, broker_agency_profile, broker_name] if employer_query
       end
       
     end
