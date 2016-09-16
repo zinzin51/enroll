@@ -173,7 +173,7 @@ RSpec.describe Api::V1::MobileApiHelper, type: :helper, dbclean: :after_each do
   
       it "should count enrollement for one waived in the same family" do 
           benefit_group_assignment = [@mikes_benefit_group_assignments]
-          expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(  benefit_group_assignment)).to eq [0, 1]
+          expect(count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(  benefit_group_assignment)).to eq [0, 1]
       end
      end
   

@@ -327,7 +327,7 @@ Rails.application.routes.draw do
       end
       namespace :mobile_api do
         get :employers_list
-        get :employer_details
+        get 'employer_details/:employer_profile_id', to: :employer_details, as: :employer_details
         get :employee_roster
       end
     end

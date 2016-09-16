@@ -59,21 +59,25 @@ RSpec.describe Api::V1::MobileApiController do
       e
     end
     
-    it "should get details for employers where broker_agency_account is active" do
+    before(:each) do 
+     sign_in(user)
+    end
 
-      allow_any_instance_of(PlanYear).to receive(:hbx_enrollments_by_month).and_return(
-        [
-          double("enrollment", coverage_kind: "health", 
-                  subscriber: double("subscriber", applicant_id: 1) ),
-          double("enrollment", coverage_kind: "dental", 
-                  subscriber: double("subscriber", applicant_id: 1) ),
-          double("enrollment", coverage_kind: "health", 
-                  subscriber: double("subscriber", applicant_id: 2) ),
-          double("enrollment", coverage_kind: "health", 
-                  subscriber: double("subscriber", applicant_id: 2) ),
-        ]
-      )
-      allow_any_instance_of(PlanYear).to receive(:waived_count).and_return(3)
+    it "should get summaries for employers where broker_agency_account is active" do
+
+  #   allow_any_instance_of(PlanYear).to receive(:hbx_enrollments_by_month).and_return(
+  #     [
+  #       double("enrollment", coverage_kind: "health", 
+  #               subscriber: double("subscriber", applicant_id: 1) ),
+  #       double("enrollment", coverage_kind: "dental", 
+  #               subscriber: double("subscriber", applicant_id: 1) ),
+  #       double("enrollment", coverage_kind: "health", 
+  #               subscriber: double("subscriber", applicant_id: 2) ),
+  #       double("enrollment", coverage_kind: "health", 
+  #               subscriber: double("subscriber", applicant_id: 2) ),
+  #     ]
+  #   )
+  #   allow_any_instance_of(PlanYear).to receive(:waived_count).and_return(3)
       
       #TODO tests for open_enrollment_start_on, open_enrollment_end_on, start_on, is_renewing?, etc              
 
@@ -108,50 +112,51 @@ RSpec.describe Api::V1::MobileApiController do
       allow_any_instance_of(PlanYear).to receive(:hbx_enrollments_by_month).and_call_original
       allow_any_instance_of(PlanYear).to receive(:waived_count).and_call_original
     end
+
+    it "should be rendered correctly to JSON" do
+
+    end
   end
 
-describe "GET employer_details" do
-    
- let(:user) { double("user", :person => person) }
-    let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
-    let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
-    let(:employer_profile) { plan_year.employer_profile}
+describe "GET employer_details" do  
+  let(:user) { double("user", :person => person) }
+  let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
+  let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
+  let(:plan_year) { FactoryGirl.create(:plan_year) }
+  let(:employer_profile) { plan_year.employer_profile}
 
-    
-    before(:each) do 
-     sign_in(user)
-    end
+  before(:each) do 
+   sign_in(user)
+  end
 
-      it "should render 200 with valid ID" do
-      get :employer_details, {employer_profile_id: employer_profile.id.to_s}
-      expect(response).to have_http_status(200), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
-	  expect(response.content_type).to eq "application/json"
-      end
-    
-      it "should render 404 with Invalid ID" do
-      get :employer_details, {employer_profile_id: "Invalid Id"}
-      expect(response).to have_http_status(404), "expected status 404, got #{response.status}: \n----\n#{response.body}\n\n"
-      end
+  it "should render 200 with valid ID" do
+    get :employer_details, {employer_profile_id: employer_profile.id.to_s}
+    expect(response).to have_http_status(200), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
+   expect(response.content_type).to eq "application/json"
+  end
 
-      it "should match with the expected result set" do
-      get :employer_details, {employer_profile_id: employer_profile.id.to_s}
-      output = JSON.parse(response.body)
-      puts "#{employer_profile.inspect}"
-      expect(output["employer_name"]).to eq(employer_profile.legal_name)
-      expect(output["employees_total"]).to eq(employer_profile.roster_size)
-      expect(output["active_general_agency"]).to eq(employer_profile.active_general_agency_legal_name)
+  it "should render 404 with Invalid ID" do
+    get :employer_details, {employer_profile_id: "Invalid Id"}
+    expect(response).to have_http_status(404), "expected status 404, got #{response.status}: \n----\n#{response.body}\n\n"
+  end
 
-      if employer_profile.show_plan_year
+  it "should match with the expected result set" do
+    get :employer_details, {employer_profile_id: employer_profile.id.to_s}
+    output = JSON.parse(response.body)
+    puts "#{employer_profile.inspect}"
+    expect(output["employer_name"]).to eq(employer_profile.legal_name)
+    expect(output["employees_total"]).to eq(employer_profile.roster_size)
+    expect(output["active_general_agency"]).to eq(employer_profile.active_general_agency_legal_name)
+
+    if employer_profile.show_plan_year
       expect(output["employees_waived"]).to eq(employer_profile.show_plan_year.waived_count)
-      expect(output["open_enrollment_begins"]).to eq(employer_profile.show_plan_year.open_enrollment_start_on) 
+      expect(output["open_enrollment_begins"]).to eq(employer_profile.show_plan_year.open_enrollment_start_on)
       expect(output["open_enrollment_ends"]).to eq(employer_profile.show_plan_year.open_enrollment_end_on) 
       expect(output["plan_year_begins"]).to eq(employer_profile.show_plan_year.start_on) 
       expect(output["renewal_in_progress"]).to eq(employer_profile.show_plan_year.is_renewing?) 
       expect(output["renewal_application_due"]).to eq(employer_profile.show_plan_year.due_date_for_publish) 
-      expect(output["minimum_participation_required"]).to eq(employer_profile.show_plan_year.minimum_enrolled_count) 
-      end
-      end
+      expect(output["minimum_participation_required"]).to eq(employer_profile.show_plan_year. minimum_enrolled_count) 
+    end
   end
-
+ end
 end

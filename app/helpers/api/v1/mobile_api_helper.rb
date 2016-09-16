@@ -39,7 +39,8 @@ module Api::V1::MobileApiHelper
       summary[:contact_info] = render_employee_contacts_json(staff || [], offices || [])
     end
     if include_details_url then
-      summary[:employer_details_url] = Rails.application.routes.url_helpers.employers_employer_profile_employer_details_api_path(employer_profile.id)
+      summary[:employer_details_url] = Rails.application.routes.url_helpers.api_v1_mobile_api_employer_details_path(employer_profile.id)
+      summary[:employer_roster_url] = Rails.application.routes.url_helpers.api_v1_mobile_api_employee_roster_path(employer_profile.id)
     end
     summary
   end
