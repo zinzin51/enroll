@@ -10,12 +10,15 @@ class CoverageHouseholdMember
   field :family_member_id, type: BSON::ObjectId
   field :is_subscriber, type: Boolean, default: false
   field :aasm_state
+  field :verification_init, type: DateTime, default: DateTime.now
 
   # def save_parent
   #   coverage_household.save
   # end
 
   include BelongsToFamilyMember
+
+  scope :unverified, -> { where(:verification_init.ne => nil ).or({ :aasm_state => "ineligible" },{ :aasm_state => "contingent" }).order(verification_init: :desc)}
 
   aasm do
     state :applicant, initial: true

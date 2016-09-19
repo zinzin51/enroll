@@ -144,4 +144,34 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   #     expect(subject.enrolled_hbx_enrollments).to eq hbx_enrollments
   #   end
   # end
+
+  context "#verification_due_date" do
+    describe "with special verification period for household" do
+      before do
+        subject.special_verification_period = Date.today
+      end
+      it "returns special_verification_period" do
+        expect(subject.verification_due_date).to eq(Date.today)
+      end
+    end
+
+    describe "without special verificatin period" do
+      context "coverage household with NO unverified members" do
+        it "returns 95 days period from current day" do
+          expect(subject.verification_due_date).to eq(Date.today+95.days)
+        end
+      end
+      context "coverage household with NO unverified members" do
+        before do
+          subject.coverage_households.first.coverage_household_members.each do |member|
+            member.aasm_state="ineligible"
+            member.verification_init=Date.today - 20.days
+          end
+        end
+        it "returns 95 days period from current day if no unverified members" do
+          expect(subject.verification_due_date).to eq(Date.today + 75.days)
+        end
+      end
+    end
+  end
 end

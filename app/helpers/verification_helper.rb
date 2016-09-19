@@ -58,13 +58,7 @@ module VerificationHelper
 
   def verification_due_date(family)
     if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
-        family.active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
-      else
-        family.active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
-      end
-    else
-      TimeKeeper.date_of_record.to_date + 95.days
+      family.active_household.verification_due_date
     end
   end
 

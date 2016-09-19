@@ -16,6 +16,7 @@ class Household
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
   field :is_active, type: Boolean, default: true
+  field :special_verification_period, type: DateTime
 
   embeds_many :hbx_enrollments
   embeds_many :tax_households
@@ -291,4 +292,17 @@ class Household
   def hbx_enrollments_with_aptc_by_year(year)
     hbx_enrollments.active.enrolled.with_aptc.by_year(year).where(changing: false).entries
   end
+
+  def verification_due_date
+    if special_verification_period
+      special_verification_period.to_date
+    else
+      if coverage_households.first.coverage_household_members.unverified.any?
+        coverage_households.first.coverage_household_members.unverified.first.verification_init + 95.days
+      else
+        Date.today + 95.days
+      end
+    end
+  end
+
 end

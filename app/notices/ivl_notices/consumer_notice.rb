@@ -45,7 +45,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     # people.reject!{|person| person.consumer_role.blank? || person.consumer_role.outstanding_verification_types.compact.blank? }
 
     enrollments = @family.enrollments.select{|e| e.currently_active? || e.future_active?}
-    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
+    enrollments.each {|e| e.household.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
   
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
@@ -78,7 +78,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     # Re-enable this condition after done with initial verification notifications
     # ((enrollment.submitted_at.present? ? enrollment.submitted_at : enrollment.created_at) + 95.days)
 
-    @notice.due_date = enrollment.special_verification_period.strftime("%m/%d/%Y")
+    @notice.due_date = enrollment.household.special_verification_period.strftime("%m/%d/%Y")
   end
 
   def verification_type_outstanding?(person, verification_type)
