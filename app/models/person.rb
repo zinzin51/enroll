@@ -635,29 +635,6 @@ class Person
         })
     end
 
-    # returns a hash of arrays of staff members, keyed by employer id
-    def staff_for_employers_including_pending(employer_profile_ids)
-      start = Time.now #
-
-      staff = self.where(:employer_staff_roles => {
-        '$elemMatch' => {
-            employer_profile_id: {  "$in": employer_profile_ids },
-            :aasm_state.ne => :is_closed
-        }
-        })
-
-      result = {}
-      staff.each do |s| 
-        s.employer_staff_roles.each do |r|
-          if (!result[r.employer_profile_id]) then 
-            result[r.employer_profile_id] = [] 
-          end
-          result[r.employer_profile_id] <<= s  
-        end
-      end
-      result.compact
-    end
-
     # Adds employer staff role to person
     # Returns status and message if failed
     # Returns status and person if successful
