@@ -205,7 +205,6 @@ Rails.application.routes.draw do
         post 'match'
         get 'inbox'
       end
-      get 'employee_roster_api', to: :employee_roster_api
       resources :plan_years do
         get 'reference_plans'
         get 'dental_reference_plans'
