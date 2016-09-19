@@ -20,8 +20,8 @@ def set_date
     begin
       enrollments = family.enrollments.select{|e| e.currently_active? || e.future_active?}
       enrollments.each do |enrollment|
-        enrollment.special_verification_period = Date.new(2016, 9, 11)
-        enrollment.save
+        enrollment.household.special_verification_period = Date.new(2016, 9, 11)
+        enrollment.save!
       end
     rescue => e
       problem_counter +=1

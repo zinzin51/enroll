@@ -39,11 +39,11 @@ class IvlNotices::ConsumerNotice < IvlNotice
     if enrollments.empty?
       raise 'enrollments not found!'
     end
-  
+    enrollments = @family.enrollments.select{|e| e.currently_active? || e.future_active?}
+    enrollments.each {|e| e.household.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
     end.uniq
-
     people = family_members.map(&:person).uniq
     people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
     people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
@@ -64,10 +64,20 @@ class IvlNotices::ConsumerNotice < IvlNotice
     end
 
     enrollments.each {|e| e.update_attributes(special_verification_period: Date.today + 95.days)}
-
     append_unverified_individuals(outstanding_people)
     notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
     notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
+    @notice.due_date = enrollment.household.special_verification_period.strftime("%m/%d/%Y")
+  end
+
+  def verification_type_outstanding?(person, verification_type)
+    verification_pending = false
+    if person.verification_types.include?(verification_type)
+      if person.consumer_role.is_type_outstanding?(verification_type)
+        verification_pending = true
+      end
+    end
+    verification_pending
   end
 
   def ssn_outstanding?(person)

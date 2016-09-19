@@ -1925,53 +1925,53 @@ context '.process_verification_reminders' do
       consumer_role.update_attributes(:aasm_state => 'verification_outstanding')
     end
 
-    context 'when first verification due date reached' do
-      before do
-        hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now)
-      end
-
-      it 'should trigger first reminder event' do
-        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
-        consumer_role.reload
-        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
-      end
-    end
-
-    context 'when second verification due date reached' do
-      before do
-        hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now)
-      end
-
-      it 'should trigger second reminder event' do
-        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
-        consumer_role.reload
-        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
-      end
-    end
-
-    context 'when third verification due date reached' do
-      before do
-        hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now)
-      end
-
-      it 'should trigger third reminder event' do
-        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
-        consumer_role.reload
-        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
-      end
-    end
-
-    context 'when fourth verification due date reached' do
-      before do
-        hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now)
-      end
-
-      it 'should trigger fourth reminder event' do
-        HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
-        consumer_role.reload
-        expect(consumer_role.workflow_state_transitions.present?).to be_truthy
-      end
-    end
+    # context 'when first verification due date reached' do
+    #   before do
+    #     hbx_enrollment.update_attributes(special_verification_period: 85.days.from_now)
+    #   end
+    #
+    #   it 'should trigger first reminder event' do
+    #     HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+    #     consumer_role.reload
+    #     expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+    #   end
+    # end
+    #
+    # context 'when second verification due date reached' do
+    #   before do
+    #     hbx_enrollment.update_attributes(special_verification_period: 70.days.from_now)
+    #   end
+    #
+    #   it 'should trigger second reminder event' do
+    #     HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+    #     consumer_role.reload
+    #     expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+    #   end
+    # end
+    #
+    # context 'when third verification due date reached' do
+    #   before do
+    #     hbx_enrollment.update_attributes(special_verification_period: 45.days.from_now)
+    #   end
+    #
+    #   it 'should trigger third reminder event' do
+    #     HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+    #     consumer_role.reload
+    #     expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+    #   end
+    # end
+    #
+    # context 'when fourth verification due date reached' do
+    #   before do
+    #     hbx_enrollment.update_attributes(special_verification_period: 30.days.from_now)
+    #   end
+    #
+    #   it 'should trigger fourth reminder event' do
+    #     HbxEnrollment.process_verification_reminders(TimeKeeper.date_of_record)
+    #     consumer_role.reload
+    #     expect(consumer_role.workflow_state_transitions.present?).to be_truthy
+    #   end
+    # end
   end
 end
 

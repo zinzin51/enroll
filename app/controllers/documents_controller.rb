@@ -56,11 +56,11 @@ class DocumentsController < ApplicationController
 
   def enrollment_verification
      family = @person.primary_family
-     if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).any?
+     if family.try(:active_household).try(:hbx_enrollments) &&  family.active_household.hbx_enrollments.verification_needed.any?
        family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
          enrollment.evaluate_individual_market_eligiblity
+         family.save!
        end
-       family.save!
        respond_to do |format|
          format.html {
            flash[:success] = "Enrollment group was completely verified."
@@ -109,14 +109,14 @@ class DocumentsController < ApplicationController
 
   def extend_due_date
     family = Family.find(params[:family_id])
-      if family.any_unverified_enrollments?
-        if family.enrollments.verification_needed.first.special_verification_period
-          new_date = family.enrollments.verification_needed.first.special_verification_period += 30.days
-          family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => new_date)
+      if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
+        if family.active_household.special_verification_period
+          family.active_household.special_verification_period += 30.days
+          family.save!
           flash[:success] = "Special verification period was extended for 30 days."
         else
-          family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => TimeKeeper.date_of_record + 30.days)
-          flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{family.active_household.hbx_enrollments.verification_needed.first.special_verification_period}"
+          family.active_household.update_attributes(:special_verification_period => TimeKeeper.date_of_record + 30.days)
+          flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{family.active_household.special_verification_period}"
         end
       else
         flash[:danger] = "Family does not have any active Enrollment to extend verification due date."
