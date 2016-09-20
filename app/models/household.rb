@@ -298,7 +298,7 @@ class Household
       special_verification_period.to_date
     else
       if coverage_households.first.coverage_household_members.unverified.any?
-        coverage_households.first.coverage_household_members.unverified.first.verification_init + 95.days
+        coverage_households.first.coverage_household_members.unverified.first.ivl_verification_init + 95.days
       else
         Date.today + 95.days
       end

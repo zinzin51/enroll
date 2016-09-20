@@ -165,7 +165,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
         before do
           subject.coverage_households.first.coverage_household_members.each do |member|
             member.aasm_state="ineligible"
-            member.verification_init=Date.today - 20.days
+            member.ivl_verification_init=Date.today - 20.days
           end
         end
         it "returns 95 days period from current day if no unverified members" do

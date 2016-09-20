@@ -18,6 +18,7 @@ describe CoverageHouseholdMember do
 
       it "records transition with callback" do
         expect(coverage_household_member).to receive(:record_transition)
+        expect(coverage_household_member).to receive(:init_verification_timer)
         coverage_household_member.move_to_contingent!
       end
     end
@@ -60,6 +61,7 @@ describe CoverageHouseholdMember do
 
       it "records transition with callback" do
         expect(coverage_household_member).to receive(:record_transition)
+        expect(coverage_household_member).to receive(:init_verification_timer)
         coverage_household_member.move_to_ineligible!
       end
     end

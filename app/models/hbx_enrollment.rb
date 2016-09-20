@@ -101,6 +101,7 @@ class HbxEnrollment
   field :published_to_bus_at, type: DateTime
   field :review_status, type: String, default: "incomplete"
   field :termination_submitted_on, type: DateTime
+  field :special_verification_period, type: DateTime #needs only for datafix script, can be removed after datamigration
 
 
   # An external enrollment is one which we keep for recording purposes,

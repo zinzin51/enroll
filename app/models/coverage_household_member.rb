@@ -10,7 +10,7 @@ class CoverageHouseholdMember
   field :family_member_id, type: BSON::ObjectId
   field :is_subscriber, type: Boolean, default: false
   field :aasm_state
-  field :verification_init, type: DateTime, default: DateTime.now
+  field :ivl_verification_init, type: DateTime
 
   # def save_parent
   #   coverage_household.save
@@ -18,7 +18,7 @@ class CoverageHouseholdMember
 
   include BelongsToFamilyMember
 
-  scope :unverified, -> { where(:verification_init.ne => nil ).or({ :aasm_state => "ineligible" },{ :aasm_state => "contingent" }).order(verification_init: :desc)}
+  scope :unverified, -> { where(:ivl_verification_init.ne => nil ).or({ :aasm_state => "ineligible" },{ :aasm_state => "contingent" }).order(ivl_verification_init: :desc)}
 
   aasm do
     state :applicant, initial: true
@@ -27,7 +27,7 @@ class CoverageHouseholdMember
     state :eligible
 
 
-    event :move_to_contingent, :after => :record_transition do
+    event :move_to_contingent, :after => [:record_transition, :init_verification_timer] do
       transitions from: :applicant, to: :contingent
       transitions from: :contingent, to: :contingent
     end
@@ -39,7 +39,7 @@ class CoverageHouseholdMember
       transitions from: :eligible, to: :eligible
     end
 
-    event :move_to_ineligible, :after => :record_transition do
+    event :move_to_ineligible, :after => [:record_transition, :init_verification_timer] do
       transitions from: :applicant, to: :ineligible
       transitions from: :contingent, to: :ineligible
       transitions from: :ineligible, to: :ineligible
@@ -101,5 +101,10 @@ class CoverageHouseholdMember
         from_state: aasm.from_state,
         to_state: aasm.to_state
     )
+  end
+
+  def init_verification_timer
+    verif_date = self.ivl_verification_init || DateTime.now
+    self.update_attributes!(:ivl_verification_init => verif_date)
   end
 end
