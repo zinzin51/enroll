@@ -5,7 +5,7 @@ module Api
       include MobileApiHelper
 
       def employers_list
-        employer_profiles, broker_agency_profile, broker_name = self.class.fetch_employers_and_broker_agency(current_user, params[:id])
+        employer_profiles, broker_agency_profile, broker_name = fetch_employers_and_broker_agency(current_user, params[:id])
         if broker_agency_profile
           @employer_details =
                 marshall_employer_summaries_json(employer_profiles, params[:report_date])
@@ -23,9 +23,7 @@ module Api
       end
 
       def employer_details
-        id_params = params.permit(:id, :employer_profile_id, :report_date)
-        id = id_params[:id] || id_params[:employer_profile_id]  #TODO user check
-        employer_profile = EmployerProfile.find(id)
+        employer_profile = fetch_employer_profile
         #print "$$$$$ got ep #{employer_profile} : blank=#{employer_profile.blank?} from id #{id}\n\n"
         if employer_profile.blank?
           render json: { file: 'public/404.html'}, status: :not_found 
@@ -36,33 +34,26 @@ module Api
           render json: { error: e.message }, :status => :internal_server_error
       end
 
+      def fetch_employer_profile
+        id_params = params.permit(:id, :employer_profile_id, :report_date)
+        id = id_params[:id] || id_params[:employer_profile_id]  #TODO user check
+        EmployerProfile.find(id)
+      end
+
       def employee_roster
-        render json: {}, :status => :no_content #TODO next release
+        employer_profile = fetch_employer_profile
+        has_renewal = employer_profile.renewing_published_plan_year.present? 
+        census_employees = employees_by(employer_profile, params[:employee_name], params[:status])  
+        total_num_employees = census_employees.count
+        census_employees = census_employees.limit(50).to_a #TODO: smaller limits, & paging past 50
+
+        render json: { 
+          employer_name: employer_profile.legal_name,
+          total_num_employees: total_num_employees,
+          roster: render_roster_employees(census_employees, has_renewal)
+        }
       end
 
-      private
-
-      def self.fetch_employers_and_broker_agency(user, submitted_id)
-        #print ("$$$$ fetch_employers_and_broker_agency(#{user}, #{submitted_id})\n")
-         broker_role = user.person.broker_role
-         broker_name = user.person.first_name if broker_role 
-
-        if submitted_id && (user.has_broker_agency_staff_role? || user.has_hbx_staff_role?)
-          broker_agency_profile = BrokerAgencyProfile.find(submitted_id)
-          employer_query = Organization.by_broker_agency_profile(broker_agency_profile._id) if broker_agency_profile
-#TODO fix security hole
-#@broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
-
-        else
-          if broker_role
-            broker_agency_profile = broker_role.broker_agency_profile 
-            employer_query = Organization.by_broker_role(broker_role.id) 
-          end
-        end
-        employer_profiles = (employer_query || []).map {|o| o.employer_profile}  
-        [employer_profiles, broker_agency_profile, broker_name] if employer_query
-      end
-      
     end
   end
 end
