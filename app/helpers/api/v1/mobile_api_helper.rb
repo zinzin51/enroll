@@ -80,7 +80,7 @@ module Api::V1::MobileApiHelper
   end
 
   # alternative, faster way to calcuate total_enrolled_count 
-  # returns a list of number enrolled (actually enrolled, not waived)
+  # returns a list of number enrolled (actually enrolled, not waived) and waived
   def count_enrolled_and_waived_employees(plan_year)  
     if plan_year && plan_year.employer_profile.census_employees.count < 100 then
       assignments = get_benefit_group_assignments_for_plan_year(plan_year)
@@ -158,7 +158,14 @@ module Api::V1::MobileApiHelper
       result.compact
   end
 
-   # A faster way of counting employees who are enrolled (not waived) 
+
+  def benefit_group_ids_of_enrollments_in_status(enrollments, status_list)
+    enrollments.select do |enrollment| 
+      status_list.include? (enrollment.aasm_state) 
+    end.map(&:benefit_group_assignment_id)
+  end
+
+  # A faster way of counting employees who are enrolled (not waived) 
   # where enrolled + waived = counting towards SHOP minimum healthcare participation
   # We first do the query to find families with appropriate enrollments,
   # then check again inside the map/reduce to get only those enrollments.
@@ -178,39 +185,18 @@ module Api::V1::MobileApiHelper
       :is_active => true #???  
     } )
 
-
-    map = %Q{ 
-      function() { 
-        var enrolled_or_renewal = #{enrolled_or_renewal};
-
-        for(var h = 0, len = this.households.length; h < len;  h++) { 
-          for (var e =0, len2 = this.households[h].hbx_enrollments.length; e < len2; e++) { 
-            var enrollment = this.households[h].hbx_enrollments[e];
-            if (enrollment.kind == "employer_sponsored" &&
-                enrollment.coverage_kind == "health" &&
-                enrollment.is_active) {
-                emit(enrollment.benefit_group_assignment_id, enrollment.aasm_state)
-            }
-          } 
-        }    
-      }
-    } 
-
-    #there should really only be one active shop health enrollment per benefit group assignment
-    #so we simply ignore collisons by taking the first one we find 
-    reduce = %Q{ 
-      function(key, values) { return values.length ? values[0] : null } 
-    }
-
-    items = families.map_reduce(map, reduce).out(inline: true)
-
-    [enrolled_or_renewal, waived].map do |statuses|
-        found_ids = items.map do |item| 
-                    item[:_id] if statuses.include? item[:value] 
-        end.compact
-
-        (found_ids & id_list).count
+    all_enrollments =  families.map { |f| f.households.map {|h| h.hbx_enrollments} }.flatten.compact
+    relevant_enrollments = all_enrollments.select do |enrollment|
+      enrollment.kind == "employer_sponsored" &&
+      enrollment.coverage_kind == "health" &&
+      enrollment.is_active
     end
+
+    enrolled_ids = benefit_group_ids_of_enrollments_in_status(relevant_enrollments, enrolled_or_renewal)
+    waived_ids = benefit_group_ids_of_enrollments_in_status(relevant_enrollments, waived)
+
+    #return count of enrolled, count of waived -- only including those originally asked for
+    [enrolled_ids, waived_ids].map { |found_ids| (found_ids & id_list).count }
   end
 
   def employees_by(employer_profile, by_employee_name = nil, by_status = 'active')
