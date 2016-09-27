@@ -139,6 +139,14 @@ RSpec.describe Api::V1::MobileApiHelper, type: :helper, dbclean: :after_each do
       # -> [1, 0]
   end
 
+  context "get_benefit_group_assignments_for_plan_year" do
+      it "should get the correct benefit group assignments for the businesses" do
+        expect(get_benefit_group_assignments_for_plan_year(plan_year_cafe)).to eq [   benefit_group_assignment_barista, benefit_group_assignment_manager, benefit_group_assignment_janitor ]
+  
+        expect(get_benefit_group_assignments_for_plan_year(plan_year_salon)).to eq [    benefit_group_assignment_hairdresser]      
+      end
+     end
+
   context "should count enrollment for two people in different households in the same family" do
      include_context "BradyWorkAfterAll"
   
@@ -175,15 +183,213 @@ RSpec.describe Api::V1::MobileApiHelper, type: :helper, dbclean: :after_each do
           benefit_group_assignment = [@mikes_benefit_group_assignments]
           expect(count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(  benefit_group_assignment)).to eq [0, 1]
       end
-     end
+
+      it "people with shopped-for-but-not-bought or terminated policies" do 
+      @enrollment1.aasm_state = "shopped"
+      @enrollment1.save
+      @enrollment2.aasm_state = "terminated"
+      @enrollment2.save
+        benefit_group_assignment = [@mikes_benefit_group_assignments]
+        expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 0]
+    end
+
+
+
+  end
+
+
+
+#############****************################
+
+context "2 waived in the same family" do
+
+  before :all do
+    create_brady_census_families
+  end
+
+
+    attr_reader :enrollment, :household, :mikes_coverage_household, :carols_coverage_household, :coverage_household
+    before(:all) do
+
+      @household = mikes_family.households.first
+      @coverage_household1 = household.coverage_households[0]
+      @coverage_household2= household.coverage_households[1]
+      puts "*********#{@coverage_household2.inspect}********"
+
+        @enrollment1 = household.create_hbx_enrollment_from(
+          employee_role: mikes_employee_role,
+          coverage_household: @coverage_household1,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
+        )
+        @enrollment1.save
+       @enrollment1.waive_coverage_by_benefit_group_assignment("inactive")
+         @enrollment1.reload
+        @enrollment2 = household.create_hbx_enrollment_from(
+          employee_role: mikes_employee_role,
+          coverage_household: @coverage_household2,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @carols_benefit_group_assignments
+        )
+        @enrollment2.save
+          @enrollment2.waive_coverage_by_benefit_group_assignment("inactive")
+          @enrollment2.reload                                                     
+
+        puts "enrollment count: #{household.hbx_enrollments.count}"
+        puts "count is :       *********#{[@mikes_benefit_group_assignments, @carols_benefit_group_assignments].count}********"
+    end
+    
+
+    it "should count enrollement for two waived in the same family" do 
+         benefit_group_assignment = [@mikes_benefit_group_assignments, @carols_benefit_group_assignments]
+         expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 2]
+    end
+
+end
+
+# context "should count enrollment for two people in different households in the same family" do
+#    include_context "BradyWorkAfterAll"
+
+#   before :all do
+
+  # create_brady_work_organizations
+  # @mikes_employer = FactoryGirl.create(:employer_profile, organization: mikes_organization)
+  # @carols_employer = FactoryGirl.create(:employer_profile)
+
+  # create_brady_coverage_households
+  #     create_brady_employers
+  #     @mikes_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
+  #     @mikes_plan_year = FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])
+  #     @mikes_hired_on = 1.year.ago.beginning_of_year.to_date
+  #     @mikes_benefit_group_assignments = FactoryGirl.create(:benefit_group_assignment,
+  #                                                          benefit_group_id: @mikes_benefit_group.id,
+  #                                                          start_on: @mikes_plan_year.start_on,
+  #                                                          aasm_state: "initialized"
+  #                                                          )
+  #     @mikes_census_employee = FactoryGirl.create(:census_employee,
+  #                                                  first_name: mike.first_name,  last_name: mike.last_name,
+  #                                                  dob: mike.dob, address: mike.addresses.first, hired_on: mikes_hired_on,
+  #                                                  employer_profile_id: @mikes_employer.id,
+  #                                                  benefit_group_assignments: [@mikes_benefit_group_assignments]
+  #                                                 )
+  #     @carols_hired_on = 1.year.ago.beginning_of_year.to_date
+  #     @carols_benefit_group = FactoryGirl.create(:benefit_group, plan_year: nil)
+  #     @carols_plan_year = FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])
+  #     @carols_benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment,
+  #                                                          benefit_group_id: @carols_benefit_group.id,
+  #                                                          start_on: @carols_plan_year.start_on,
+  #                                                          aasm_state: "initialized"
+  #                                                          )
+  #     @carols_census_employee = FactoryGirl.create(:census_employee,
+  #                                                   first_name: carol.first_name,  last_name: carol.last_name,
+  #                                                   dob: carol.dob, address: carol.addresses.first, hired_on: carols_hired_on,
+  #                                                   employer_profile_id: @carols_employer.id,
+  #                                                   benefit_group_assignments: [@carols_benefit_group_assignments]
+  #                                                  )
+
+  #     @mikes_benefit_group.save
+  #     create_brady_employee_roles
+
+
+
+#   @household = mikes_family.households.first
+#       @coverage_household = @household.coverage_households.first
+
+#         @enrollment1 = @household.create_hbx_enrollment_from(
+#           employee_role: mikes_employee_role,
+#           coverage_household: @coverage_household,
+#           benefit_group: mikes_benefit_group,
+#           benefit_group_assignment: @mikes_benefit_group_assignments
+#         )
+#         @enrollment1.save
+#         @enrollment2 = @household.create_hbx_enrollment_from(
+#           employee_role: mikes_employee_role,
+#           coverage_household: @coverage_household,
+#           benefit_group: mikes_benefit_group,
+#           benefit_group_assignment: @mikes_benefit_group_assignments
+#         )
+#         @enrollment2.save
+
+# end    
+
+#     it "should count enrollement for one waived in the same family" do 
+#         benefit_group_assignment = [@mikes_benefit_group_assignments]
+#         expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 1]
+#     end
+
+
+# end
+# end
+
+
+# TODO not enrolled this year but already enrolled for next year (2 plan years for same employer)
+       # -> [1,0] if looking at next year
+
+context "not enrolled this year but already enrolled for next year" do
+
+let!(:employer_profile)      { FactoryGirl.create(:employer_profile) }
+    
+    let!(:current_calender_year)              { TimeKeeper.date_of_record.year } 
+    let!(:middle_of_prev_year)                { Date.new(current_calender_year - 1, 6, 10) }
+    let!(:current_plan_year_start_on)         { Date.new(current_calender_year, 1, 1) }
+    let!(:current_plan_year_end_on)           { Date.new(current_calender_year, 12, 31) }
+    let!(:current_open_enrollment_start_on)   { Date.new(current_calender_year - 1, 12, 1) }
+    let!(:current_open_enrollment_end_on)     { Date.new(current_calender_year - 1, 12, 10) }
+    let!(:current_effective_date)             { current_plan_year_start_on }
+    
+
+        let!(:current_plan_year)                  { py = FactoryGirl.create(:plan_year,
+                                               start_on: current_plan_year_start_on,
+                                               end_on: current_plan_year_end_on,
+                                               open_enrollment_start_on: current_open_enrollment_start_on,
+                                               open_enrollment_end_on: current_open_enrollment_end_on,
+                                               employer_profile: employer_profile
+                                             )
+
+                                             blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                        
+                                             py.benefit_groups = [blue]
+                                             py.save
+                                             py.update_attributes({:aasm_state => 'published'})
+                                             py
+                                          }
+
+        let!(:next_calender_year)              { TimeKeeper.date_of_record.year.next }
+        let!(:middle_of_current_year)          { Date.new(next_calender_year - 1, 6, 10) }
+        let!(:next_plan_year_start_on)         { Date.new(next_calender_year, 1, 1) }
+        let!(:next_plan_year_end_on)           { Date.new(next_calender_year, 12, 31) }
+        let!(:next_open_enrollment_start_on)   { Date.new(next_calender_year - 1, 12, 1) }
+        let!(:next_open_enrollment_end_on)     { Date.new(next_calender_year - 1, 12, 10) }
+        let!(:next_effective_date)             { Date.new(2016, 9, 1) }#next_plan_year_start_on }
+
+    
+         let!(:next_plan_year)                  { py = FactoryGirl.create(:plan_year,
+                                               start_on: next_plan_year_start_on,
+                                               end_on: next_plan_year_end_on,
+                                               open_enrollment_start_on: next_open_enrollment_start_on,
+                                               open_enrollment_end_on: next_open_enrollment_end_on,
+                                               employer_profile: employer_profile
+                                             )
+
+                                             blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                        
+                                             py.benefit_groups = [blue]
+                                             py.save
+                                             py.update_attributes({:aasm_state => 'published'})
+                                             py
+                                          }
+
+
+
+    it "Should give [1,0] if looking at next year" do
+               puts "#{next_plan_year.inspect}"
+               #puts next_plan_year.inspect
+               #puts employer_profile.inspect                           
+    end
+end
+     
   
-     context "get_benefit_group_assignments_for_plan_year" do
-      it "should get the correct benefit group assignments for the businesses" do
-        expect(get_benefit_group_assignments_for_plan_year(plan_year_cafe)).to eq [   benefit_group_assignment_barista, benefit_group_assignment_manager, benefit_group_assignment_janitor ]
-  
-        expect(get_benefit_group_assignments_for_plan_year(plan_year_salon)).to eq [    benefit_group_assignment_hairdresser]      
-      end
-     end
+     
   
      describe "staff_for_employers_including_pending", :dbclean => :after_all do
   	   before(:each) do
