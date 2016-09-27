@@ -1,0 +1,1 @@
+Family.where("households.coverage_households"=>{"$exists"=>true}).update_all({"$unset"=>{"households.coverage_households.aasm_state": ""}})

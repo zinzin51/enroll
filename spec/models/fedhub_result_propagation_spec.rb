@@ -18,7 +18,7 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
     enrollment
   end
 
-  describe "when lawful presence fails verification" do
+  describe "lawful presence fails verification" do
     let(:denial_information) do
       Struct.new(:determined_at, :vlp_authority).new(Time.now, "ssa")
     end
@@ -27,7 +27,7 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
       person.consumer_role.coverage_purchased!("args")
     end
 
-    describe "when the enrollment is active" do
+    describe "active enrollments" do
       before :each do
         enrollment
         person.consumer_role.ssn_invalid!(denial_information)
@@ -39,7 +39,7 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
       end
     end
 
-    describe "when the enrollment is terminated" do
+    describe "terminated enrollment" do
       before :each do
         person.consumer_role.revert!(denial_information)
         enrollment.terminate_coverage!
@@ -56,13 +56,13 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
       end
     end
 
-    describe "when enrollment is terminated with fully verified member" do
+    describe "terminated enrollment with fully verified member" do
       before :each do
         person.consumer_role.import!
         enrollment.terminate_coverage!
       end
 
-      it "moves unverified member to withdrawn status" do
+      it "doesn't change member's status" do
         expect(person.consumer_role.fully_verified?).to be_truthy
       end
     end

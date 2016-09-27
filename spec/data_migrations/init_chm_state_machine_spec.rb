@@ -14,7 +14,7 @@ describe InitCHMStateMachine, :dbclean => :after_each do
                  "unverified" => "contingent" }
 
   before do
-    allow_any_instance_of(InitCHMStateMachine).to receive(:get_families).and_return [family]
+    allow(subject).to receive(:get_families).and_return [family]
   end
   states_map.each do |consumer_status, ch_member_status|
     it "moves" do

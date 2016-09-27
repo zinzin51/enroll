@@ -1217,6 +1217,8 @@ class HbxEnrollment
   end
 
   def any_other_active_enrollments?
-    household.hbx_enrollments.reject{ |enrollment| enrollment == self }.any?{ |enrollment| enrollment.is_active? }
+    household.hbx_enrollments.individual_market.enrolled_and_renewing.to_a.reject do |enrollment|
+      enrollment == self
+    end.any?{ |enrollment| enrollment.currently_active? || enrollment.future_active? }
   end
 end

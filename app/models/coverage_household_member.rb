@@ -56,7 +56,7 @@ class CoverageHouseholdMember
             ch_member.evaluate_individual_market_eligiblity if ch_member.family_member.person.consumer_role.id == consumer_role.id
           end
         end
-        hh.hbx_enrollments.each do |he|
+        hh.hbx_enrollments.individual_market.each do |he|
           he.evaluate_individual_market_eligiblity
         end
       end

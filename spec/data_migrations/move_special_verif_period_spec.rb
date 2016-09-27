@@ -6,7 +6,7 @@ describe MoveVerifPeriod, :dbclean => :after_each do
   subject { MoveVerifPeriod.new("fix me task", double(:current_scope => nil)) }
 
   before do
-    allow_any_instance_of(InitCHMStateMachine).to receive(:get_families).and_return [family]
+    allow(subject).to receive(:get_families).and_return [family]
     family.active_household.hbx_enrollments<<FactoryGirl.build(:hbx_enrollment, :household => family.active_household, :special_verification_period => Date.today)
     subject.migrate
     family.reload
