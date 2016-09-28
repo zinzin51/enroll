@@ -360,7 +360,7 @@ let!(:employer_profile)      { FactoryGirl.create(:employer_profile) }
         let!(:next_plan_year_end_on)           { Date.new(next_calender_year, 12, 31) }
         let!(:next_open_enrollment_start_on)   { Date.new(next_calender_year - 1, 12, 1) }
         let!(:next_open_enrollment_end_on)     { Date.new(next_calender_year - 1, 12, 10) }
-        let!(:next_effective_date)             { Date.new(2016, 9, 1) }#next_plan_year_start_on }
+        let!(:next_effective_date)             { Date.new(2017, 2, 1) }#next_plan_year_start_on }
 
     
          let!(:next_plan_year)                  { py = FactoryGirl.create(:plan_year,
@@ -384,7 +384,8 @@ let!(:employer_profile)      { FactoryGirl.create(:employer_profile) }
     it "Should give [1,0] if looking at next year" do
                puts "#{next_plan_year.inspect}"
                #puts next_plan_year.inspect
-               #puts employer_profile.inspect                           
+               #puts employer_profile.inspect      
+               #pending                     
     end
 end
      
