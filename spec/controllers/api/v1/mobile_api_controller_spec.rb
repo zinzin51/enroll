@@ -185,10 +185,27 @@ let!(:org1) { FactoryGirl.create(:organization, legal_name: "Alphabet Agency", d
 let!(:broker_agency_profile1) { FactoryGirl.create(:broker_agency_profile, organization: org1) }
 let!(:broker_role1) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id) }
 let!(:broker_agency_account1) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile1, writing_agent: broker_role1, family: carols_family)}
-let!(:carols_employer) {FactoryGirl.create(:employer_profile, organization: carols_organization, broker_agency_profile: broker_agency_profile1, broker_role_id: broker_role1._id, broker_agency_accounts: [broker_agency_account1])}
-let!(:user1) { FactoryGirl.create(:user, person: broker_role.person, roles: [:broker]) }
+#let!(:carols_emp) {FactoryGirl.create(:employer_profile, organization: carols_organization, broker_agency_profile: broker_agency_profile1, broker_role_id: broker_role1._id, broker_agency_accounts: [broker_agency_account1])}
+let!(:person) { broker_role1.person.tap do |person| 
+                      person.first_name = "Walter" 
+                      person.last_name = "White"
+                      end
+                      broker_role1.person.save
+                      broker_role1.person 
+                    }
 
+let!(:user1) { FactoryGirl.create(:user, person: broker_role1.person, roles: [:broker]) }
 
+let!(:carols_emp) { carols_employer.tap do |carol| 
+                                carol.organization = carols_organization
+                                carol.broker_agency_profile = broker_agency_profile1
+                                carol.broker_role_id = broker_role1._id
+                                carol.broker_agency_accounts = [broker_agency_account1]
+                                end
+                    carols_employer.save 
+                    carols_employer
+
+                           }
 
 # what I could really use is extending the brady bunch setup to include brokers
 # 3:33 like there's a broker who represents Mike's company and another who represents Carol's
@@ -198,41 +215,99 @@ let!(:user1) { FactoryGirl.create(:user, person: broker_role.person, roles: [:br
 # 3:36 - the hbx admin should be able to see anything
 # 3:36 - the broker for Mike's company should see only Mike's company, not Carol's, in employers_list, and should be able to see the roster/details for Mike's company (but get a 404 or empty list if they follow the link for Carol's)
 # 3:40 - Mike's employer should be able to see his own roster & details, but shouldn't be able to access employers_list at all, and also shouldn't be able to see Carol's stuff
-
-it "Mikes broker should be able to see only Mikes Company" do
-
+context "Mikes specs" do
+before(:each) do
   sign_in user
   get :employers_list, id: broker_agency_profile.id, format: :json
-  output = JSON.parse(response.body)
-
-      expect(response).to have_http_status(:success), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
-      expect(output["broker_name"]).to eq("John")
-      employer = output["broker_clients"][0]
-      expect(output["broker_clients"].count).to eq 1
-      expect(employer).not_to be(nil), "in #{output}"
-      expect(employer["employer_name"]).to eq(mikes_employer.legal_name)
+  @output = JSON.parse(response.body)
 end
 
 
-it "Carols broker should be able to see only Carols Company" do
-puts "#{carols_employer.organization.inspect}"
+it "Mikes broker should be able to login and get success status" do
+  expect(@output["broker_name"]).to eq("John")
+  expect(response).to have_http_status(:success), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
+end
+
+it "No of broker clients in Mikes broker's employer's list should be 1" do
+  expect(@output["broker_clients"].count).to eq 1
+end
 
 
+it "Mikes broker should be able to see only Mikes Company and it shouldn't be nil" do
+      expect(@output["broker_clients"][0]).not_to be(nil), "in #{@output}"
+      expect(@output["broker_clients"][0]["employer_name"]).to eq(mikes_employer.legal_name)
+end
+
+it "Mikes broker should be able to access the Mikes employee roster" do
+ get :employee_roster, {employer_profile_id: mikes_employer.id.to_s}, format: :json
+ @output = JSON.parse(response.body)
+ expect(response).to have_http_status(:success)
+ expect(@output["employer_name"]).to eq(mikes_employer.legal_name)
+ expect(@output["roster"].blank?).to be_truthy
+end
+
+end
+
+
+context "carols specs" do
+before(:each) do
   sign_in user1
   get :employers_list, id: broker_agency_profile1.id, format: :json
-  output = JSON.parse(response.body)
-
-      expect(response).to have_http_status(:success), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
-      expect(output["broker_name"]).to eq("John")
-      employer = output["broker_clients"][0]
-      expect(output["broker_clients"].count).to eq 1
-      expect(employer).not_to be(nil), "in #{output}"
-      expect(employer["employer_name"]).to eq(mikes_employer.legal_name)
+  @output = JSON.parse(response.body)
 end
 
 
+it "Carols broker should be able to login and get success status" do
+  expect(@output["broker_name"]).to eq("Walter")
+  expect(response).to have_http_status(:success), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
+end
+
+it "No of broker clients in Carols broker's employer's list should be 1" do
+  expect(@output["broker_clients"].count).to eq 1
+end
+
+
+it "Carols broker should be able to see only Mikes Company and it shouldn't be nil" do
+      expect(@output["broker_clients"][0]).not_to be(nil), "in #{@output}"
+      expect(@output["broker_clients"][0]["employer_name"]).to eq(carols_employer.legal_name)
+end
+
+
+it "Carols broker should be able to access the Carols employee roster" do
+ get :employee_roster, {employer_profile_id: carols_employer.id.to_s}, format: :json
+ @output = JSON.parse(response.body)
+ expect(response).to have_http_status(:success)
+ expect(@output["employer_name"]).to eq(carols_employer.legal_name)
+ expect(@output["roster"]).not_to be []
+ expect(@output["roster"].count).to eq 1
+end
+
+end
+
+# it "Carols broker should be able to see only Carols Company" do
+# # puts "#{carols_employer.inspect}"
+# # carols_employer.organization = carols_organization 
+# # carols_employer.save
+# puts "*******#{carols_employer.organization.inspect}"
+# puts "#{broker_role1.person.inspect}"
+
+
+
+#   sign_in user1
+#   get :employers_list, id: broker_agency_profile1.id, format: :json
+#   output = JSON.parse(response.body)
+
+# puts "#{output.inspect}"
+#       expect(response).to have_http_status(:success), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
+#       expect(output["broker_name"]).to eq("Walter")
+#       employer = output["broker_clients"][0]
+#       expect(output["broker_clients"].count).to eq 1
+#       expect(employer).not_to be(nil), "in #{output}"
+#       expect(employer["employer_name"]).to eq(carols_employer.legal_name)
+# end
+
+end
 end
 end
 
 
-end
