@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::MobileApiHelper, type: :helper, dbclean: :after_each do
+RSpec.describe Api::V1::MobileApiHelper, dbclean: :after_each do
    
   let!(:employer_profile_cafe)      { FactoryGirl.create(:employer_profile) }
   let!(:employer_profile_salon)     { FactoryGirl.create(:employer_profile) }
@@ -190,14 +190,14 @@ RSpec.describe Api::V1::MobileApiHelper, type: :helper, dbclean: :after_each do
       @enrollment2.aasm_state = "terminated"
       @enrollment2.save
         benefit_group_assignment = [@mikes_benefit_group_assignments]
-        expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 0]
+        expect(count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 0]
     end
 
 
 
   end
 
-
+end
 
 #############****************################
 
@@ -242,7 +242,7 @@ context "2 waived in the same family" do
 
     it "should count enrollement for two waived in the same family" do 
          benefit_group_assignment = [@mikes_benefit_group_assignments, @carols_benefit_group_assignments]
-         expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 2]
+         expect(count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 2]
     end
 
 end
@@ -363,26 +363,26 @@ let!(:employer_profile)      { FactoryGirl.create(:employer_profile) }
         let!(:next_effective_date)             { Date.new(2017, 2, 1) }#next_plan_year_start_on }
 
     
-         let!(:next_plan_year)                  { py = FactoryGirl.create(:plan_year,
-                                               start_on: next_plan_year_start_on,
-                                               end_on: next_plan_year_end_on,
-                                               open_enrollment_start_on: next_open_enrollment_start_on,
-                                               open_enrollment_end_on: next_open_enrollment_end_on,
-                                               employer_profile: employer_profile
-                                             )
+         # let!(:next_plan_year)                  { py = FactoryGirl.create(:plan_year,
+         #                                       start_on: next_plan_year_start_on,
+         #                                       end_on: next_plan_year_end_on,
+         #                                       open_enrollment_start_on: next_open_enrollment_start_on,
+         #                                       open_enrollment_end_on: next_open_enrollment_end_on,
+         #                                       employer_profile: employer_profile
+         #                                     )
 
-                                             blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+         #                                     blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
                                         
-                                             py.benefit_groups = [blue]
-                                             py.save
-                                             py.update_attributes({:aasm_state => 'published'})
-                                             py
-                                          }
+         #                                     py.benefit_groups = [blue]
+         #                                     py.save
+         #                                     py.update_attributes({:aasm_state => 'published'})
+         #                                     py
+         #                                  }
 
 
 
     it "Should give [1,0] if looking at next year" do
-               puts "#{next_plan_year.inspect}"
+               #puts "#{next_plan_year.inspect}"
                #puts next_plan_year.inspect
                #puts employer_profile.inspect      
                #pending                     
@@ -422,6 +422,9 @@ end
   	    expect(@res[@employer_profile_ids[2]].count).to eql 1
   	   end
      end
-  end
+
 end
+ 
+
+
  
