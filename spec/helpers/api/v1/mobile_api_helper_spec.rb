@@ -314,7 +314,7 @@ end
 
 #     it "should count enrollement for one waived in the same family" do 
 #         benefit_group_assignment = [@mikes_benefit_group_assignments]
-#         expect(HbxEnrollment.count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 1]
+#         expect(count_shop_and_health_enrolled_and_waived_by_benefit_group_assignments(benefit_group_assignment)).to eq [0, 1]
 #     end
 
 
@@ -363,6 +363,28 @@ let!(:employer_profile)      { FactoryGirl.create(:employer_profile) }
         let!(:next_effective_date)             { Date.new(2017, 2, 1) }#next_plan_year_start_on }
 
     
+
+         let!(:next_plan_year)                  { 
+
+                                            prev_date = TimeKeeper.date_of_record 
+                                            TimeKeeper.set_date_of_record_unprotected!(next_plan_year_start_on - 14)
+                                            py = FactoryGirl.create(:plan_year,
+                                               start_on: next_plan_year_start_on,
+                                               end_on: next_plan_year_end_on,
+                                               open_enrollment_start_on: next_open_enrollment_start_on,
+                                               open_enrollment_end_on: next_open_enrollment_end_on,
+                                               employer_profile: employer_profile
+                                             )
+
+                                             blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                        
+                                             py.benefit_groups = [blue]
+                                             py.save
+                                             py.update_attributes({:aasm_state => 'published'})
+                                             py
+                                             TimeKeeper.set_date_of_record_unprotected!(prev_date)
+                                          }
+
          # let!(:next_plan_year)                  { py = FactoryGirl.create(:plan_year,
          #                                       start_on: next_plan_year_start_on,
          #                                       end_on: next_plan_year_end_on,
@@ -378,6 +400,7 @@ let!(:employer_profile)      { FactoryGirl.create(:employer_profile) }
          #                                     py.update_attributes({:aasm_state => 'published'})
          #                                     py
          #                                  }
+
 
 
 
