@@ -1,6 +1,7 @@
 require 'rails_helper'
+require 'support/brady_bunch'
 
-RSpec.describe Api::V1::MobileApiController do
+RSpec.describe Api::V1::MobileApiController, dbclean: :after_each do
 
  describe "get employers_list" do
     let!(:broker_role) {FactoryGirl.create(:broker_role)}
@@ -156,4 +157,82 @@ describe "GET employer_details" do
     end
   end
  end
+
+
+
+# **********************************////////////************************************
+  context "Functionality and security specs" do 
+  include_context "BradyWorkAfterAll"
+
+   before :each do
+      create_brady_census_families
+  end
+
+  context "Specs for Mike and Carol from BradyBunch" do
+    include_context "BradyBunch"  
+    attr_reader :mikes_organization, :mikes_employer, :mikes_family, :carols_organization, :carols_employer, :carols_family
+
+let!(:org) { FactoryGirl.create(:organization) }
+let!(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: org) }
+let!(:broker_role) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
+let!(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent: broker_role, family: mikes_family)}
+let!(:mikes_employer) {FactoryGirl.create(:employer_profile, organization: mikes_organization, broker_agency_profile: broker_agency_profile, broker_role_id: broker_role._id, broker_agency_accounts: [broker_agency_account])}
+let!(:user) { FactoryGirl.create(:user, person: broker_role.person, roles: [:broker]) }
+
+
+
+let!(:org1) { FactoryGirl.create(:organization, legal_name: "Alphabet Agency", dba: "ABCD etc") }
+let!(:broker_agency_profile1) { FactoryGirl.create(:broker_agency_profile, organization: org1) }
+let!(:broker_role1) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id) }
+let!(:broker_agency_account1) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile1, writing_agent: broker_role1, family: carols_family)}
+let!(:carols_employer) {FactoryGirl.create(:employer_profile, organization: carols_organization, broker_agency_profile: broker_agency_profile1, broker_role_id: broker_role1._id, broker_agency_accounts: [broker_agency_account1])}
+let!(:user1) { FactoryGirl.create(:user, person: broker_role.person, roles: [:broker]) }
+
+
+
+# what I could really use is extending the brady bunch setup to include brokers
+# 3:33 like there's a broker who represents Mike's company and another who represents Carol's
+# 3:33 and the brokers belong to different agencies and one is on staff at their agency and the agencies are themselves employers
+# 3:35 and we'd have another user who's an hbx admin
+# 3:35 so the test cases are:
+# 3:36 - the hbx admin should be able to see anything
+# 3:36 - the broker for Mike's company should see only Mike's company, not Carol's, in employers_list, and should be able to see the roster/details for Mike's company (but get a 404 or empty list if they follow the link for Carol's)
+# 3:40 - Mike's employer should be able to see his own roster & details, but shouldn't be able to access employers_list at all, and also shouldn't be able to see Carol's stuff
+
+it "Mikes broker should be able to see only Mikes Company" do
+
+  sign_in user
+  get :employers_list, id: broker_agency_profile.id, format: :json
+  output = JSON.parse(response.body)
+
+      expect(response).to have_http_status(:success), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
+      expect(output["broker_name"]).to eq("John")
+      employer = output["broker_clients"][0]
+      expect(output["broker_clients"].count).to eq 1
+      expect(employer).not_to be(nil), "in #{output}"
+      expect(employer["employer_name"]).to eq(mikes_employer.legal_name)
+end
+
+
+it "Carols broker should be able to see only Carols Company" do
+puts "#{carols_employer.organization.inspect}"
+
+
+  sign_in user1
+  get :employers_list, id: broker_agency_profile1.id, format: :json
+  output = JSON.parse(response.body)
+
+      expect(response).to have_http_status(:success), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
+      expect(output["broker_name"]).to eq("John")
+      employer = output["broker_clients"][0]
+      expect(output["broker_clients"].count).to eq 1
+      expect(employer).not_to be(nil), "in #{output}"
+      expect(employer["employer_name"]).to eq(mikes_employer.legal_name)
+end
+
+
+end
+end
+
+
 end

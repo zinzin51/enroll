@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::MobileApiHelper, type: :helper, dbclean: :after_each do
+RSpec.describe Api::V1::MobileApiHelper, dbclean: :after_each do
    
   let!(:employer_profile_cafe)      { FactoryGirl.create(:employer_profile) }
   let!(:employer_profile_salon)     { FactoryGirl.create(:employer_profile) }
@@ -197,7 +197,7 @@ RSpec.describe Api::V1::MobileApiHelper, type: :helper, dbclean: :after_each do
 
   end
 
-
+end
 
 #############****************################
 
@@ -363,6 +363,7 @@ let!(:employer_profile)      { FactoryGirl.create(:employer_profile) }
         let!(:next_effective_date)             { Date.new(2017, 2, 1) }#next_plan_year_start_on }
 
     
+
          let!(:next_plan_year)                  { 
 
                                             prev_date = TimeKeeper.date_of_record 
@@ -384,10 +385,27 @@ let!(:employer_profile)      { FactoryGirl.create(:employer_profile) }
                                              TimeKeeper.set_date_of_record_unprotected!(prev_date)
                                           }
 
+         # let!(:next_plan_year)                  { py = FactoryGirl.create(:plan_year,
+         #                                       start_on: next_plan_year_start_on,
+         #                                       end_on: next_plan_year_end_on,
+         #                                       open_enrollment_start_on: next_open_enrollment_start_on,
+         #                                       open_enrollment_end_on: next_open_enrollment_end_on,
+         #                                       employer_profile: employer_profile
+         #                                     )
+
+         #                                     blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                        
+         #                                     py.benefit_groups = [blue]
+         #                                     py.save
+         #                                     py.update_attributes({:aasm_state => 'published'})
+         #                                     py
+         #                                  }
+
+
 
 
     it "Should give [1,0] if looking at next year" do
-               puts "#{next_plan_year.inspect}"
+               #puts "#{next_plan_year.inspect}"
                #puts next_plan_year.inspect
                #puts employer_profile.inspect      
                #pending                     
@@ -427,6 +445,9 @@ end
   	    expect(@res[@employer_profile_ids[2]].count).to eql 1
   	   end
      end
-  end
+
 end
+ 
+
+
  
