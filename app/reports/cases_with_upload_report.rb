@@ -18,11 +18,8 @@ class CasesWithUploadReport< MongoidMigrationTask
               person.last_name,
               person.hbx_id
           ]
-
         end
       end
-
-
     end
 end
 
