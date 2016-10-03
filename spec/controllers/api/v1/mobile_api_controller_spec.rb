@@ -180,12 +180,10 @@ let!(:mikes_employer) {FactoryGirl.create(:employer_profile, organization: mikes
 let!(:user) { FactoryGirl.create(:user, person: broker_role.person, roles: [:broker]) }
 
 
-
 let!(:org1) { FactoryGirl.create(:organization, legal_name: "Alphabet Agency", dba: "ABCD etc") }
 let!(:broker_agency_profile1) { FactoryGirl.create(:broker_agency_profile, organization: org1) }
 let!(:broker_role1) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id) }
 let!(:broker_agency_account1) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile1, writing_agent: broker_role1, family: carols_family)}
-#let!(:carols_emp) {FactoryGirl.create(:employer_profile, organization: carols_organization, broker_agency_profile: broker_agency_profile1, broker_role_id: broker_role1._id, broker_agency_accounts: [broker_agency_account1])}
 let!(:person) { broker_role1.person.tap do |person| 
                       person.first_name = "Walter" 
                       person.last_name = "White"
@@ -195,7 +193,6 @@ let!(:person) { broker_role1.person.tap do |person|
                     }
 
 let!(:user1) { FactoryGirl.create(:user, person: broker_role1.person, roles: [:broker]) }
-
 let!(:carols_emp) { carols_employer.tap do |carol| 
                                 carol.organization = carols_organization
                                 carol.broker_agency_profile = broker_agency_profile1
@@ -206,6 +203,10 @@ let!(:carols_emp) { carols_employer.tap do |carol|
                     carols_employer
 
                            }
+
+let(:hbx_person) { FactoryGirl.create(:person, first_name: "Jessie")}
+let!(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: hbx_person)}
+let!(:hbx_user) { double("user", :has_broker_agency_staff_role? => false ,:has_hbx_staff_role? => true, :has_employer_staff_role? => false, :has_broker_role? => false, :person => hbx_staff_role.person) }                          
 
 # what I could really use is extending the brady bunch setup to include brokers
 # 3:33 like there's a broker who represents Mike's company and another who represents Carol's
@@ -246,6 +247,16 @@ it "Mikes broker should be able to access the Mikes employee roster" do
  expect(@output["roster"].blank?).to be_truthy
 end
 
+it "HBX Admin should be able to see Mikes details" do
+  sign_out user
+  sign_in hbx_user
+  get :employers_list, id: broker_agency_profile.id, format: :json
+  @output = JSON.parse(response.body) 
+  expect(@output["broker_agency"]).to eq("Turner Agency, Inc")
+  expect(@output["broker_clients"].count).to eq 1
+  expect(@output["broker_clients"][0]["employer_name"]).to eq(mikes_employer.legal_name)
+end
+
 end
 
 
@@ -282,7 +293,19 @@ it "Carols broker should be able to access the Carols employee roster" do
  expect(@output["roster"].count).to eq 1
 end
 
+
+it "HBX Admin should be able to see Carols details" do
+  sign_in hbx_user
+  get :employers_list, id: broker_agency_profile1.id, format: :json
+  @output = JSON.parse(response.body) 
+  expect(@output["broker_agency"]).to eq("Alphabet Agency")
+  expect(@output["broker_clients"].count).to eq 1
+  expect(@output["broker_clients"][0]["employer_name"]).to eq(carols_employer.legal_name)
 end
+
+end
+
+
 
 # it "Carols broker should be able to see only Carols Company" do
 # # puts "#{carols_employer.inspect}"
