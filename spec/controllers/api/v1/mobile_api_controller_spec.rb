@@ -170,15 +170,17 @@ describe "GET employer_details" do
 
   context "Specs for Mike and Carol from BradyBunch" do
     include_context "BradyBunch"  
-    attr_reader :mikes_organization, :mikes_employer, :mikes_family, :carols_organization, :carols_employer, :carols_family
+    attr_reader :mikes_organization, :mikes_employer_profile, :mikes_family, :carols_organization, :carols_employer, :carols_family
 
 let!(:org) { FactoryGirl.create(:organization) }
 let!(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: org) }
 let!(:broker_role) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
 let!(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent: broker_role, family: mikes_family)}
-let!(:mikes_employer) {FactoryGirl.create(:employer_profile, organization: mikes_organization, broker_agency_profile: broker_agency_profile, broker_role_id: broker_role._id, broker_agency_accounts: [broker_agency_account])}
+let!(:mikes_employer_profile) {FactoryGirl.create(:employer_profile, organization: mikes_organization, broker_agency_profile: broker_agency_profile, broker_role_id: broker_role._id, broker_agency_accounts: [broker_agency_account])}
 let!(:user) { FactoryGirl.create(:user, person: broker_role.person, roles: [:broker]) }
-
+let!(:mikes_employer_profile_person) { FactoryGirl.create(:person, first_name: "Fring")}
+let!(:mikes_employer_profile_staff_role) { FactoryGirl.create(:employer_staff_role, person: mikes_employer_profile_person, employer_profile_id: mikes_employer_profile.id)}
+let!(:mikes_employer_profile_user) { double("user", :has_broker_agency_staff_role? => false ,:has_hbx_staff_role? => false, :has_employer_staff_role? => true, :has_broker_role? => false, :person => mikes_employer_profile_staff_role.person) }
 
 let!(:org1) { FactoryGirl.create(:organization, legal_name: "Alphabet Agency", dba: "ABCD etc") }
 let!(:broker_agency_profile1) { FactoryGirl.create(:broker_agency_profile, organization: org1) }
@@ -236,14 +238,14 @@ end
 
 it "Mikes broker should be able to see only Mikes Company and it shouldn't be nil" do
       expect(@output["broker_clients"][0]).not_to be(nil), "in #{@output}"
-      expect(@output["broker_clients"][0]["employer_name"]).to eq(mikes_employer.legal_name)
+      expect(@output["broker_clients"][0]["employer_name"]).to eq(mikes_employer_profile.legal_name)
 end
 
 it "Mikes broker should be able to access the Mikes employee roster" do
- get :employee_roster, {employer_profile_id: mikes_employer.id.to_s}, format: :json
+ get :employee_roster, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
  @output = JSON.parse(response.body)
  expect(response).to have_http_status(:success)
- expect(@output["employer_name"]).to eq(mikes_employer.legal_name)
+ expect(@output["employer_name"]).to eq(mikes_employer_profile.legal_name)
  expect(@output["roster"].blank?).to be_truthy
 end
 
@@ -254,8 +256,46 @@ it "HBX Admin should be able to see Mikes details" do
   @output = JSON.parse(response.body) 
   expect(@output["broker_agency"]).to eq("Turner Agency, Inc")
   expect(@output["broker_clients"].count).to eq 1
-  expect(@output["broker_clients"][0]["employer_name"]).to eq(mikes_employer.legal_name)
+  expect(@output["broker_clients"][0]["employer_name"]).to eq(mikes_employer_profile.legal_name)
 end
+
+it "Mikes employer shouldn't be able to see the employers_list and should get 404 status on request" do
+  sign_out user
+  sign_in mikes_employer_profile_user
+  get :employers_list, id: broker_agency_profile.id, format: :json
+  @output = JSON.parse(response.body)
+  expect(response.status).to eq 404
+end
+
+it "Mikes employer should be able to see his own roster" do
+  sign_in mikes_employer_profile_user
+  get :employee_roster, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
+  @output = JSON.parse(response.body)
+  expect(response).to have_http_status(:success)
+  expect(@output["employer_name"]).to eq(mikes_employer_profile.legal_name)
+  expect(@output["roster"].blank?).to be_truthy
+end
+
+it "should render 200 with valid ID" do
+    sign_in mikes_employer_profile_user
+    get :employer_details, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
+    expect(response).to have_http_status(200), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
+    expect(response.content_type).to eq "application/json"
+  end
+
+  it "should render 404 with Invalid ID" do
+    get :employer_details, {employer_profile_id: "Invalid Id"}
+    expect(response).to have_http_status(404), "expected status 404, got #{response.status}: \n----\n#{response.body}\n\n"
+  end
+
+  it "should match with the expected result set" do
+    get :employer_details, {employer_profile_id: mikes_employer_profile.id.to_s}
+    output = JSON.parse(response.body)
+    #puts "#{mikesemployer_profile.inspect}"
+    expect(output["employer_name"]).to eq(mikes_employer_profile.legal_name)
+    expect(output["employees_total"]).to eq(mikes_employer_profile.roster_size)
+    expect(output["active_general_agency"]).to eq(mikes_employer_profile.active_general_agency_legal_name)
+  end
 
 end
 
