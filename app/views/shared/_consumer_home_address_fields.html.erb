@@ -56,7 +56,7 @@
 
           <% required = kind=='home' ? "address_required" : '' %>
 
-          <%= address.text_field :address_1, placeholder: "ADDRESS LINE 1 #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
+          <%= address.text_field :address_1, placeholder: "ADDRESS LINE 1 #{'*' if required.present?}", class: "floatlabel form-control #{required} address_1", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
         </div>
         <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
           <%= address.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control" %>
@@ -65,10 +65,10 @@
 
       <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
+          <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "floatlabel form-control #{required} city", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE #{'*' if required.present?}"}, required: required_for_consumer_address(required, !f.object.no_dc_address), id:'state_id' ,class: "#{required}") %>
+          <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE #{'*' if required.present?}"}, required: required_for_consumer_address(required, !f.object.no_dc_address), id:'state_id' ,class: "#{required} state") %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%= address.text_field :zip, placeholder: "ZIP #{'*' if required.present?}", class: "number floatlabel form-control zip #{required}", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
@@ -108,12 +108,6 @@
 <% end %>
 
 <script>
-$(document).ready(function () {
-  $('#state_id').change(function(){
-    if (!$("#no_dc_address").is(':checked') && $(this).val() != 'DC') {alert('You have selected a Non DC state, please check No DC Address')}
-  });
-});
-
 $(document).on('ready page:load', function () {
   ConsumerRole.initialize();
 });

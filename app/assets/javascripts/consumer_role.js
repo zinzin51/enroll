@@ -1,21 +1,27 @@
 var ConsumerRole = (function( window, undefined ) {
   function initialize() {
-    $("#person_no_dc_address, #dependent_no_dc_address, #no_dc_address").click(function(){
+    $("#person_no_dc_address, #dependent_no_dc_address, #no_dc_address").click(function(event){
       toggle_no_dc_address_reasons(this);
       check_state_for_no_dc_address($(this).parents('#address_info').find('#state_id'));
+      event.stopPropagation();
     });
 
     $('#radio_homeless, #radio_outside').click(function(){
-      show_mailing_address_required_msg();
       show_mailing_address_fields($(this).parents('#address_info').next('.form-action'));
+      check_mailing_address_fields();
     });
 
     $('#address_info + span.form-action').click(function(){
       toggle_mailing_address_fields(this);
     });
 
-    $('#state_id').change(function(){
+    $('#state_id').change(function(event){
       check_state_for_no_dc_address(this);
+      event.stopPropagation();
+    });
+
+    $('.mailing-div .address_1, .mailing-div .city, .mailing-div select, .mailing-div .zip').change(function(){
+      check_mailing_address_fields();
     });
   }
 
@@ -59,12 +65,25 @@ var ConsumerRole = (function( window, undefined ) {
   }
 
   function check_state_for_no_dc_address(target) {
-    if ($("#no_dc_address").is(':checked') && $(target).val() == 'DC' && $(target).val() != '') {
-      alert('You have checked No DC Address, please selecte a Non DC state');
+    if (!$("#no_dc_address").is(':checked') && $(target).val() != 'DC') {
+      alert('You have selected a Non DC state, please check No DC Address');
+    }
+  }
+
+  function check_mailing_address_fields(target) {
+    var mailing_address = $(".mailing-div .address_1").val();
+    var mailing_city = $(".mailing-div .city").val();
+    var mailing_state = $(".mailing-div select").val();
+    var mailing_zip = $(".mailing-div .zip").val();
+    if (mailing_address!="" && mailing_city!="" && mailing_state!="" && mailing_zip!="") {
+      $("#mailing_address_required_msg").addClass('hidden');
+    } else {
+      show_mailing_address_required_msg();
     }
   }
 
   return {
     initialize: initialize,
+    check_state_for_no_dc_address: check_state_for_no_dc_address,
   };
 })( window );

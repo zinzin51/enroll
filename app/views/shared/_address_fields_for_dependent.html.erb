@@ -44,19 +44,19 @@
             <%= address.hidden_field :kind %>
             <% required = "address_required" if kind == 'home' && f.object.same_with_primary != 'true' %>
 
-            <%= address.text_field :address_1, placeholder: "ADDRESS LINE 1 #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
+            <%= address.text_field :address_1, placeholder: "ADDRESS LINE 1 #{'*' if required.present?}", class: "floatlabel form-control #{required} address_1", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
           </div>
           <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-            <%= address.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control" %>
+            <%= address.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control address_2" %>
           </div>
         </div>
 
         <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
           <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-            <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
+            <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "floatlabel form-control #{required} city", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
           </div>
           <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-            <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE #{'*' if required.present?}"}, { required: required_for_consumer_address(required, !f.object.no_dc_address) }) %>
+            <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE #{'*' if required.present?}", onchange: "ConsumerRole.check_state_for_no_dc_address(this)", class: 'state'}, { required: required_for_consumer_address(required, !f.object.no_dc_address) }) %>
           </div>
           <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
             <%= address.text_field :zip, placeholder: "ZIP #{'*' if required.present?}", class: "number floatlabel form-control zip #{required}", required: required_for_consumer_address(required, !f.object.no_dc_address) %>
@@ -100,11 +100,3 @@
   <p>We need your mailing address so that your health insurance plan can send important documents like invoices and insurance cards. If you don’t check this address regularly, be sure to indicate that you want electronic notices below. You may also want to call your health insurance company to request electronic notifications from them.</p>
 </div>
 <% end %>
-
-<script>
-$(document).ready(function () {
-  $('#state_id').change(function(){
-    if (!$("#no_dc_address").is(':checked') && $(this).val() != 'DC') {alert('You have selected a Non DC state, please check No DC Address')}
-  });
-});
-</script>
