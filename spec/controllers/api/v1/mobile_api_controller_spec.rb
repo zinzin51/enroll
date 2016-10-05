@@ -145,15 +145,32 @@ describe "GET employer_details" do
     expect(output["employees_total"]).to eq(employer_profile.roster_size)
     expect(output["active_general_agency"]).to eq(employer_profile.active_general_agency_legal_name)
 
-    if employer_profile.show_plan_year
-      expect(output["employees_waived"]).to eq(employer_profile.show_plan_year.waived_count)
-      expect(output["open_enrollment_begins"]).to eq(employer_profile.show_plan_year.open_enrollment_start_on)
-      expect(output["open_enrollment_ends"]).to eq(employer_profile.show_plan_year.open_enrollment_end_on) 
-      expect(output["plan_year_begins"]).to eq(employer_profile.show_plan_year.start_on) 
-      expect(output["renewal_in_progress"]).to eq(employer_profile.show_plan_year.is_renewing?) 
-      expect(output["renewal_application_due"]).to eq(employer_profile.show_plan_year.due_date_for_publish) 
-      expect(output["minimum_participation_required"]).to eq(employer_profile.show_plan_year. minimum_enrolled_count) 
+    py = employer_profile.show_plan_year
+    if py
+      expect(output["employees_enrolled"]).to             eq(py.total_enrolled_count - py.waived_count )
+      expect(output["employees_waived"]).to               eq(py.waived_count)
+      expect(output["open_enrollment_begins"]).to         eq(py.open_enrollment_start_on)
+      expect(output["open_enrollment_ends"]).to           eq(py.open_enrollment_end_on) 
+      expect(output["plan_year_begins"]).to               eq(py.start_on) 
+      expect(output["renewal_in_progress"]).to            eq(py.is_renewing?) 
+      expect(output["renewal_application_available"]).to  eq(py.start_on >> Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months) 
+      expect(output["renewal_application_due"]).to        eq(py.due_date_for_publish) 
+      expect(output["minimum_participation_required"]).to eq(py. minimum_enrolled_count) 
     end
+
+ 
+
+
+ # "renewal_application_available": "2016-08-01",
+ # "renewal_application_due": "2016-10-10",
+ # "binder_payment_due": null,
+ # "minimum_participation_required": 27,
+ # "billing_report_date": "2016-10-29",
+ # "active_general_agency": "Betadyne General Agency, Inc.",
+ # "total_premium": 17502.09,
+ # "employee_contribution": 6081.62,
+ # "employer_contribution": 11420.47,
+
   end
  end
 end
