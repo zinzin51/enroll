@@ -155,21 +155,12 @@ describe "GET employer_details" do
       expect(output["renewal_in_progress"]).to            eq(py.is_renewing?) 
       expect(output["renewal_application_available"]).to  eq(py.start_on >> Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months) 
       expect(output["renewal_application_due"]).to        eq(py.due_date_for_publish) 
-      expect(output["minimum_participation_required"]).to eq(py. minimum_enrolled_count) 
-    end
+      expect(output["minimum_participation_required"]).to eq(py.minimum_enrolled_count) 
 
- 
-
-
- # "renewal_application_available": "2016-08-01",
- # "renewal_application_due": "2016-10-10",
- # "binder_payment_due": null,
- # "minimum_participation_required": 27,
- # "billing_report_date": "2016-10-29",
- # "active_general_agency": "Betadyne General Agency, Inc.",
- # "total_premium": 17502.09,
- # "employee_contribution": 6081.62,
- # "employer_contribution": 11420.47,
+      expect(output["total_premium"]).to eq(0.0) 
+      expect(output["employer_contribution"]).to eq(0.0) 
+      expect(output["employee_contribution"]).to eq(0.0) 
+    end 
 
   end
  end
