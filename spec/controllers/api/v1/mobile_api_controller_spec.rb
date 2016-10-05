@@ -369,6 +369,13 @@ it "Carols employer should be able to see his own roster" do
   expect(@output["roster"].blank?).to be_falsey
 end
 
+it "Carols employer should not be able to see Mike's employer's roster" do
+  sign_in carols_employer_profile_user
+  get :employee_roster, {employer_profile_id:mikes_employer_profile.id.to_s}, format: :json
+  @output = JSON.parse(response.body)
+  expect(response).to have_http_status(:unauthorized)
+ end
+
 it "Carols employer should render 200 with valid ID" do
     sign_in carols_employer_profile_user
     get :employer_details, {employer_profile_id: carols_employer_profile.id.to_s}, format: :json
