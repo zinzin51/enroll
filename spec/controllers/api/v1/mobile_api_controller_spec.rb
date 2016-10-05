@@ -364,7 +364,7 @@ it "Carols employer should be able to see his own roster" do
 end
 
 it "Carols employer should not be able to see Mike's employer's roster" do
-  pending
+  pending("add security to roster")
   get :employee_roster, {employer_profile_id:mikes_employer_profile.id.to_s}, format: :json
   @output = JSON.parse(response.body)
   expect(response).to have_http_status(:unauthorized)
