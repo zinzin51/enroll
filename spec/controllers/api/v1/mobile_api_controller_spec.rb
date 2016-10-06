@@ -161,6 +161,8 @@ describe "GET employer_details" do
       expect(output["total_premium"]).to eq(0.0) 
       expect(output["employer_contribution"]).to eq(0.0) 
       expect(output["employee_contribution"]).to eq(0.0) 
+
+      expect(output["plan_offerings"]).to eq([])
     end 
 
   end
@@ -225,7 +227,7 @@ describe "GET employer_details" do
       let!(:hbx_user) { double("user", :has_broker_agency_staff_role? => false ,:has_hbx_staff_role? => true, :has_employer_staff_role? => false, :has_broker_role? => false, :person => hbx_staff_role.person) }                          
 
       #Mikes specs begin
-      context "Mike broker specs" do
+      context "Mike's broker" do
         before(:each) do
           sign_in mikes_broker
           get :employers_list, id: broker_agency_profile.id, format: :json
@@ -233,28 +235,61 @@ describe "GET employer_details" do
         end
 
 
-        it "Mikes broker should be able to login and get success status" do
+        it "should be able to login and get success status" do
           expect(@output["broker_name"]).to eq("John")
           expect(response).to have_http_status(:success), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
         end
 
-        it "No of broker clients in Mikes broker's employer's list should be 1" do
+        it "should have 1 client in their broker's employer's list" do
           expect(@output["broker_clients"].count).to eq 1
         end
 
-
-        it "Mikes broker should be able to see only Mikes Company and it shouldn't be nil" do
-              expect(@output["broker_clients"][0]).not_to be(nil), "in #{@output}"
-              expect(@output["broker_clients"][0]["employer_name"]).to eq(mikes_employer_profile.legal_name)
+        it "should be able to see only Mikes Company in the list and it shouldn't be nil" do
+          expect(@output["broker_clients"][0]).not_to be(nil), "in #{@output}"
+          expect(@output["broker_clients"][0]["employer_name"]).to eq(mikes_employer_profile.legal_name)
         end
 
-        it "Mikes broker should be able to access Mikes employee roster" do
+        it "should be able to access Mike's employee roster" do
          get :employee_roster, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
          @output = JSON.parse(response.body)
          expect(response).to have_http_status(:success)
          expect(@output["employer_name"]).to eq(mikes_employer_profile.legal_name)
          expect(@output["roster"].blank?).to be_truthy
         end
+
+        it "should be able to access Mike's employer details" do
+         get :employer_details, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
+         @output = JSON.parse(response.body)
+         expect(response).to have_http_status(:success)
+         expect(@output["employer_name"]).to eq "Mike's Architects Limited"
+
+         #TODO Venu & Pavan: can we get some more data here, so these aren't all nil?
+         expect(@output["employees_total"]).to eq 0
+         expect(@output["employees_enrolled"]).to be(nil)
+         expect(@output["employees_waived"]).to be(nil)
+         expect(@output["open_enrollment_begins"]).to be(nil)
+         expect(@output["open_enrollment_ends"]).to be(nil)
+         expect(@output["plan_year_begins"]).to be(nil)
+         expect(@output["renewal_in_progress"]).to be(nil)
+         expect(@output["renewal_application_available"]).to be(nil)
+         expect(@output["renewal_application_due"]).to be(nil)
+         expect(@output["binder_payment_due"]).to eq ""
+         expect(@output["minimum_participation_required"]).to be(nil)
+         expect(@output["total_premium"]).to be(nil)
+         expect(@output["employer_contribution"]).to be(nil)
+         expect(@output["employee_contribution"]).to be(nil)
+         expect(@output["active_general_agency"]).to be(nil)
+
+         #TODO Venu & Pavan: can we get some real plan offerings here?
+         expect(@output["plan_offerings"]).to be(nil)
+        end
+
+        it "should not be able to access Carol's employee roster" do
+          pending("add roster security")
+          get :employee_roster, {employer_profile_id: carols_employer_profile.id.to_s}, format: :json
+          expect(response).to have_http_status(:unauthorized)
+        end
+
       end
 
       context "Mikes employer specs" do
