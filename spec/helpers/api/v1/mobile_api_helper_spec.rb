@@ -202,7 +202,8 @@ end
 #############****************################
 
 context "2 waived in the same family" do
-
+  include_context "BradyWorkAfterAll"
+  
   before :all do
     create_brady_census_families
   end
