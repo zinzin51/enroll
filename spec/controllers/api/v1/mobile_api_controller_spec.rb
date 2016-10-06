@@ -178,7 +178,7 @@ describe "GET employer_details" do
 
     context "For this we are using BradyBunch and BradyWorkAfterAll support files" do
       include_context "BradyBunch"  
-      attr_reader :mikes_organization, :mikes_employer_profile, :mikes_family, :carols_organization, :carols_employer, :carols_family
+      attr_reader :mikes_organization, :mikes_employer_profile, :mikes_family, :carols_organization, :carols_employer, :carols_family, :mikes_plan_year, :carols_plan_year
 
       # Mikes Factory records
       let!(:org) { FactoryGirl.create(:organization) }
@@ -292,7 +292,7 @@ describe "GET employer_details" do
 
       end
 
-      context "Mikes employer specs" do
+       context "Mikes employer specs" do
         before(:each) do
           sign_in mikes_employer_profile_user
         end
