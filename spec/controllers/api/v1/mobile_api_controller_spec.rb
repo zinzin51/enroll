@@ -169,14 +169,14 @@ describe "GET employer_details" do
  end
 
 # **********************************////////////************************************
-  context "Various scenarios for testing functionality and security of Mobile api controller actions" do 
+  context "\nVarious scenarios for testing functionality and security of Mobile api controller actions:\n" do 
     include_context "BradyWorkAfterAll"
 
      before :each do
         create_brady_census_families
     end
 
-    context "For this we are using BradyBunch and BradyWorkAfterAll support files" do
+    context " (for this we are using BradyBunch and BradyWorkAfterAll support files)\n " do
       include_context "BradyBunch"  
       attr_reader :mikes_organization, :mikes_employer_profile, :mikes_family, :carols_organization, :carols_employer, :carols_family
 
@@ -230,10 +230,9 @@ describe "GET employer_details" do
       context "Mike's broker" do
         before(:each) do
           sign_in mikes_broker
-          get :employers_list, id: broker_agency_profile.id, format: :json
+          get :employers_list, format: :json
           @output = JSON.parse(response.body)
         end
-
 
         it "should be able to login and get success status" do
           expect(@output["broker_name"]).to eq("John")
@@ -284,9 +283,21 @@ describe "GET employer_details" do
          expect(@output["plan_offerings"]).to be(nil)
         end
 
+        it "should not be able to access Carol's broker's employer list" do
+          pending("add security for broker from other agency")
+          get :employers_list,  {id: broker_agency_profile1.id}, format: :json
+          expect(response).to have_http_status(:unauthorized)
+        end
+
         it "should not be able to access Carol's employee roster" do
           pending("add roster security")
           get :employee_roster, {employer_profile_id: carols_employer_profile.id.to_s}, format: :json
+          expect(response).to have_http_status(:unauthorized)
+        end
+
+        it "should not be able to access Carol's employer details" do
+          pending("add details security")
+          get :employer_details, {employer_profile_id: carols_employer_profile.id.to_s}, format: :json
           expect(response).to have_http_status(:unauthorized)
         end
 
@@ -334,10 +345,9 @@ describe "GET employer_details" do
 
       #Carols spec begin
       context "Carols broker specs" do
-
         before(:each) do
           sign_in carols_broker
-          get :employers_list, id: broker_agency_profile1.id, format: :json
+          get :employers_list, format: :json
           @output = JSON.parse(response.body)
         end
 
@@ -358,7 +368,7 @@ describe "GET employer_details" do
         end
 
 
-        it "Carols broker should be able to access the Carols employee roster" do
+        it "Carols broker should be able to access Carol's employee roster" do
          get :employee_roster, {employer_profile_id: carols_employer_profile.id.to_s}, format: :json
          @output = JSON.parse(response.body)
          expect(response).to have_http_status(:success)
@@ -370,44 +380,49 @@ describe "GET employer_details" do
       end
 
 
-      context "Carols employer specs" do
+      context "Carols employer" do
         before(:each) do
         sign_in carols_employer_profile_user
         end
 
-        it "Carols employer shouldn't be able to see the employers_list and should get 404 status on request" do
+        it "shouldn't be able to see the employers_list and should get 404 status on request" do
           get :employers_list, id: broker_agency_profile1.id, format: :json
           @output = JSON.parse(response.body)
-          expect(response.status).to eq 404
+          expect(response).to have_http_status(:not_found)
         end
 
-        it "Carols employer should be able to see his own roster" do
+        it "should be able to see their own roster specifying id" do
           get :employee_roster, {employer_profile_id: carols_employer_profile.id.to_s}, format: :json
           @output = JSON.parse(response.body)
           expect(response).to have_http_status(:success)
+          expect(response.content_type).to eq "application/json"
           expect(@output["employer_name"]).to eq(carols_employer_profile.legal_name)
           expect(@output["roster"].blank?).to be_falsey
         end
 
-        it "Carols employer should not be able to see Mike's employer's roster" do
+        it "should be able to see their own roster by default (with no id)" do
+          pending("add default id for employer account")
+          get :employee_roster, format: :json
+          @output = JSON.parse(response.body)
+          expect(response).to have_http_status(:success)
+          expect(response.content_type).to eq "application/json"
+          expect(@output["employer_name"]).to eq(carols_employer_profile.legal_name)
+          expect(@output["roster"].blank?).to be_falsey
+        end
+
+        it "should not be able to see Mike's employer's roster" do
           pending("add security to roster")
           get :employee_roster, {employer_profile_id:mikes_employer_profile.id.to_s}, format: :json
           @output = JSON.parse(response.body)
           expect(response).to have_http_status(:unauthorized)
          end
 
-        it "Carols employer should render 200 with valid ID" do
-            get :employer_details, {employer_profile_id: carols_employer_profile.id.to_s}, format: :json
-            expect(response).to have_http_status(200), "expected status 200, got #{response.status}: \n----\n#{response.body}\n\n"
-            expect(response.content_type).to eq "application/json"
-        end
-
-        it "Carols employer should render 404 with Invalid ID" do
+        it "should get 404 NOT FOUND seeking an invalid employer profile ID" do
           get :employer_details, {employer_profile_id: "Invalid Id"}
           expect(response).to have_http_status(404), "expected status 404, got #{response.status}: \n----\n#{response.body}\n\n"
         end
 
-        it "Carols employer details request should match with the expected result set" do
+        it "details request should match with the expected result set" do
           get :employer_details, {employer_profile_id: carols_employer_profile.id.to_s}
           output = JSON.parse(response.body)
           expect(output["employer_name"]).to eq(carols_employer_profile.legal_name)
