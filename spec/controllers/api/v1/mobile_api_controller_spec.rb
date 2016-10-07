@@ -280,7 +280,7 @@ describe "GET employer_details" do
          expect(@output["active_general_agency"]).to be(nil)
 
          #TODO Venu & Pavan: can we get some real plan offerings here?
-         expect(@output["plan_offerings"]).to be(nil)
+         expect(@output["plan_offerings"]).to eq([])
         end
 
         it "should not be able to access Carol's broker's employer list" do

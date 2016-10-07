@@ -3,6 +3,7 @@ module Api
     class MobileApiController < ApplicationController
     
       include MobileApiHelper
+      include MobileApiRosterHelper
 
       def employers_list
         employer_profiles, broker_agency_profile, broker_name = fetch_employers_and_broker_agency(current_user, params[:id])
