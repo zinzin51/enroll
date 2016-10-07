@@ -54,6 +54,7 @@ module Api::V1::MobileApiHelper
     details[:employer_contribution] = employer_contribution
     details[:employee_contribution] = employee_contribution
     details[:active_general_agency] = employer_profile.active_general_agency_legal_name # Note: queries DB
+    details[:plan_offerings]        = []
 
     #TODO next release
     #details[:reference_plan] = 
@@ -199,99 +200,33 @@ module Api::V1::MobileApiHelper
     [enrolled_ids, waived_ids].map { |found_ids| (found_ids & id_list).count }
   end
 
-  def employees_by(employer_profile, by_employee_name = nil, by_status = 'active')
-    census_employees = case by_status
-                   when 'terminated'
-                     employer_profile.census_employees.terminated
-                   when 'all'
-                     employer_profile.census_employees
-                   else
-                     employer_profile.census_employees.active
-                   end.sorted
-    by_employee_name ? census_employees.employee_name(by_employee_name) : census_employees
-  end
+ 
 
-  def status_label_for(enrollment_status)
-    {
-      'Renewing' => HbxEnrollment::RENEWAL_STATUSES,
-      'Terminated' => HbxEnrollment::TERMINATED_STATUSES,
-      'Enrolled' => HbxEnrollment::ENROLLED_STATUSES,
-      'Waived' => HbxEnrollment::WAIVED_STATUSES
-    }.each do |label, enrollment_statuses|
-        return label if enrollment_statuses.include?(enrollment_status.to_s)
-    end
-  end
+  def fetch_employers_and_broker_agency(user, submitted_id)
+    #print ("$$$$ fetch_employers_and_broker_agency(#{user}, #{submitted_id})\n")
+     broker_role = user.person.broker_role
+     broker_name = user.person.first_name if broker_role 
 
-  ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER = [:plan_type, :deductible, :family_deductible, :provider_directory_url, :rx_formulary_url]  
-  def render_roster_employee(census_employee, has_renewal)
-    assignments = { active: census_employee.active_benefit_group_assignment }
-    assignments[:renewal] = census_employee.renewal_benefit_group_assignment if has_renewal
-    enrollments = {}
-    assignments.keys.each do |period_type|
-      assignment = assignments[period_type]
-      enrollments[period_type] = {}
-      %W(health dental).each do |coverage_kind|
-          enrollment = assignment.hbx_enrollments.detect { |e| e.coverage_kind == coverage_kind } if assignment
-          rendered_enrollment = if enrollment then
-            {
-              status: status_label_for(enrollment.aasm_state),
-              employer_contribution: enrollment.total_employer_contribution,
-              employee_cost: enrollment.total_employee_cost,
-              total_premium: enrollment.total_premium,
-              plan_name: enrollment.plan.try(:name),
-              metal_level:  enrollment.plan.try(coverage_kind == "health" ? :metal_level : :dental_level)
-            } 
-          else 
-            {
-              status: 'Not Enrolled'
-            }
-          end
-          if enrollment && enrollment.plan 
-            ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
-              value = enrollment.plan.try(field)
-              rendered_enrollment[field] = value if value
-            end
-          end
-          enrollments[period_type][coverage_kind] = rendered_enrollment
-      end
-    end
-
-    {
-      id: census_employee.id,
-      first_name:   census_employee.first_name,
-      middle_name:  census_employee.middle_name,
-      last_name:    census_employee.last_name,
-      name_suffix:  census_employee.name_sfx,
-      enrollments:  enrollments
-    }
-  end
-
-  def render_roster_employees(employees, has_renewal)
-    employees.compact.map do |ee| 
-      render_roster_employee(ee, has_renewal) 
-    end
-  end
-
-   def fetch_employers_and_broker_agency(user, submitted_id)
-        #print ("$$$$ fetch_employers_and_broker_agency(#{user}, #{submitted_id})\n")
-         broker_role = user.person.broker_role
-         broker_name = user.person.first_name if broker_role 
-
-        if submitted_id && (user.has_broker_agency_staff_role? || user.has_hbx_staff_role?)
-          broker_agency_profile = BrokerAgencyProfile.find(submitted_id)
-          employer_query = Organization.by_broker_agency_profile(broker_agency_profile._id) if broker_agency_profile
+    if submitted_id && (user.has_broker_agency_staff_role? || user.has_hbx_staff_role?)
+      broker_agency_profile = BrokerAgencyProfile.find(submitted_id)
+      employer_query = Organization.by_broker_agency_profile(broker_agency_profile._id) if broker_agency_profile
 #TODO fix security hole
 #@broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
 
-        else
-          if broker_role
-            broker_agency_profile = broker_role.broker_agency_profile 
-            employer_query = Organization.by_broker_role(broker_role.id) 
-          end
-        end
-        employer_profiles = (employer_query || []).map {|o| o.employer_profile}  
-        [employer_profiles, broker_agency_profile, broker_name] if employer_query
+    else
+      if broker_role
+        broker_agency_profile = broker_role.broker_agency_profile 
+        employer_query = Organization.by_broker_role(broker_role.id) 
       end
+    end
+    employer_profiles = (employer_query || []).map {|o| o.employer_profile}  
+    [employer_profiles, broker_agency_profile, broker_name] if employer_query
+  end
+
+  def active_and_renewal_plan_years(employer_profile)
+    { active: nil, renewal: nil}
+  end
+
 
 end
 
