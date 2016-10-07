@@ -46,15 +46,19 @@ module Api::V1::MobileApiHelper
   end
 
   def render_employer_details_json(employer_profile: nil, year: nil, num_enrolled: nil, 
-                                        num_waived: nil, total_premium: nil, 
-                                        employer_contribution: nil, employee_contribution: nil)
+                                   num_waived: nil, total_premium: nil, 
+                                   employer_contribution: nil, employee_contribution: nil)
     details = render_employer_summary_json(employer_profile: employer_profile, year: year, 
                                            num_enrolled: num_enrolled, num_waived: num_waived)
     details[:total_premium] = total_premium
     details[:employer_contribution] = employer_contribution
     details[:employee_contribution] = employee_contribution
     details[:active_general_agency] = employer_profile.active_general_agency_legal_name # Note: queries DB
-    details[:plan_offerings]        = []
+
+
+    details[:plan_offerings]        = Hash[active_and_renewal_plan_years(employer_profile).map do |period, py| 
+      [period, py] 
+    end]
 
     #TODO next release
     #details[:reference_plan] = 
@@ -131,7 +135,8 @@ module Api::V1::MobileApiHelper
                                    num_waived: waived, 
                                    total_premium: premium_amt_total, 
                                    employer_contribution: employer_contribution_total, 
-                                   employee_contribution: employee_cost_total)
+                                   employee_contribution: employee_cost_total
+                                  )
     else
       render_employer_details_json(employer_profile: employer_profile)
     end
@@ -224,7 +229,8 @@ module Api::V1::MobileApiHelper
   end
 
   def active_and_renewal_plan_years(employer_profile)
-    { active: nil, renewal: nil}
+    { active: employer_profile.active_plan_year }
+    #TODO: renewal when appropriate, see employer_profiles_controller.sort_plan_years
   end
 
 

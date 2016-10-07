@@ -185,7 +185,7 @@ describe "GET employer_details" do
       let!(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: org) }
       let!(:broker_role) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
       let!(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent: broker_role, family: mikes_family)}
-      let!(:mikes_employer_profile) {FactoryGirl.create(:employer_profile, organization: mikes_organization, broker_agency_profile: broker_agency_profile, broker_role_id: broker_role._id, broker_agency_accounts: [broker_agency_account])}
+      let!(:mikes_employer_profile) {FactoryGirl.create(:employer_profile, organization: mikes_organization, broker_agency_profile: broker_agency_profile, broker_role_id: broker_role._id, broker_agency_accounts: [broker_agency_account], plan_years: [mikes_plan_year])}
       let!(:mikes_broker) { FactoryGirl.create(:user, person: broker_role.person, roles: [:broker]) }
       let!(:mikes_employer_profile_person) { FactoryGirl.create(:person, first_name: "Fring")}
       let!(:mikes_employer_profile_staff_role) { FactoryGirl.create(:employer_staff_role, person: mikes_employer_profile_person, employer_profile_id: mikes_employer_profile.id)}
@@ -211,6 +211,7 @@ describe "GET employer_details" do
                                       carol.broker_agency_profile = broker_agency_profile1
                                       carol.broker_role_id = broker_role1._id
                                       carol.broker_agency_accounts = [broker_agency_account1]
+                                      carol.plan_years = [carols_plan_year]
                                       end
                           carols_employer.save 
                           carols_employer
@@ -257,6 +258,10 @@ describe "GET employer_details" do
         end
 
         it "should be able to access Mike's employer details" do
+         expect(mikes_employer_profile.plan_years.count).to be > 0 
+         expect(mikes_employer_profile.active_plan_year).to_not be nil 
+         print "\n>>>> py: #{mikes_employer_profile.active_plan_year.inspect}\n"
+
          get :employer_details, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
          @output = JSON.parse(response.body)
          expect(response).to have_http_status(:success)
@@ -280,7 +285,8 @@ describe "GET employer_details" do
          expect(@output["active_general_agency"]).to be(nil)
 
          #TODO Venu & Pavan: can we get some real plan offerings here?
-         expect(@output["plan_offerings"]).to eq([])
+         #it would be cool if Mike had just active but Carol had active and renewal, for instance
+         expect(@output["plan_offerings"].keys).to eq(["active"]) 
         end
 
         it "should not be able to access Carol's broker's employer list" do
