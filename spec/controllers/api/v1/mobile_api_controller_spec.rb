@@ -190,7 +190,12 @@ describe "GET employer_details" do
       let!(:mikes_employer_profile_person) { FactoryGirl.create(:person, first_name: "Fring")}
       let!(:mikes_employer_profile_staff_role) { FactoryGirl.create(:employer_staff_role, person: mikes_employer_profile_person, employer_profile_id: mikes_employer_profile.id)}
       let!(:mikes_employer_profile_user) { double("user", :has_broker_agency_staff_role? => false ,:has_hbx_staff_role? => false, :has_employer_staff_role? => true, :has_broker_role? => false, :person => mikes_employer_profile_staff_role.person) }
-
+      let!(:mike_plan_year) { mikes_plan_year.tap do |plan_year|
+                                  plan_year.employer_profile = mikes_employer_profile
+                                  end
+                                  mikes_plan_year.save
+                                  mikes_plan_year
+                              }
 
       #Carols Factory records
       let!(:org1) { FactoryGirl.create(:organization, legal_name: "Alphabet Agency", dba: "ABCD etc") }
@@ -202,7 +207,7 @@ describe "GET employer_details" do
                             person.last_name = "White"
                             end
                             broker_role1.person.save
-                            broker_role1.person 
+                            broker_role1.person   
                           }
 
       let!(:carols_broker) { FactoryGirl.create(:user, person: broker_role1.person, roles: [:broker]) }
@@ -219,7 +224,12 @@ describe "GET employer_details" do
       let!(:carols_employer_profile_person) { FactoryGirl.create(:person, first_name: "Pinkman")}
       let!(:carols_employer_profile_staff_role) { FactoryGirl.create(:employer_staff_role, person: carols_employer_profile_person, employer_profile_id: carols_employer_profile.id)}
       let!(:carols_employer_profile_user) { double("user", :has_broker_agency_staff_role? => false ,:has_hbx_staff_role? => false, :has_employer_staff_role? => true, :has_broker_role? => false, :person => carols_employer_profile_staff_role.person) }
-
+      let!(:carol_plan_year) { carols_plan_year.tap do |plan_year|
+                                  plan_year.employer_profile = carols_employer_profile
+                                  end
+                                  carols_plan_year.save
+                                  carols_plan_year
+                              }
 
       #HBX Admin Factories
       let(:hbx_person) { FactoryGirl.create(:person, first_name: "Jessie")}
