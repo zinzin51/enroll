@@ -80,7 +80,7 @@ module Api::V1::MobileApiHelper
   end
 
   # alternative, faster way to calcuate total_enrolled_count 
-  # returns a list of number enrolled (actually enrolled, not waived)
+  # returns a list of number enrolled (actually enrolled, not waived) and waived
   def count_enrolled_and_waived_employees(plan_year)  
     if plan_year && plan_year.employer_profile.census_employees.count < 100 then
       assignments = get_benefit_group_assignments_for_plan_year(plan_year)
@@ -158,7 +158,14 @@ module Api::V1::MobileApiHelper
       result.compact
   end
 
-   # A faster way of counting employees who are enrolled (not waived) 
+
+  def benefit_group_ids_of_enrollments_in_status(enrollments, status_list)
+    enrollments.select do |enrollment| 
+      status_list.include? (enrollment.aasm_state) 
+    end.map(&:benefit_group_assignment_id)
+  end
+
+  # A faster way of counting employees who are enrolled (not waived) 
   # where enrolled + waived = counting towards SHOP minimum healthcare participation
   # We first do the query to find families with appropriate enrollments,
   # then check again inside the map/reduce to get only those enrollments.
@@ -178,40 +185,113 @@ module Api::V1::MobileApiHelper
       :is_active => true #???  
     } )
 
+    all_enrollments =  families.map { |f| f.households.map {|h| h.hbx_enrollments} }.flatten.compact
+    relevant_enrollments = all_enrollments.select do |enrollment|
+      enrollment.kind == "employer_sponsored" &&
+      enrollment.coverage_kind == "health" &&
+      enrollment.is_active
+    end
 
-    map = %Q{ 
-      function() { 
-        var enrolled_or_renewal = #{enrolled_or_renewal};
+    enrolled_ids = benefit_group_ids_of_enrollments_in_status(relevant_enrollments, enrolled_or_renewal)
+    waived_ids = benefit_group_ids_of_enrollments_in_status(relevant_enrollments, waived)
 
-        for(var h = 0, len = this.households.length; h < len;  h++) { 
-          for (var e =0, len2 = this.households[h].hbx_enrollments.length; e < len2; e++) { 
-            var enrollment = this.households[h].hbx_enrollments[e];
-            if (enrollment.kind == "employer_sponsored" &&
-                enrollment.coverage_kind == "health" &&
-                enrollment.is_active) {
-                emit(enrollment.benefit_group_assignment_id, enrollment.aasm_state)
-            }
-          } 
-        }    
-      }
-    } 
+    #return count of enrolled, count of waived -- only including those originally asked for
+    [enrolled_ids, waived_ids].map { |found_ids| (found_ids & id_list).count }
+  end
 
-    #there should really only be one active shop health enrollment per benefit group assignment
-    #so we simply ignore collisons by taking the first one we find 
-    reduce = %Q{ 
-      function(key, values) { return values.length ? values[0] : null } 
-    }
+  def employees_by(employer_profile, by_employee_name = nil, by_status = 'active')
+    census_employees = case by_status
+                   when 'terminated'
+                     employer_profile.census_employees.terminated
+                   when 'all'
+                     employer_profile.census_employees
+                   else
+                     employer_profile.census_employees.active
+                   end.sorted
+    by_employee_name ? census_employees.employee_name(by_employee_name) : census_employees
+  end
 
-    items = families.map_reduce(map, reduce).out(inline: true)
-
-    [enrolled_or_renewal, waived].map do |statuses|
-        found_ids = items.map do |item| 
-                    item[:_id] if statuses.include? item[:value] 
-        end.compact
-
-        (found_ids & id_list).count
+  def status_label_for(enrollment_status)
+    {
+      'Renewing' => HbxEnrollment::RENEWAL_STATUSES,
+      'Terminated' => HbxEnrollment::TERMINATED_STATUSES,
+      'Enrolled' => HbxEnrollment::ENROLLED_STATUSES,
+      'Waived' => HbxEnrollment::WAIVED_STATUSES
+    }.each do |label, enrollment_statuses|
+        return label if enrollment_statuses.include?(enrollment_status.to_s)
     end
   end
+
+  ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER = [:plan_type, :deductible, :family_deductible, :provider_directory_url, :rx_formulary_url]  
+  def render_roster_employee(census_employee, has_renewal)
+    assignments = { active: census_employee.active_benefit_group_assignment }
+    assignments[:renewal] = census_employee.renewal_benefit_group_assignment if has_renewal
+    enrollments = {}
+    assignments.keys.each do |period_type|
+      assignment = assignments[period_type]
+      enrollments[period_type] = {}
+      %W(health dental).each do |coverage_kind|
+          enrollment = assignment.hbx_enrollments.detect { |e| e.coverage_kind == coverage_kind } if assignment
+          rendered_enrollment = if enrollment then
+            {
+              status: status_label_for(enrollment.aasm_state),
+              employer_contribution: enrollment.total_employer_contribution,
+              employee_cost: enrollment.total_employee_cost,
+              total_premium: enrollment.total_premium,
+              plan_name: enrollment.plan.try(:name),
+              metal_level:  enrollment.plan.try(coverage_kind == "health" ? :metal_level : :dental_level)
+            } 
+          else 
+            {
+              status: 'Not Enrolled'
+            }
+          end
+          if enrollment && enrollment.plan 
+            ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
+              value = enrollment.plan.try(field)
+              rendered_enrollment[field] = value if value
+            end
+          end
+          enrollments[period_type][coverage_kind] = rendered_enrollment
+      end
+    end
+
+    {
+      id: census_employee.id,
+      first_name:   census_employee.first_name,
+      middle_name:  census_employee.middle_name,
+      last_name:    census_employee.last_name,
+      name_suffix:  census_employee.name_sfx,
+      enrollments:  enrollments
+    }
+  end
+
+  def render_roster_employees(employees, has_renewal)
+    employees.compact.map do |ee| 
+      render_roster_employee(ee, has_renewal) 
+    end
+  end
+
+   def fetch_employers_and_broker_agency(user, submitted_id)
+        #print ("$$$$ fetch_employers_and_broker_agency(#{user}, #{submitted_id})\n")
+         broker_role = user.person.broker_role
+         broker_name = user.person.first_name if broker_role 
+
+        if submitted_id && (user.has_broker_agency_staff_role? || user.has_hbx_staff_role?)
+          broker_agency_profile = BrokerAgencyProfile.find(submitted_id)
+          employer_query = Organization.by_broker_agency_profile(broker_agency_profile._id) if broker_agency_profile
+#TODO fix security hole
+#@broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
+
+        else
+          if broker_role
+            broker_agency_profile = broker_role.broker_agency_profile 
+            employer_query = Organization.by_broker_role(broker_role.id) 
+          end
+        end
+        employer_profiles = (employer_query || []).map {|o| o.employer_profile}  
+        [employer_profiles, broker_agency_profile, broker_name] if employer_query
+      end
 
 end
 

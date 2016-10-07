@@ -5,7 +5,7 @@ RSpec.describe Api::V1::MobileApiController do
  describe "get employers_list" do
     let!(:broker_role) {FactoryGirl.create(:broker_role)}
     let(:person) {double("person", broker_role: broker_role, first_name: "Brunhilde")}
-    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person)}
+    let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :person => person)}
     let(:organization) {
       o = FactoryGirl.create(:employer)
       a = o.primary_office_location.address
