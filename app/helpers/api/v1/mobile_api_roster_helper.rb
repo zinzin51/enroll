@@ -13,13 +13,13 @@ module Api::V1::MobileApiRosterHelper
   end
 
   def status_label_for(enrollment_status)
-    {
-      'Renewing' => HbxEnrollment::RENEWAL_STATUSES,
-      'Terminated' => HbxEnrollment::TERMINATED_STATUSES,
+  	{
+      'Waived' => HbxEnrollment::WAIVED_STATUSES,
       'Enrolled' => HbxEnrollment::ENROLLED_STATUSES,
-      'Waived' => HbxEnrollment::WAIVED_STATUSES
-    }.each do |label, enrollment_statuses|
-        return label if enrollment_statuses.include?(enrollment_status.to_s)
+      'Terminated' => HbxEnrollment::TERMINATED_STATUSES,
+      'Renewing' => HbxEnrollment::RENEWAL_STATUSES
+    }.inject(nil) do |result, (label, enrollment_statuses)|
+         enrollment_statuses.include?(enrollment_status.to_s) ? label : result
     end
   end
 
@@ -27,11 +27,12 @@ module Api::V1::MobileApiRosterHelper
   def render_roster_employee(census_employee, has_renewal)
     assignments = { active: census_employee.active_benefit_group_assignment }
     assignments[:renewal] = census_employee.renewal_benefit_group_assignment if has_renewal
+    #active_benefit_group
     enrollments = {}
     assignments.keys.each do |period_type|
       assignment = assignments[period_type]
       enrollments[period_type] = {}
-      %W(health dental).each do |coverage_kind|
+      %w{health dental}.each do |coverage_kind|
           enrollment = assignment.hbx_enrollments.detect { |e| e.coverage_kind == coverage_kind } if assignment
           rendered_enrollment = if enrollment then
             {
@@ -40,7 +41,7 @@ module Api::V1::MobileApiRosterHelper
               employee_cost: enrollment.total_employee_cost,
               total_premium: enrollment.total_premium,
               plan_name: enrollment.plan.try(:name),
-              metal_level:  enrollment.plan.try(coverage_kind == "health" ? :metal_level : :dental_level)
+              metal_level:  enrollment.plan.try(coverage_kind == :health ? :metal_level : :dental_level)
             } 
           else 
             {
@@ -59,12 +60,17 @@ module Api::V1::MobileApiRosterHelper
 
     {
       id: census_employee.id,
-      first_name:   census_employee.first_name,
-      middle_name:  census_employee.middle_name,
-      last_name:    census_employee.last_name,
-      name_suffix:  census_employee.name_sfx,
-      enrollments:  enrollments
-    }
+      first_name:        census_employee.first_name,
+      middle_name:       census_employee.middle_name,
+      last_name:         census_employee.last_name,
+      name_suffix:       census_employee.name_sfx,
+      date_of_birth:     census_employee.dob,
+      ssn_masked:        "***-**-#{ census_employee.ssn.chars.last(4).join }", 
+      gender:            census_employee.gender,
+      hired_on:          census_employee.hired_on,
+      is_business_owner: census_employee.is_business_owner,
+      enrollments:       enrollments
+    } 
   end
 
   def render_roster_employees(employees, has_renewal)
