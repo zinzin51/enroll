@@ -178,61 +178,58 @@ describe "GET employer_details" do
 
     context " (for this we are using BradyBunch and BradyWorkAfterAll support files)\n " do
       include_context "BradyBunch"  
-      attr_reader :mikes_organization, :mikes_employer_profile, :mikes_family, :carols_organization, :carols_employer, :carols_family, :mikes_plan_year, :carols_plan_year
+      attr_reader :mikes_organization, :mikes_employer, :mikes_family, :carols_organization, :carols_employer, :carols_family, :mikes_plan_year, :carols_plan_year
 
       # Mikes Factory records
-      let!(:org) { FactoryGirl.create(:organization) }
-      let!(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: org) }
-      let!(:broker_role) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
-      let!(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent: broker_role, family: mikes_family)}
-      let!(:mikes_employer_profile) {FactoryGirl.create(:employer_profile, organization: mikes_organization, broker_agency_profile: broker_agency_profile, broker_role_id: broker_role._id, broker_agency_accounts: [broker_agency_account], plan_years: [mikes_plan_year])}
-      let!(:mikes_broker) { FactoryGirl.create(:user, person: broker_role.person, roles: [:broker]) }
+      let!(:mikes_broker_org) { FactoryGirl.create(:organization) }
+      let!(:mikes_broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: mikes_broker_org) }
+      let!(:mikes_broker_role) { FactoryGirl.create(:broker_role, broker_agency_profile_id: mikes_broker_agency_profile.id) }
+      let!(:mikes_broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: mikes_broker_agency_profile, writing_agent: mikes_broker_role, family: mikes_family)}
+      let(:mikes_employer_profile) { mikes_employer.tap do |employer|
+                                        employer.organization = mikes_organization
+                                        employer.broker_agency_profile = mikes_broker_agency_profile
+                                        employer.broker_role_id = mikes_broker_role._id
+                                        employer.broker_agency_accounts = [mikes_broker_agency_account]
+                                        employer.plan_years = [mikes_plan_year]
+                                        end
+                                      mikes_employer.save
+                                      mikes_employer
+                                    }
+      let!(:mikes_broker) { FactoryGirl.create(:user, person: mikes_broker_role.person, roles: [:broker]) }
       let!(:mikes_employer_profile_person) { FactoryGirl.create(:person, first_name: "Fring")}
       let!(:mikes_employer_profile_staff_role) { FactoryGirl.create(:employer_staff_role, person: mikes_employer_profile_person, employer_profile_id: mikes_employer_profile.id)}
       let!(:mikes_employer_profile_user) { double("user", :has_broker_agency_staff_role? => false ,:has_hbx_staff_role? => false, :has_employer_staff_role? => true, :has_broker_role? => false, :person => mikes_employer_profile_staff_role.person) }
-      let!(:mike_plan_year) { mikes_plan_year.tap do |plan_year|
-                                  plan_year.employer_profile = mikes_employer_profile
-                                  end
-                                  mikes_plan_year.save
-                                  mikes_plan_year
-                              }
+      
 
       #Carols Factory records
-      let!(:org1) { FactoryGirl.create(:organization, legal_name: "Alphabet Agency", dba: "ABCD etc") }
-      let!(:broker_agency_profile1) { FactoryGirl.create(:broker_agency_profile, organization: org1) }
-      let!(:broker_role1) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id) }
-      let!(:broker_agency_account1) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile1, writing_agent: broker_role1, family: carols_family)}
-      let!(:person) { broker_role1.person.tap do |person| 
+      let!(:carols_broker_org) { FactoryGirl.create(:organization, legal_name: "Alphabet Agency", dba: "ABCD etc") }
+      let!(:carols_broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: carols_broker_org) }
+      let!(:carols_broker_role) { FactoryGirl.create(:broker_role, broker_agency_profile_id: carols_broker_agency_profile.id) }
+      let!(:carols_broker_agency_account) { FactoryGirl.create(:broker_agency_account, broker_agency_profile: carols_broker_agency_profile, writing_agent: carols_broker_role, family: carols_family)}
+      let!(:person) { carols_broker_role.person.tap do |person| 
                             person.first_name = "Walter" 
                             person.last_name = "White"
                             end
-                            broker_role1.person.save
-                            broker_role1.person   
+                            carols_broker_role.person.save
+                            carols_broker_role.person   
                           }
 
-      let!(:carols_broker) { FactoryGirl.create(:user, person: broker_role1.person, roles: [:broker]) }
+      let!(:carols_broker) { FactoryGirl.create(:user, person: carols_broker_role.person, roles: [:broker]) }
       let!(:carols_employer_profile) { carols_employer.tap do |carol| 
-                                      carol.organization = carols_organization
-                                      carol.broker_agency_profile = broker_agency_profile1
-                                      carol.broker_role_id = broker_role1._id
-                                      carol.broker_agency_accounts = [broker_agency_account1]
-                                      carol.plan_years = [carols_plan_year]
-                                      end
-                          carols_employer.save 
-                          carols_employer
-
-                                 }
+                                          carol.organization = carols_organization
+                                          carol.broker_agency_profile = carols_broker_agency_profile
+                                          carol.broker_role_id = carols_broker_role._id
+                                          carol.broker_agency_accounts = [carols_broker_agency_account]
+                                          end
+                                       carols_employer.save 
+                                       carols_employer
+                                      }
       let!(:carols_employer_profile_person) { FactoryGirl.create(:person, first_name: "Pinkman")}
       let!(:carols_employer_profile_staff_role) { FactoryGirl.create(:employer_staff_role, person: carols_employer_profile_person, employer_profile_id: carols_employer_profile.id)}
       let!(:carols_employer_profile_user) { double("user", :has_broker_agency_staff_role? => false ,:has_hbx_staff_role? => false, :has_employer_staff_role? => true, :has_broker_role? => false, :person => carols_employer_profile_staff_role.person) }
-      let!(:carol_plan_year) { carols_plan_year.tap do |plan_year|
-                                  plan_year.employer_profile = carols_employer_profile
-                                  end
-                                  carols_plan_year.save
-                                  carols_plan_year
-                              }
-
-      #HBX Admin Factories
+     
+    
+          #HBX Admin Factories
       let(:hbx_person) { FactoryGirl.create(:person, first_name: "Jessie")}
       let!(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: hbx_person)}
       let!(:hbx_user) { double("user", :has_broker_agency_staff_role? => false ,:has_hbx_staff_role? => true, :has_employer_staff_role? => false, :has_broker_role? => false, :person => hbx_staff_role.person) }                          
@@ -264,7 +261,7 @@ describe "GET employer_details" do
          @output = JSON.parse(response.body)
          expect(response).to have_http_status(:success)
          expect(@output["employer_name"]).to eq(mikes_employer_profile.legal_name)
-         expect(@output["roster"].blank?).to be_truthy
+         expect(@output["roster"].blank?).to be_falsey
         end
 
         it "should be able to access Mike's employer details" do
@@ -278,7 +275,7 @@ describe "GET employer_details" do
          expect(@output["employer_name"]).to eq "Mike's Architects Limited"
 
          #TODO Venu & Pavan: can we get some more data here, so these aren't all nil?
-         expect(@output["employees_total"]).to eq 0
+         expect(@output["employees_total"]).to eq 1
          expect(@output["employees_enrolled"]).to be(nil)
          expect(@output["employees_waived"]).to be(nil)
          expect(@output["open_enrollment_begins"]).to be(nil)
@@ -301,7 +298,7 @@ describe "GET employer_details" do
 
         it "should not be able to access Carol's broker's employer list" do
           pending("add security for broker from other agency")
-          get :employers_list,  {id: broker_agency_profile1.id}, format: :json
+          get :employers_list,  {id: carols_broker_agency_profile.id}, format: :json
           expect(response).to have_http_status(:unauthorized)
         end
 
@@ -325,7 +322,7 @@ describe "GET employer_details" do
         end
 
         it "Mikes employer shouldn't be able to see the employers_list and should get 404 status on request" do
-          get :employers_list, id: broker_agency_profile.id, format: :json
+          get :employers_list, id: mikes_broker_agency_profile.id, format: :json
           @output = JSON.parse(response.body)
           expect(response.status).to eq 404
         end
@@ -335,7 +332,7 @@ describe "GET employer_details" do
           @output = JSON.parse(response.body)
           expect(response).to have_http_status(:success)
           expect(@output["employer_name"]).to eq(mikes_employer_profile.legal_name)
-          expect(@output["roster"].blank?).to be_truthy
+          expect(@output["roster"].blank?).to be_falsey
         end
 
         it "Mikes employer should render 200 with valid ID" do
@@ -402,7 +399,7 @@ describe "GET employer_details" do
         end
 
         it "shouldn't be able to see the employers_list and should get 404 status on request" do
-          get :employers_list, id: broker_agency_profile1.id, format: :json
+          get :employers_list, id: carols_broker_agency_profile.id, format: :json
           @output = JSON.parse(response.body)
           expect(response).to have_http_status(:not_found)
         end
@@ -428,7 +425,7 @@ describe "GET employer_details" do
 
         it "should not be able to see Mike's employer's roster" do
           pending("add security to roster")
-          get :employee_roster, {employer_profile_id:mikes_employer_profile.id.to_s}, format: :json
+          get :employee_roster, { employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
           @output = JSON.parse(response.body)
           expect(response).to have_http_status(:unauthorized)
          end
@@ -450,7 +447,7 @@ describe "GET employer_details" do
       context "HBX admin specs" do
         it "HBX Admin should be able to see Mikes details" do
           sign_in hbx_user
-          get :employers_list, id: broker_agency_profile.id, format: :json
+          get :employers_list, id: mikes_broker_agency_profile.id, format: :json
           @output = JSON.parse(response.body) 
           expect(@output["broker_agency"]).to eq("Turner Agency, Inc")
           expect(@output["broker_clients"].count).to eq 1
@@ -459,7 +456,7 @@ describe "GET employer_details" do
 
         it "HBX Admin should be able to see Carols details" do
           sign_in hbx_user
-          get :employers_list, id: broker_agency_profile1.id, format: :json
+          get :employers_list, id: carols_broker_agency_profile.id, format: :json
           @output = JSON.parse(response.body) 
           expect(@output["broker_agency"]).to eq("Alphabet Agency")
           expect(@output["broker_clients"].count).to eq 1
