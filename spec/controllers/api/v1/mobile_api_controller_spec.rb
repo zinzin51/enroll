@@ -195,6 +195,8 @@ describe "GET employer_details" do
                                       mikes_employer.save
                                       mikes_employer
                                     }
+
+
       let!(:mikes_broker) { FactoryGirl.create(:user, person: mikes_broker_role.person, roles: [:broker]) }
       let!(:mikes_employer_profile_person) { FactoryGirl.create(:person, first_name: "Fring")}
       let!(:mikes_employer_profile_staff_role) { FactoryGirl.create(:employer_staff_role, person: mikes_employer_profile_person, employer_profile_id: mikes_employer_profile.id)}
@@ -236,10 +238,12 @@ describe "GET employer_details" do
 
       #Mikes specs begin
       context "Mike's broker" do
+
         before(:each) do
           sign_in mikes_broker
           get :employers_list, format: :json
           @output = JSON.parse(response.body)
+          mikes_plan_year.update_attributes( aasm_state: "published" ) if mikes_plan_year.aasm_state != "published"
         end
 
         it "should be able to login and get success status" do
@@ -266,29 +270,29 @@ describe "GET employer_details" do
 
         it "should be able to access Mike's employer details" do
          expect(mikes_employer_profile.plan_years.count).to be > 0 
+
          #expect(mikes_employer_profile.active_plan_year).to_not be nil 
          #print "\n>>>> py: #{mikes_employer_profile.active_plan_year.inspect}\n"
 
          get :employer_details, {employer_profile_id: mikes_employer_profile.id.to_s}, format: :json
          @output = JSON.parse(response.body)
+
          expect(response).to have_http_status(:success)
          expect(@output["employer_name"]).to eq "Mike's Architects Limited"
-
-         #TODO Venu & Pavan: can we get some more data here, so these aren't all nil?
          expect(@output["employees_total"]).to eq 1
-         expect(@output["employees_enrolled"]).to be(nil)
-         expect(@output["employees_waived"]).to be(nil)
-         expect(@output["open_enrollment_begins"]).to be(nil)
-         expect(@output["open_enrollment_ends"]).to be(nil)
-         expect(@output["plan_year_begins"]).to be(nil)
-         expect(@output["renewal_in_progress"]).to be(nil)
-         expect(@output["renewal_application_available"]).to be(nil)
-         expect(@output["renewal_application_due"]).to be(nil)
+         expect(@output["employees_enrolled"]).to eq 0
+         expect(@output["employees_waived"]).to eq 0
+         expect(@output["open_enrollment_begins"]).to eq mikes_employer_profile.active_plan_year.open_enrollment_start_on.strftime("%Y-%m-%d")
+         expect(@output["open_enrollment_ends"]).to eq mikes_employer_profile.active_plan_year.open_enrollment_end_on.strftime("%Y-%m-%d")
+         expect(@output["plan_year_begins"]).to eq mikes_employer_profile.active_plan_year.start_on.strftime("%Y-%m-%d")
+         expect(@output["renewal_in_progress"]).to be_falsey
+         expect(@output["renewal_application_available"]).to eq "2016-07-01"
+         expect(@output["renewal_application_due"]).to eq mikes_plan_year.due_date_for_publish.strftime("%Y-%m-%d")
          expect(@output["binder_payment_due"]).to eq ""
-         expect(@output["minimum_participation_required"]).to be(nil)
-         expect(@output["total_premium"]).to be(nil)
-         expect(@output["employer_contribution"]).to be(nil)
-         expect(@output["employee_contribution"]).to be(nil)
+         expect(@output["minimum_participation_required"]).to eq 1
+         expect(@output["total_premium"]).to eq 0
+         expect(@output["employer_contribution"]).to eq 0
+         expect(@output["employee_contribution"]).to eq 0
          expect(@output["active_general_agency"]).to be(nil)
 
          #TODO Venu & Pavan: can we get some real plan offerings here?
