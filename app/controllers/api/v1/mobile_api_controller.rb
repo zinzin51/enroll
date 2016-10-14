@@ -3,6 +3,7 @@ module Api
     class MobileApiController < ApplicationController
     
       include MobileApiHelper
+      include MobileApiRosterHelper
 
       def employers_list
         employer_profiles, broker_agency_profile, broker_name = fetch_employers_and_broker_agency(current_user, params[:id])
@@ -24,7 +25,6 @@ module Api
 
       def employer_details
         employer_profile = fetch_employer_profile
-        #print "$$$$$ got ep #{employer_profile} : blank=#{employer_profile.blank?} from id #{id}\n\n"
         if employer_profile.blank?
           render json: { file: 'public/404.html'}, status: :not_found 
         else
