@@ -23,11 +23,35 @@ module Api::V1::MobileApiRosterHelper
     end
   end
 
+  def relationship_with(dependent)
+  	dependent.try(:relationship) || dependent.try(:employee_relationship)
+  end
+  
+  def dependents_of(census_employee)
+  	all_dependents = census_employee.try(:employee_role).try(:person).try(:primary_family).try(:active_family_members) || census_employee.census_dependents || []
+  	all_dependents.reject { |d| relationship_with(d) == "self" }
+  end
+
+
+  def render_individual(individual)
+  	ssn = individual.try(:ssn)	
+  	ssn_masked = "***-**-#{ ssn.chars.last(4).join }" if ssn
+
+  	{
+  	  first_name:        individual.try(:first_name),
+      middle_name:       individual.try(:middle_name),
+      last_name:         individual.try(:last_name),
+      name_suffix:       individual.try(:name_sfx),
+      date_of_birth:     individual.try(:dob),
+      ssn_masked:        ssn_masked, 
+      gender:            individual.try(:gender)
+  	}
+  end
+
   ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER = [:plan_type, :deductible, :family_deductible, :provider_directory_url, :rx_formulary_url]  
   def render_roster_employee(census_employee, has_renewal)
     assignments = { active: census_employee.active_benefit_group_assignment }
     assignments[:renewal] = census_employee.renewal_benefit_group_assignment if has_renewal
-    #active_benefit_group
     enrollments = {}
     assignments.keys.each do |period_type|
       assignment = assignments[period_type]
@@ -41,7 +65,9 @@ module Api::V1::MobileApiRosterHelper
               employee_cost: enrollment.total_employee_cost,
               total_premium: enrollment.total_premium,
               plan_name: enrollment.plan.try(:name),
-              metal_level:  enrollment.plan.try(coverage_kind == :health ? :metal_level : :dental_level)
+              plan_type: enrollment.plan.try(:plan_type),
+              metal_level:  enrollment.plan.try(coverage_kind == :health ? :metal_level : :dental_level),
+			  benefit_group_name: enrollment.benefit_group.title
             } 
           else 
             {
@@ -58,19 +84,16 @@ module Api::V1::MobileApiRosterHelper
       end
     end
 
-    {
-      id: census_employee.id,
-      first_name:        census_employee.first_name,
-      middle_name:       census_employee.middle_name,
-      last_name:         census_employee.last_name,
-      name_suffix:       census_employee.name_sfx,
-      date_of_birth:     census_employee.dob,
-      ssn_masked:        "***-**-#{ census_employee.ssn.chars.last(4).join }", 
-      gender:            census_employee.gender,
-      hired_on:          census_employee.hired_on,
-      is_business_owner: census_employee.is_business_owner,
-      enrollments:       enrollments
-    } 
+    result = render_individual(census_employee)
+    result[:id]   				= census_employee.id
+    result[:hired_on] 			= census_employee.hired_on
+    result[:is_business_owner]  = census_employee.is_business_owner
+    result[:enrollments] 		= enrollments
+    result[:dependents]			= dependents_of(census_employee).map do |d| 
+    	render_individual(d).merge(relationship: relationship_with(d)) 
+    end
+    result
+
   end
 
   def render_roster_employees(employees, has_renewal)
