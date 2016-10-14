@@ -45,22 +45,117 @@ module Api::V1::MobileApiHelper
     summary
   end
 
+  def eligibility_rule_for(benefit_group)
+    case benefit_group.effective_on_offset
+    when 0 then
+      "First of the month following or coinciding with date of hire"
+    when 1 then
+      "First of the month following date of hire"
+    else 
+      "#{benefit_group.effective_on_kind.humanize} following #{benefit_group.effective_on_offset} days" 
+    end 
+  end
+
+  MAX_DENTAL_PLANS = 13
+
+  def render_plans_by!(rendered)
+    count_dental_plans = rendered[:elected_dental_plans].try(:count)
+    plans_by, plans_by_summary_text = case rendered[:plan_option_kind]
+                                      when "single_carrier" 
+                                        then ["All Plans From A Single Carrier",
+                                              "All #{rendered[:carrier_name]} Plans"]
+                                      when "metal_level"    
+                                        then ["All Plans From A Given Metal Level",
+                                              "All #{rendered[:metal_level]} Level Plans"]
+                                      when "single_plan"    
+                                        then 
+                                          if count_dental_plans.nil? then
+                                            ["A Single Plan", "Reference Plan Only"] 
+                                          else 
+                                            [count_dental_plans < MAX_DENTAL_PLANS ? 
+                                              "Custom (#{ count_dental_plans } Plans)" : 
+                                              "All Plans"] * 2
+                                          end
+                                      else nil
+                                      end
+
+    rendered[:plans_by] = plans_by
+    rendered[:plans_by_summary_text] = plans_by_summary_text
+    rendered
+  end
+
+  def display_metal_level(plan)
+    (plan.active_year == 2015 || plan.coverage_kind == "health" ? plan.metal_level : plan.dental_level).try(:titleize) 
+  end
+
+  def render_plan_offering(plan: nil, plan_option_kind: nil, relationship_benefits: [], employer_estimated_max: 0, employee_estimated_min: 0, employee_estimated_max: 0,  elected_dental_plans: nil )
+        render_plans_by!(
+                reference_plan_name:    plan.name.try(:upcase), 
+                reference_plan_HIOS_id: plan.hios_id,
+                carrier_name:           plan.carrier_profile.try(:legal_name),
+                plan_type:              plan.try(:plan_type).try(:upcase),
+                metal_level:            display_metal_level(plan),
+                plan_option_kind:       plan_option_kind,
+                employer_contribution_by_relationship: 
+                      Hash[relationship_benefits.map do |rb| 
+                        [rb.relationship, rb.premium_pct] if rb.offered
+                      end],
+                elected_dental_plans: elected_dental_plans,
+                estimated_employer_max_monthly_cost: employer_estimated_max,
+                estimated_plan_participant_min_monthly_cost: employee_estimated_min,
+                estimated_plan_participant_max_monthly_cost: employee_estimated_max
+        )
+  end
+
+  def render_plan_offerings_by_year(plan_year)
+    plan_year.benefit_groups.compact.map do |benefit_group|
+
+       health_offering = render_plan_offering(
+          plan: benefit_group.reference_plan, 
+          plan_option_kind: benefit_group.plan_option_kind, 
+          relationship_benefits: benefit_group.relationship_benefits, 
+          employer_estimated_max: benefit_group.monthly_employer_contribution_amount, 
+          employee_estimated_min: benefit_group.monthly_min_employee_cost, 
+          employee_estimated_max: benefit_group.monthly_max_employee_cost) 
+
+       elected_dental_plans = benefit_group.elected_dental_plans.map do |p| 
+               { 
+                  carrier_name: p.carrier_profile.legal_name, 
+                  plan_name: p.name 
+               }
+       end if benefit_group.elected_dental_plan_ids.count < MAX_DENTAL_PLANS
+
+       dental_offering = render_plan_offering(
+          plan:                   benefit_group.dental_reference_plan, 
+          plan_option_kind:       benefit_group.plan_option_kind, 
+          relationship_benefits:  benefit_group.dental_relationship_benefits, 
+          employer_estimated_max: benefit_group.monthly_employer_contribution_amount(dental_reference_plan), 
+          employee_estimated_min: benefit_group.monthly_min_employee_cost('dental'), 
+          employee_estimated_max: benefit_group.monthly_max_employee_cost('dental'),
+          elected_dental_plans:   elected_dental_plans) if benefit_group.is_offering_dental? && dental_reference_plan
+
+       { 
+          benefit_group_name: benefit_group.title,
+          eligibility_rule:   eligibility_rule_for(benefit_group),
+          health:             health_offering,
+          dental:             dental_offering
+       }
+    end
+  end
+
   def render_employer_details_json(employer_profile: nil, year: nil, num_enrolled: nil, 
-                                        num_waived: nil, total_premium: nil, 
-                                        employer_contribution: nil, employee_contribution: nil)
+                                   num_waived: nil, total_premium: nil, 
+                                   employer_contribution: nil, employee_contribution: nil)
     details = render_employer_summary_json(employer_profile: employer_profile, year: year, 
                                            num_enrolled: num_enrolled, num_waived: num_waived)
     details[:total_premium] = total_premium
     details[:employer_contribution] = employer_contribution
     details[:employee_contribution] = employee_contribution
     details[:active_general_agency] = employer_profile.active_general_agency_legal_name # Note: queries DB
-
-    #TODO next release
-    #details[:reference_plan] = 
-    #details[:offering_type] = 
-    #details[:new_hire_rule] = 
-    #details[:contribution_levels] = 
-     details
+    details[:plan_offerings]        = Hash[active_and_renewal_plan_years(employer_profile).map do |period, py| 
+      [period, py ? render_plan_offerings_by_year(py) : nil] 
+    end]
+    details
   end
 
   def get_benefit_group_assignments_for_plan_year(plan_year)
@@ -130,7 +225,8 @@ module Api::V1::MobileApiHelper
                                    num_waived: waived, 
                                    total_premium: premium_amt_total, 
                                    employer_contribution: employer_contribution_total, 
-                                   employee_contribution: employee_cost_total)
+                                   employee_contribution: employee_cost_total
+                                  )
     else
       render_employer_details_json(employer_profile: employer_profile)
     end
@@ -199,99 +295,34 @@ module Api::V1::MobileApiHelper
     [enrolled_ids, waived_ids].map { |found_ids| (found_ids & id_list).count }
   end
 
-  def employees_by(employer_profile, by_employee_name = nil, by_status = 'active')
-    census_employees = case by_status
-                   when 'terminated'
-                     employer_profile.census_employees.terminated
-                   when 'all'
-                     employer_profile.census_employees
-                   else
-                     employer_profile.census_employees.active
-                   end.sorted
-    by_employee_name ? census_employees.employee_name(by_employee_name) : census_employees
-  end
+ 
 
-  def status_label_for(enrollment_status)
-    {
-      'Renewing' => HbxEnrollment::RENEWAL_STATUSES,
-      'Terminated' => HbxEnrollment::TERMINATED_STATUSES,
-      'Enrolled' => HbxEnrollment::ENROLLED_STATUSES,
-      'Waived' => HbxEnrollment::WAIVED_STATUSES
-    }.each do |label, enrollment_statuses|
-        return label if enrollment_statuses.include?(enrollment_status.to_s)
-    end
-  end
+  def fetch_employers_and_broker_agency(user, submitted_id)
+    #print ("$$$$ fetch_employers_and_broker_agency(#{user}, #{submitted_id})\n")
+     broker_role = user.person.broker_role
+     broker_name = user.person.first_name if broker_role 
 
-  ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER = [:plan_type, :deductible, :family_deductible, :provider_directory_url, :rx_formulary_url]  
-  def render_roster_employee(census_employee, has_renewal)
-    assignments = { active: census_employee.active_benefit_group_assignment }
-    assignments[:renewal] = census_employee.renewal_benefit_group_assignment if has_renewal
-    enrollments = {}
-    assignments.keys.each do |period_type|
-      assignment = assignments[period_type]
-      enrollments[period_type] = {}
-      %W(health dental).each do |coverage_kind|
-          enrollment = assignment.hbx_enrollments.detect { |e| e.coverage_kind == coverage_kind } if assignment
-          rendered_enrollment = if enrollment then
-            {
-              status: status_label_for(enrollment.aasm_state),
-              employer_contribution: enrollment.total_employer_contribution,
-              employee_cost: enrollment.total_employee_cost,
-              total_premium: enrollment.total_premium,
-              plan_name: enrollment.plan.try(:name),
-              metal_level:  enrollment.plan.try(coverage_kind == "health" ? :metal_level : :dental_level)
-            } 
-          else 
-            {
-              status: 'Not Enrolled'
-            }
-          end
-          if enrollment && enrollment.plan 
-            ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
-              value = enrollment.plan.try(field)
-              rendered_enrollment[field] = value if value
-            end
-          end
-          enrollments[period_type][coverage_kind] = rendered_enrollment
-      end
-    end
-
-    {
-      id: census_employee.id,
-      first_name:   census_employee.first_name,
-      middle_name:  census_employee.middle_name,
-      last_name:    census_employee.last_name,
-      name_suffix:  census_employee.name_sfx,
-      enrollments:  enrollments
-    }
-  end
-
-  def render_roster_employees(employees, has_renewal)
-    employees.compact.map do |ee| 
-      render_roster_employee(ee, has_renewal) 
-    end
-  end
-
-   def fetch_employers_and_broker_agency(user, submitted_id)
-        #print ("$$$$ fetch_employers_and_broker_agency(#{user}, #{submitted_id})\n")
-         broker_role = user.person.broker_role
-         broker_name = user.person.first_name if broker_role 
-
-        if submitted_id && (user.has_broker_agency_staff_role? || user.has_hbx_staff_role?)
-          broker_agency_profile = BrokerAgencyProfile.find(submitted_id)
-          employer_query = Organization.by_broker_agency_profile(broker_agency_profile._id) if broker_agency_profile
+    if submitted_id && (user.has_broker_agency_staff_role? || user.has_hbx_staff_role?)
+      broker_agency_profile = BrokerAgencyProfile.find(submitted_id)
+      employer_query = Organization.by_broker_agency_profile(broker_agency_profile._id) if broker_agency_profile
 #TODO fix security hole
 #@broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
 
-        else
-          if broker_role
-            broker_agency_profile = broker_role.broker_agency_profile 
-            employer_query = Organization.by_broker_role(broker_role.id) 
-          end
-        end
-        employer_profiles = (employer_query || []).map {|o| o.employer_profile}  
-        [employer_profiles, broker_agency_profile, broker_name] if employer_query
+    else
+      if broker_role
+        broker_agency_profile = broker_role.broker_agency_profile 
+        employer_query = Organization.by_broker_role(broker_role.id) 
       end
+    end
+    employer_profiles = (employer_query || []).map {|o| o.employer_profile}  
+    [employer_profiles, broker_agency_profile, broker_name] if employer_query
+  end
+
+  def active_and_renewal_plan_years(employer_profile)
+    { active: employer_profile.active_plan_year }
+    #TODO: renewal when appropriate, see employer_profiles_controller.sort_plan_years
+  end
+
 
 end
 
