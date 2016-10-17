@@ -45,6 +45,104 @@ module Api::V1::MobileApiHelper
     summary
   end
 
+  def eligibility_rule_for(benefit_group)
+    case benefit_group.effective_on_offset
+    when 0 then
+      "First of the month following or coinciding with date of hire"
+    when 1 then
+      "First of the month following date of hire"
+    else 
+      "#{benefit_group.effective_on_kind.humanize} following #{benefit_group.effective_on_offset} days" 
+    end 
+  end
+
+  MAX_DENTAL_PLANS = 13
+
+  def render_plans_by!(rendered)
+    count_dental_plans = rendered[:elected_dental_plans].try(:count)
+    plans_by, plans_by_summary_text = case rendered[:plan_option_kind]
+                                      when "single_carrier" 
+                                        then ["All Plans From A Single Carrier",
+                                              "All #{rendered[:carrier_name]} Plans"]
+                                      when "metal_level"    
+                                        then ["All Plans From A Given Metal Level",
+                                              "All #{rendered[:metal_level]} Level Plans"]
+                                      when "single_plan"    
+                                        then 
+                                          if count_dental_plans.nil? then
+                                            ["A Single Plan", "Reference Plan Only"] 
+                                          else 
+                                            [count_dental_plans < MAX_DENTAL_PLANS ? 
+                                              "Custom (#{ count_dental_plans } Plans)" : 
+                                              "All Plans"] * 2
+                                          end
+                                      else nil
+                                      end
+
+    rendered[:plans_by] = plans_by
+    rendered[:plans_by_summary_text] = plans_by_summary_text
+    rendered
+  end
+
+  def display_metal_level(plan)
+    (plan.active_year == 2015 || plan.coverage_kind == "health" ? plan.metal_level : plan.dental_level).try(:titleize) 
+  end
+
+  def render_plan_offering(plan: nil, plan_option_kind: nil, relationship_benefits: [], employer_estimated_max: 0, employee_estimated_min: 0, employee_estimated_max: 0,  elected_dental_plans: nil )
+        render_plans_by!(
+                reference_plan_name:    plan.name.try(:upcase), 
+                reference_plan_HIOS_id: plan.hios_id,
+                carrier_name:           plan.carrier_profile.try(:legal_name),
+                plan_type:              plan.try(:plan_type).try(:upcase),
+                metal_level:            display_metal_level(plan),
+                plan_option_kind:       plan_option_kind,
+                employer_contribution_by_relationship: 
+                      Hash[relationship_benefits.map do |rb| 
+                        [rb.relationship, rb.premium_pct] if rb.offered
+                      end],
+                elected_dental_plans: elected_dental_plans,
+                estimated_employer_max_monthly_cost: employer_estimated_max,
+                estimated_plan_participant_min_monthly_cost: employee_estimated_min,
+                estimated_plan_participant_max_monthly_cost: employee_estimated_max
+        )
+  end
+
+  def render_plan_offerings_by_year(plan_year)
+    plan_year.benefit_groups.compact.map do |benefit_group|
+
+       health_offering = render_plan_offering(
+          plan: benefit_group.reference_plan, 
+          plan_option_kind: benefit_group.plan_option_kind, 
+          relationship_benefits: benefit_group.relationship_benefits, 
+          employer_estimated_max: benefit_group.monthly_employer_contribution_amount, 
+          employee_estimated_min: benefit_group.monthly_min_employee_cost, 
+          employee_estimated_max: benefit_group.monthly_max_employee_cost) 
+
+       elected_dental_plans = benefit_group.elected_dental_plans.map do |p| 
+               { 
+                  carrier_name: p.carrier_profile.legal_name, 
+                  plan_name: p.name 
+               }
+       end if benefit_group.elected_dental_plan_ids.count < MAX_DENTAL_PLANS
+
+       dental_offering = render_plan_offering(
+          plan:                   benefit_group.dental_reference_plan, 
+          plan_option_kind:       benefit_group.plan_option_kind, 
+          relationship_benefits:  benefit_group.dental_relationship_benefits, 
+          employer_estimated_max: benefit_group.monthly_employer_contribution_amount(dental_reference_plan), 
+          employee_estimated_min: benefit_group.monthly_min_employee_cost('dental'), 
+          employee_estimated_max: benefit_group.monthly_max_employee_cost('dental'),
+          elected_dental_plans:   elected_dental_plans) if benefit_group.is_offering_dental? && dental_reference_plan
+
+       { 
+          benefit_group_name: benefit_group.title,
+          eligibility_rule:   eligibility_rule_for(benefit_group),
+          health:             health_offering,
+          dental:             dental_offering
+       }
+    end
+  end
+
   def render_employer_details_json(employer_profile: nil, year: nil, num_enrolled: nil, 
                                    num_waived: nil, total_premium: nil, 
                                    employer_contribution: nil, employee_contribution: nil)
@@ -54,18 +152,10 @@ module Api::V1::MobileApiHelper
     details[:employer_contribution] = employer_contribution
     details[:employee_contribution] = employee_contribution
     details[:active_general_agency] = employer_profile.active_general_agency_legal_name # Note: queries DB
-
-
     details[:plan_offerings]        = Hash[active_and_renewal_plan_years(employer_profile).map do |period, py| 
-      [period, py] 
+      [period, py ? render_plan_offerings_by_year(py) : nil] 
     end]
-
-    #TODO next release
-    #details[:reference_plan] = 
-    #details[:offering_type] = 
-    #details[:new_hire_rule] = 
-    #details[:contribution_levels] = 
-     details
+    details
   end
 
   def get_benefit_group_assignments_for_plan_year(plan_year)
