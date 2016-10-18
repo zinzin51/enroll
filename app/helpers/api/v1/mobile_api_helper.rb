@@ -98,7 +98,7 @@ module Api::V1::MobileApiHelper
                 plan_option_kind:       plan_option_kind,
                 employer_contribution_by_relationship: 
                       Hash[relationship_benefits.map do |rb| 
-                        [rb.relationship, rb.premium_pct] if rb.offered
+                        [rb.relationship, rb.offered ? rb.premium_pct : nil]  
                       end],
                 elected_dental_plans: elected_dental_plans,
                 estimated_employer_max_monthly_cost: employer_estimated_max,
