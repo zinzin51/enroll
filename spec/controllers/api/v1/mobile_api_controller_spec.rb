@@ -174,11 +174,12 @@ describe "GET employer_details" do
 
      before :each do
         create_brady_census_families
+        carols_plan_year.update_attributes( aasm_state: "published" ) if carols_plan_year.aasm_state != "published"
     end
 
     context " (for this we are using BradyBunch and BradyWorkAfterAll support files)\n " do
       include_context "BradyBunch"  
-      attr_reader :mikes_organization, :mikes_employer, :mikes_family, :carols_organization, :carols_employer, :carols_family, :mikes_plan_year, :carols_plan_year
+      attr_reader :mikes_organization, :mikes_employer, :mikes_family, :carols_organization, :carols_employer, :carols_family, :mikes_plan_year, :carols_plan_year, :carols_benefit_group
 
       # Mikes Factory records
       let!(:mikes_broker_org) { FactoryGirl.create(:organization) }
@@ -229,7 +230,7 @@ describe "GET employer_details" do
       let!(:carols_employer_profile_person) { FactoryGirl.create(:person, first_name: "Pinkman")}
       let!(:carols_employer_profile_staff_role) { FactoryGirl.create(:employer_staff_role, person: carols_employer_profile_person, employer_profile_id: carols_employer_profile.id)}
       let!(:carols_employer_profile_user) { double("user", :has_broker_agency_staff_role? => false ,:has_hbx_staff_role? => false, :has_employer_staff_role? => true, :has_broker_role? => false, :person => carols_employer_profile_staff_role.person) }
-     
+      let!(:carols_renewing_plan_year) { FactoryGirl.create(:renewing_plan_year, aasm_state: "renewing_draft", employer_profile: carols_employer, benefit_groups: [carols_benefit_group]) }
     
           #HBX Admin Factories
       let(:hbx_person) { FactoryGirl.create(:person, first_name: "Jessie")}
@@ -393,6 +394,7 @@ describe "GET employer_details" do
          expect(@output["roster"]).not_to be []
          expect(@output["roster"].count).to eq 1
         end
+
 
       end
 

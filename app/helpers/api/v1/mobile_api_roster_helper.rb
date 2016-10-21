@@ -67,7 +67,7 @@ module Api::V1::MobileApiRosterHelper
               plan_name: enrollment.plan.try(:name),
               plan_type: enrollment.plan.try(:plan_type),
               metal_level:  enrollment.plan.try(coverage_kind == :health ? :metal_level : :dental_level),
-			  benefit_group_name: enrollment.benefit_group.title
+			        benefit_group_name: enrollment.benefit_group.title
             } 
           else 
             {
@@ -80,18 +80,23 @@ module Api::V1::MobileApiRosterHelper
               rendered_enrollment[field] = value if value
             end
           end
+          if rendered_enrollment[:status] == "Terminated"
+            rendered_enrollment[:terminated_on] = enrollment.terminated_on  
+            rendered_enrollment[:terminate_reason] = enrollment.terminate_reason
+          end
           enrollments[period_type][coverage_kind] = rendered_enrollment
       end
     end
 
     result = render_individual(census_employee)
-    result[:id]   				= census_employee.id
-    result[:hired_on] 			= census_employee.hired_on
-    result[:is_business_owner]  = census_employee.is_business_owner
-    result[:enrollments] 		= enrollments
-    result[:dependents]			= dependents_of(census_employee).map do |d| 
+    result[:id]   				            = census_employee.id
+    result[:hired_on] 			          = census_employee.hired_on
+    result[:is_business_owner]        = census_employee.is_business_owner
+    result[:enrollments] 		          = enrollments
+    result[:dependents]			          = dependents_of(census_employee).map do |d| 
     	render_individual(d).merge(relationship: relationship_with(d)) 
     end
+
     result
 
   end
