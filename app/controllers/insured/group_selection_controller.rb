@@ -62,7 +62,7 @@ class Insured::GroupSelectionController < ApplicationController
     if @hbx_enrollment.present?
       if @market_kind == "shop" && @hbx_enrollment.plan.market == "individual"
         raise "You cannot elect employer sponsored coverage with an individual market plan. Please shop for a new plan."
-      elsif @market_kind == "individual" && hbx_enrollment.plan.market == "shop"
+      elsif @market_kind == "individual" && @hbx_enrollment.plan.market == "shop"
         raise "You cannot elect individual market coverage with a shop market plan. Please shop for a new plan."
       end
     end
