@@ -60,7 +60,7 @@ module ApplicationHelper
     generated_target_id ||= "#{sanitized_object_name}_jq_datepicker_plain_field"
     capture do
       concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id, :value=> obj_val.try(:to_s, :db)))
-      concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
+      concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :start_date => "07/01/2016", :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
     end
   end
 
@@ -154,7 +154,7 @@ module ApplicationHelper
 
   # Uses a boolean value to return an HTML checked/unchecked glyph
   def boolean_to_glyph(test)
-    test ? content_tag(:span, "", class: "fui-checkbox-checked") : content_tag(:span, "", class: "fui-checkbox-unchecked")
+    test ? content_tag(:span, "", class: "fa fa-check-square-o aria-hidden='true'") : content_tag(:span, "", class: "fa fa-square-o aria-hidden='true'")
   end
 
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
@@ -372,11 +372,20 @@ module ApplicationHelper
     return link
   end
 
-  def display_carrier_logo(carrier_name, options = {:width => 50})
-    carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
-    if carrier_name.present?
-      image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+  def display_carrier_logo(plan, options = {:width => 50})
+    return "" if !plan.carrier_profile.extract_value.present?
+    hios_id = plan.hios_id[0..6].extract_value
+    carrier_name = case hios_id
+    when "75753DC"
+      "oci"
+    when "21066DC"
+      "uhcma"
+    when "41842DC"
+      "uhic"
+    else
+      plan.carrier_profile.legal_name.extract_value
     end
+    image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def dob_in_words(age, dob)
@@ -439,7 +448,7 @@ module ApplicationHelper
 
     content_tag(:div, class: 'progress-wrapper employer-dummy') do
       content_tag(:div, class: 'progress') do
-        concat(content_tag(:div, class: "progress-bar #{progress_bar_class}", style: "width: #{progress_bar_width}%;", role: 'progressbar', aria: {valuenow: "#{enrolled}", valuemin: "0", valuemax: "#{eligible}"}, data: {value: "#{enrolled}"}) do
+        concat(content_tag(:div, class: "progress-bar #{progress_bar_class} progress-bar-striped", style: "width: #{progress_bar_width}%;", role: 'progressbar', aria: {valuenow: "#{enrolled}", valuemin: "0", valuemax: "#{eligible}"}, data: {value: "#{enrolled}"}) do
           concat content_tag(:span, '', class: 'sr-only')
         end)
 
@@ -448,7 +457,7 @@ module ApplicationHelper
         end
 
         if eligible > 2
-          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "&nbsp;#{p_min}&nbsp;" unless plan_year.start_on.to_date.month == 1
+          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minumum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
 
@@ -601,4 +610,14 @@ module ApplicationHelper
     end
   end
 
+  def asset_data_base64(path)
+    asset = Rails.application.assets.find_asset(path)
+    throw "Could not find asset '#{path}'" if asset.nil?
+    base64 = Base64.encode64(asset.to_s).gsub(/\s+/, "")
+    "data:#{asset.content_type};base64,#{Rack::Utils.escape(base64)}"
+  end
+
+  def find_plan_name(hbx_id)
+    HbxEnrollment.find(hbx_id).try(:plan).try(:name)
+  end
 end
