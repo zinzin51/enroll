@@ -9,7 +9,7 @@ module Api
 
         def employee_enrollments
           @assignments.map do |assignment|
-            hbx_enrollments = @grouped_bga_enrollments[assignment.id.to_s].flatten unless !@grouped_bga_enrollments || @grouped_bga_enrollments
+            hbx_enrollments = @grouped_bga_enrollments[assignment.id.to_s].flatten unless !@grouped_bga_enrollments || @grouped_bga_enrollments.empty?
             enrollment_year = {start_on: assignment.plan_year.start_on}
             %w{health dental}.each do |coverage_kind|
               enrollment, rendered_enrollment = initialize_enrollment hbx_enrollments, coverage_kind
