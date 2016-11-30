@@ -5,10 +5,10 @@ module Api
         MAX_DENTAL_PLANS = 13
         attr_accessor :plan_year
 
-        def self.is_current_or_upcoming? plan_year
+        def is_current_or_upcoming?
           now = TimeKeeper.date_of_record
-          (now - 1.year..now + 1.year).include? plan_year.try(:start_on) 
-        end  
+          (now - 1.year..now + 1.year).include? @plan_year.try(:start_on)
+        end
 
         def open_enrollment?
           employee_max? && @as_of &&
@@ -34,15 +34,15 @@ module Api
           renewals_offset_in_months = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months
 
           {
-            open_enrollment_begins:         @plan_year.open_enrollment_start_on,
-            open_enrollment_ends:           @plan_year.open_enrollment_end_on,
-            plan_year_begins:               @plan_year.start_on,
-            renewal_in_progress:            @plan_year.is_renewing?,
-            renewal_application_available:  @plan_year.start_on >> renewals_offset_in_months,
-            renewal_application_due:        @plan_year.due_date_for_publish,
-            state:                          @plan_year.aasm_state.to_s.humanize.titleize,
-            minimum_participation_required: @plan_year.minimum_enrolled_count
-          }       
+              open_enrollment_begins: @plan_year.open_enrollment_start_on,
+              open_enrollment_ends: @plan_year.open_enrollment_end_on,
+              plan_year_begins: @plan_year.start_on,
+              renewal_in_progress: @plan_year.is_renewing?,
+              renewal_application_available: @plan_year.start_on >> renewals_offset_in_months,
+              renewal_application_due: @plan_year.due_date_for_publish,
+              state: @plan_year.aasm_state.to_s.humanize.titleize,
+              minimum_participation_required: @plan_year.minimum_enrolled_count
+          }
         end
 
         def render_details

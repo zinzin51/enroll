@@ -9,9 +9,10 @@ module Api
 
         def employee_enrollments
           @assignments.map do |assignment|
-            enrollment_year = { start_on: assignment.plan_year.start_on }
+            hbx_enrollments = @grouped_bga_enrollments[assignment.id.to_s].flatten unless !@grouped_bga_enrollments || @grouped_bga_enrollments
+            enrollment_year = {start_on: assignment.plan_year.start_on}
             %w{health dental}.each do |coverage_kind|
-              enrollment, rendered_enrollment = initialize_enrollment assignment, coverage_kind
+              enrollment, rendered_enrollment = initialize_enrollment hbx_enrollments, coverage_kind
 
               Employee::ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
                 value = enrollment.plan.try(field)
@@ -54,8 +55,8 @@ module Api
           rendered_enrollment[:terminate_reason] = enrollment.terminate_reason
         end
 
-        def initialize_enrollment assignment, coverage_kind
-          enrollment = assignment.hbx_enrollments.detect { |e| e.coverage_kind == coverage_kind } if assignment #doing a query on Families
+        def initialize_enrollment hbx_enrollments, coverage_kind
+          enrollment = hbx_enrollments.detect { |e| e.coverage_kind == coverage_kind } unless !hbx_enrollments || hbx_enrollments.empty?
           rendered_enrollment = if enrollment
                                   {status: status_label_for(enrollment.aasm_state),
                                    employer_contribution: enrollment.total_employer_contribution,
