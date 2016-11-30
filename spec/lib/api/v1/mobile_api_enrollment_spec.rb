@@ -21,7 +21,8 @@ RSpec.describe Api::V1::Mobile::Enrollment, dbclean: :after_each do
 
     it 'should return employee enrollments' do
       assignments = [benefit_group_assignment, benefit_group_assignment]
-      enrollments = Api::V1::Mobile::Enrollment.new(assignments: assignments).employee_enrollments
+      grouped_bga_enrollments = [hbx_enrollment].group_by { |x| x.benefit_group_assignment_id.to_s }
+      enrollments = Api::V1::Mobile::Enrollment.new(assignments: assignments, grouped_bga_enrollments: grouped_bga_enrollments).employee_enrollments
       expect(enrollments).to be_a_kind_of Array
       expect(enrollments.size).to eq 2
 
@@ -32,11 +33,11 @@ RSpec.describe Api::V1::Mobile::Enrollment, dbclean: :after_each do
 
       active_health, renewal_health = active['health'], renewal['health']
       active_dental, renewal_dental = active['dental'], renewal['dental']
-      expect(active_health).to include(:status, :employer_contribution, :employee_cost, 
-                                       :total_premium, :plan_name, :plan_type, :metal_level, 
+      expect(active_health).to include(:status, :employer_contribution, :employee_cost,
+                                       :total_premium, :plan_name, :plan_type, :metal_level,
                                        :benefit_group_name)
-      expect(renewal_health).to include(:status, :employer_contribution, :employee_cost, 
-                                        :total_premium, :plan_name, :plan_type, :metal_level, 
+      expect(renewal_health).to include(:status, :employer_contribution, :employee_cost,
+                                        :total_premium, :plan_name, :plan_type, :metal_level,
                                         :benefit_group_name)
       expect(active_dental).to include(:status)
       expect(renewal_dental).to include(:status)
@@ -54,7 +55,7 @@ RSpec.describe Api::V1::Mobile::Enrollment, dbclean: :after_each do
       expect(bgas.size).to eq 1
       expect(bgas.pop).to be_a_kind_of BSON::ObjectId
 
-      expect{enrollment.benefit_group_assignment_ids(HbxEnrollment::ENROLLED_STATUSES, [], [])}.to raise_error(LocalJumpError)
+      expect { enrollment.benefit_group_assignment_ids(HbxEnrollment::ENROLLED_STATUSES, [], []) }.to raise_error(LocalJumpError)
       enrollment.benefit_group_assignment_ids HbxEnrollment::ENROLLED_STATUSES, [], [] do |enrolled_ids, waived_ids, terminated_ids|
         expect(enrolled_ids).to be_a_kind_of Array
         expect(enrolled_ids.size).to eq 1
@@ -64,7 +65,7 @@ RSpec.describe Api::V1::Mobile::Enrollment, dbclean: :after_each do
 
     it 'should initialize enrollments' do
       enrollment = Api::V1::Mobile::Enrollment.new
-      enrollments = enrollment.send(:initialize_enrollment, benefit_group_assignment, 'health')
+      enrollments = enrollment.send(:initialize_enrollment, [hbx_enrollment], 'health')
       expect(enrollments).to be_a_kind_of Array
       expect(enrollments.shift).to be_a_kind_of HbxEnrollment
       expect(enrollments.shift).to include(:status, :employer_contribution, :employee_cost, :total_premium, :plan_name,

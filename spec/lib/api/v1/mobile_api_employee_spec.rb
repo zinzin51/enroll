@@ -5,6 +5,7 @@ require 'lib/api/v1/support/mobile_employee_data'
 
 RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
   include_context 'employer_data'
+  include Api::V1::Mobile::Cache
 
   shared_examples 'roster_employees' do |desc|
     include_context 'employee_data'
@@ -31,12 +32,12 @@ RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
       expect(emp[:enrollments][0]).to include('health', 'dental', :start_on)
       health = emp[:enrollments][0]["health"]
       expect(health).to_not be nil
-      expect(health).to include(:status, :employer_contribution, :employee_cost, :total_premium, 
+      expect(health).to include(:status, :employer_contribution, :employee_cost, :total_premium,
                                 :plan_name, :plan_type, :metal_level, :benefit_group_name)
       expect(health[:status]).to eq "Enrolled"
 
       dental = emp[:enrollments][0]["dental"]
-      expect(dental).to include(:status, :employer_contribution, :employee_cost, :total_premium, 
+      expect(dental).to include(:status, :employer_contribution, :employee_cost, :total_premium,
                                 :plan_name, :plan_type, :metal_level, :benefit_group_name)
     end
   end
@@ -46,15 +47,8 @@ RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
 
     it_behaves_like 'roster_employees', 'return the employee' do
       let!(:emp) {
-        employee = Api::V1::Mobile::Employee.new employees: [ce_employee]
+        employee = Api::V1::Mobile::Employee.new employees: [ce_employee], employer_profile: employer_profile_salon
         employee.roster_employees.pop
-      }
-    end
-
-    it_behaves_like 'roster_employees', 'return the employees' do
-      let!(:emp) {
-        employee = Api::V1::Mobile::Employee.new
-        employee.send(:roster_employee, ce_employee)
       }
     end
 

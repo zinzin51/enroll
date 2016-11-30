@@ -132,6 +132,7 @@ module MobileEmployerData
         e
       end
       let!(:benefit_group_assignment) {send(benefit_group_assignment_id)}
+      let!(:hbx_enrollment) {send(shop_enrollment_id)}
 
       before do
         allow(send(employee_role_id)).to receive(:benefit_group).and_return(benefit_group_assignment.benefit_group)

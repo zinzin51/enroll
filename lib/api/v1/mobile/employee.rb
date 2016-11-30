@@ -2,6 +2,7 @@ module Api
   module V1
     module Mobile
       class Employee < Base
+        include Cache
         ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER = [:plan_type, :deductible, :family_deductible, :provider_directory_url, :rx_formulary_url]
 
         def initialize args={}
@@ -21,22 +22,10 @@ module Api
         end
 
         def roster_employees
-          employees_benefits = @employees.map { |e| {"#{e.id}" => e, benefit_group_assignments: e.benefit_group_assignments} }.flatten
-          benefit_group_assignment_ids = employees_benefits.map { |x| x[:benefit_group_assignments] }.flatten.map(&:id)
-          enrollments_for_benefit_groups = hbx_enrollments benefit_group_assignment_ids
-          grouped_bga_enrollments = enrollments_for_benefit_groups.group_by { |x| x.benefit_group_assignment_id.to_s }
-
-          plan_ids = enrollments_for_benefit_groups.map { |x| x.plan_id }.flatten
-          indexed_plans = Plan.where(:'id'.in => plan_ids).index_by(&:id)
-          enrollments_for_benefit_groups.map { |e| e.plan = indexed_plans[e.plan_id] }
-
-          benefit_groups = @employer_profile.plan_years.map { |p| p.benefit_groups }.flatten.compact.index_by(&:id)
-          enrollments_for_benefit_groups.map { |e| e.benefit_group = benefit_groups[e.benefit_group_id] }
-
-
+          cache = plan_and_benefit_group @employees, @employer_profile
           @employees.compact.map { |ee|
-            benefit_group_assignments = employees_benefits.detect { |b| b.keys.include? ee.id.to_s }.try(:[], :benefit_group_assignments)
-            roster_employee ee, benefit_group_assignments, grouped_bga_enrollments
+            benefit_group_assignments = cache[:employees_benefits].detect { |b| b.keys.include? ee.id.to_s }.try(:[], :benefit_group_assignments)
+            roster_employee ee, benefit_group_assignments, cache[:grouped_bga_enrollments]
           }
         end
 
@@ -69,13 +58,6 @@ module Api
         # Private
         #
         private
-
-        def hbx_enrollments benefit_group_assignment_ids
-          families = ::Family.where(:'households.hbx_enrollments'.elem_match => {
-              :'benefit_group_assignment_id'.in => benefit_group_assignment_ids
-          })
-          families.map { |f| f.households.map { |h| h.hbx_enrollments } }.flatten.compact
-        end
 
         def benefit_group_assignments
           @benefit_group_assignments ||= @benefit_group.employees.map do |ee|
