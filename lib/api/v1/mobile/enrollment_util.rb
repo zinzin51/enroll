@@ -1,7 +1,7 @@
 module Api
   module V1
     module Mobile
-      class Enrollment < Base
+      class EnrollmentUtil < BaseUtil
 
         def benefit_group_assignment_ids enrolled, waived, terminated
           yield bg_assignment_ids(enrolled), bg_assignment_ids(waived), bg_assignment_ids(terminated)
@@ -14,7 +14,7 @@ module Api
             %w{health dental}.each do |coverage_kind|
               enrollment, rendered_enrollment = initialize_enrollment hbx_enrollments, coverage_kind
 
-              Employee::ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
+              EmployeeUtil::ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
                 value = enrollment.plan.try(field)
                 rendered_enrollment[field] = value if value
               end if enrollment && enrollment.plan

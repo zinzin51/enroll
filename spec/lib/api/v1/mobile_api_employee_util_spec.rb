@@ -3,9 +3,8 @@ require 'support/brady_bunch'
 require 'lib/api/v1/support/mobile_employer_data'
 require 'lib/api/v1/support/mobile_employee_data'
 
-RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
+RSpec.describe Api::V1::Mobile::EmployeeUtil, dbclean: :after_each do
   include_context 'employer_data'
-  include Api::V1::Mobile::Cache
 
   shared_examples 'roster_employees' do |desc|
     include_context 'employee_data'
@@ -47,13 +46,13 @@ RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
 
     it_behaves_like 'roster_employees', 'return the employee' do
       let!(:emp) {
-        employee = Api::V1::Mobile::Employee.new employees: [ce_employee], employer_profile: employer_profile_salon
+        employee = Api::V1::Mobile::EmployeeUtil.new employees: [ce_employee], employer_profile: employer_profile_salon
         employee.roster_employees.pop
       }
     end
 
     it 'sorts employees' do
-      sby = Api::V1::Mobile::Employee.new(employer_profile: FactoryGirl.create(:employer_profile), status: 'all').employees_sorted_by
+      sby = Api::V1::Mobile::EmployeeUtil.new(employer_profile: FactoryGirl.create(:employer_profile), status: 'all').employees_sorted_by
       expect(sby).to be_a_kind_of Mongoid::Criteria
       expect(sby.klass).to eq CensusEmployee
       expect(sby.options).to include(:sort)
@@ -61,9 +60,9 @@ RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
     end
 
     it 'should return the benefit group assignments' do
-      mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year
-      benefit_group = Api::V1::Mobile::BenefitGroup.new plan_year: mobile_plan_year.plan_year
-      employee = Api::V1::Mobile::Employee.new benefit_group: benefit_group
+      mobile_plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_cafe.show_plan_year
+      benefit_group = Api::V1::Mobile::BenefitGroupUtil.new plan_year: mobile_plan_year.plan_year
+      employee = Api::V1::Mobile::EmployeeUtil.new benefit_group: benefit_group
       bgas = employee.send(:benefit_group_assignments)
       expect(bgas).to be_a_kind_of Array
       expect(bgas.size).to eq 3
@@ -73,14 +72,14 @@ RSpec.describe Api::V1::Mobile::Employee, dbclean: :after_each do
     end
 
     it 'should return the count by enrollment status' do
-      mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year
-      benefit_group = Api::V1::Mobile::BenefitGroup.new plan_year: mobile_plan_year.plan_year
-      employee = Api::V1::Mobile::Employee.new benefit_group: benefit_group
+      mobile_plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_cafe.show_plan_year
+      benefit_group = Api::V1::Mobile::BenefitGroupUtil.new plan_year: mobile_plan_year.plan_year
+      employee = Api::V1::Mobile::EmployeeUtil.new benefit_group: benefit_group
       expect(employee.count_by_enrollment_status).to eq [2, 0, 0]
     end
 
     it 'should return the basic individual' do
-      employee = Api::V1::Mobile::Employee.new
+      employee = Api::V1::Mobile::EmployeeUtil.new
       individual = employee.send(:basic_individual, ce_employee)
       expect(individual).to include(:first_name, :middle_name, :last_name, :name_suffix, :date_of_birth, :ssn_masked,
                                     :gender)

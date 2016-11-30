@@ -2,7 +2,7 @@ require "rails_helper"
 require 'support/brady_bunch'
 require 'lib/api/v1/support/mobile_employer_data'
 
-RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
+RSpec.describe Api::V1::Mobile::EmployerUtil, dbclean: :after_each do
   include_context 'employer_data'
 
   shared_examples 'organizations_by' do |desc|
@@ -21,7 +21,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
   context 'Enrollment Status' do
 
     it 'initializes the plan year' do
-      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile_cafe
+      employer = Api::V1::Mobile::EmployerUtil.new user: user, employer_profile: employer_profile_cafe
       plan_years = employer.instance_variable_get(:@plan_years)
       expect(plan_years.count).to eq 1
       expect(plan_years[0]).to be_a_kind_of PlanYear
@@ -30,22 +30,22 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
     it_behaves_like 'organizations_by', 'get organization by broker agency profile' do
       let!(:employer) {
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
-        Api::V1::Mobile::Employer.new user: user, authorized: {broker_agency_profile: broker_agency_profile}
+        Api::V1::Mobile::EmployerUtil.new user: user, authorized: {broker_agency_profile: broker_agency_profile}
       }
     end
 
     it_behaves_like 'organizations_by', 'get organization by broker role' do
       let!(:employer) {
         allow(employer_profile2).to receive(:broker_agency_accounts).and_return([broker_agency_account2])
-        Api::V1::Mobile::Employer.new user: user, authorized: {broker_role: broker_role}
+        Api::V1::Mobile::EmployerUtil.new user: user, authorized: {broker_role: broker_role}
       }
     end
 
     it 'should count by enrollment status' do
       
       plan_year = employer_profile_cafe.show_plan_year
-      mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: plan_year, as_of: Time.now
-      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile_cafe
+      mobile_plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: plan_year, as_of: Time.now
+      employer = Api::V1::Mobile::EmployerUtil.new user: user, employer_profile: employer_profile_cafe
 
       result = employer.send(:count_by_enrollment_status, mobile_plan_year)
       expect(result).to eq [2, 0, 0]
@@ -63,7 +63,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
     end
 
     it 'should return the summary details,including URLs' do
-      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile
+      employer = Api::V1::Mobile::EmployerUtil.new user: user, employer_profile: employer_profile
       summary = employer.send(:summary_details, {employer_profile: employer_profile_cafe, years: employer_profile_cafe.plan_years, include_enrollment_counts: true, include_details_url: true})
       expect(summary).to include(:employer_name, :binder_payment_due, :employees_total, :plan_years,
         :employer_details_url, :employee_roster_url)
@@ -107,7 +107,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
     end
 
     it 'should return the details' do
-      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile_cafe
+      employer = Api::V1::Mobile::EmployerUtil.new user: user, employer_profile: employer_profile_cafe
       summary = employer.details
 
       expect(summary).to include(:employer_name, :binder_payment_due, :employees_total, :plan_years,
@@ -123,17 +123,17 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
       end
 
     it 'counts by enrollment status' do
-      mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year
+      mobile_plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_cafe.show_plan_year
       result = @employer.send(:count_by_enrollment_status, mobile_plan_year)
       expect(result).to eq [2, 0, 0]
 
-      mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_salon.show_plan_year
+      mobile_plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_salon.show_plan_year
       result = @employer.send(:count_by_enrollment_status, mobile_plan_year)
       expect(result).to eq [1, 0, 0]
     end
 
     it 'should return employer summaries' do
-      employer = Api::V1::Mobile::Employer.new(employer_profiles: [employer_profile_cafe])
+      employer = Api::V1::Mobile::EmployerUtil.new(employer_profiles: [employer_profile_cafe])
       summaries = employer.send(:marshall_employer_summaries)
       expect(summaries).to be_a_kind_of Array
       expect(summaries.size).to eq 1
@@ -160,7 +160,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
     end
 
     it 'returns employer details' do
-      employer = Api::V1::Mobile::Employer.new employer_profile: employer_profile_cafe, report_date: TimeKeeper.date_of_record
+      employer = Api::V1::Mobile::EmployerUtil.new employer_profile: employer_profile_cafe, report_date: TimeKeeper.date_of_record
       details = employer.details
       expect(details).to include(:employer_name, :binder_payment_due, :employees_total, :plan_years,
         :active_general_agency)
@@ -202,7 +202,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
 
     it 'return employers and broker agency' do
       allow(Organization).to receive(:by_broker_agency_profile).and_return([organization])
-      employer = Api::V1::Mobile::Employer.new authorized: {broker_agency_profile: broker_agency_profile, status: 200},
+      employer = Api::V1::Mobile::EmployerUtil.new authorized: {broker_agency_profile: broker_agency_profile, status: 200},
                                                user: user
       broker = employer.employers_and_broker_agency
       expect(broker).to include(:broker_name, :broker_agency, :broker_agency_id, :broker_clients)
@@ -210,12 +210,12 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
     end
 
     it 'returns benefit group assignments for plan year' do
-      e = Api::V1::Mobile::Employee.new benefit_group: Api::V1::Mobile::BenefitGroup.new(plan_year: employer_profile_salon.show_plan_year)
+      e = Api::V1::Mobile::EmployeeUtil.new benefit_group: Api::V1::Mobile::BenefitGroupUtil.new(plan_year: employer_profile_salon.show_plan_year)
       expect(e.send(:benefit_group_assignments)).to be_a_kind_of Array
       expect(e.send(:benefit_group_assignments).size).to eq 1
       expect(e.send(:benefit_group_assignments)).to eq [benefit_group_assignment_hairdresser]
 
-      e = Api::V1::Mobile::Employee.new benefit_group: Api::V1::Mobile::BenefitGroup.new(plan_year: employer_profile_cafe.show_plan_year)
+      e = Api::V1::Mobile::EmployeeUtil.new benefit_group: Api::V1::Mobile::BenefitGroupUtil.new(plan_year: employer_profile_cafe.show_plan_year)
       expect(e.send(:benefit_group_assignments)).to be_a_kind_of Array
       expect(e.send(:benefit_group_assignments).size).to eq 3
       expect(e.send(:benefit_group_assignments)).to eq [benefit_group_assignment_barista, benefit_group_assignment_manager, benefit_group_assignment_janitor]
@@ -260,7 +260,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
       @enrollment1.waive_coverage_by_benefit_group_assignment("inactive")
       @enrollment2.waive_coverage_by_benefit_group_assignment("inactive")
       benefit_group_assignment = [@mikes_benefit_group_assignments, @carols_benefit_group_assignments]
-      employee = Api::V1::Mobile::Employee.new benefit_group_assignments: benefit_group_assignment
+      employee = Api::V1::Mobile::EmployeeUtil.new benefit_group_assignments: benefit_group_assignment
       result = employee.send(:count_by_enrollment_status)
       expect(result).to eq [0, 2, 0]
     end
@@ -270,7 +270,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
       @enrollment1.update_attributes(aasm_state: "coverage_enrolled")
       @enrollment2.update_attributes(aasm_state: "coverage_enrolled")
       benefit_group_assignment = [@mikes_benefit_group_assignments, @carols_benefit_group_assignments]
-      employee = Api::V1::Mobile::Employee.new benefit_group_assignments: benefit_group_assignment
+      employee = Api::V1::Mobile::EmployeeUtil.new benefit_group_assignments: benefit_group_assignment
       result = employee.send(:count_by_enrollment_status)
       expect(result).to eq [2, 0, 0]
     end
@@ -280,7 +280,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
       @enrollment2.waive_coverage_by_benefit_group_assignment("inactive")
       @enrollment1.update_attributes(aasm_state: "coverage_enrolled")
       benefit_group_assignment = [@mikes_benefit_group_assignments, @carols_benefit_group_assignments]
-      employee = Api::V1::Mobile::Employee.new benefit_group_assignments: benefit_group_assignment
+      employee = Api::V1::Mobile::EmployeeUtil.new benefit_group_assignments: benefit_group_assignment
       result = employee.send(:count_by_enrollment_status)
       expect(result).to eq [1, 1, 0]
     end
@@ -288,7 +288,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
     it "people with shopped-for-but-not-bought or terminated policies" do
       @enrollment2.update_attributes(aasm_state: "coverage_terminated")
       benefit_group_assignment = [@mikes_benefit_group_assignments, @carols_benefit_group_assignments]
-      employee = Api::V1::Mobile::Employee.new benefit_group_assignments: benefit_group_assignment
+      employee = Api::V1::Mobile::EmployeeUtil.new benefit_group_assignments: benefit_group_assignment
       result = employee.send(:count_by_enrollment_status)
       expect(result).to eq [0, 0, 1]
     end
@@ -309,7 +309,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
 
 
       benefit_group_assignment = [@mikes_benefit_group_assignments]
-      employee = Api::V1::Mobile::Employee.new benefit_group_assignments: benefit_group_assignment
+      employee = Api::V1::Mobile::EmployeeUtil.new benefit_group_assignments: benefit_group_assignment
       result = employee.send(:count_by_enrollment_status)
       expect(result).to eq [0, 0, 0]
     end
@@ -329,7 +329,7 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
 
 
       benefit_group_assignment = [@mikes_benefit_group_assignments]
-      employee = Api::V1::Mobile::Employee.new benefit_group_assignments: benefit_group_assignment
+      employee = Api::V1::Mobile::EmployeeUtil.new benefit_group_assignments: benefit_group_assignment
       result = employee.send(:count_by_enrollment_status)
       expect(result).to eq [0, 0, 0]
 

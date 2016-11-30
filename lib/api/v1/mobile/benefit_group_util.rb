@@ -1,7 +1,7 @@
 module Api
   module V1
     module Mobile
-      class BenefitGroup < Base
+      class BenefitGroupUtil < BaseUtil
         attr_accessor :ids, :plan_year
 
         def initialize args

@@ -1,7 +1,7 @@
 module Api
   module V1
     module Mobile
-      class Security < Base
+      class SecurityUtil < BaseUtil
 
         def authorize_employer_list
           return broker_role unless @params[:id]

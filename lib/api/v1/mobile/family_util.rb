@@ -1,7 +1,7 @@
 module Api
   module V1
     module Mobile
-      class Family < Base
+      class FamilyUtil < BaseUtil
 
         def hbx_enrollments
           families = ::Family.where(:'households.hbx_enrollments'.elem_match => {

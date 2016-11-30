@@ -1,7 +1,7 @@
 module Api
   module V1
     module Mobile
-      module Renderer
+      module RendererUtil
         NO_BROKER_AGENCY_PROFILE_FOUND = 'no broker agency profile or broker role found'
         NO_EMPLOYER_DETAILS_FOUND = 'no employer details found'
         NO_EMPLOYEE_ROSTER_FOUND = 'no employee roster found'
@@ -34,7 +34,7 @@ module Api
           render json: {
               employer_name: @employer_profile.legal_name,
               total_num_employees: employees.size,
-              roster: Api::V1::Mobile::Employee.new(employees: employees.limit(500).to_a, employer_profile: @employer_profile).roster_employees}
+              roster: Api::V1::Mobile::EmployeeUtil.new(employees: employees.limit(500).to_a, employer_profile: @employer_profile).roster_employees}
         end
 
         def render_employee_roster_error

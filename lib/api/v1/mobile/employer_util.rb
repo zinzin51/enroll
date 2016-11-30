@@ -1,12 +1,12 @@
 module Api
   module V1
     module Mobile
-      class Employer < Base
+      class EmployerUtil < BaseUtil
 
         def initialize args={}
           super args
           all_years = @employer_profile.try(:plan_years) || []
-          @plan_years = all_years.select { |y| Api::V1::Mobile::PlanYear.new(plan_year: y).is_current_or_upcoming? }
+          @plan_years = all_years.select { |y| Api::V1::Mobile::PlanYearUtil.new(plan_year: y).is_current_or_upcoming? }
         end
 
         def employers_and_broker_agency
@@ -38,7 +38,7 @@ module Api
 
         def marshall_employer_summaries
           return [] if @employer_profiles.blank?
-          staff_by_employer_id = Api::V1::Mobile::Staff.new(employer_profiles: @employer_profiles).keyed_by_employer_id
+          staff_by_employer_id = Api::V1::Mobile::StaffUtil.new(employer_profiles: @employer_profiles).keyed_by_employer_id
           @employer_profiles.map do |er|
             summary_details employer_profile: er,
                             years: er.plan_years,
@@ -54,14 +54,14 @@ module Api
         # Check if the plan year is in renewal without triggering an additional query
         #
         def count_by_enrollment_status mobile_plan_year
-          employee = Employee.new benefit_group: Api::V1::Mobile::BenefitGroup.new(plan_year: mobile_plan_year.plan_year)
+          employee = EmployeeUtil.new benefit_group: Api::V1::Mobile::BenefitGroupUtil.new(plan_year: mobile_plan_year.plan_year)
           employee.count_by_enrollment_status
         end
 
         def summary_details employer_profile:, years: [], staff: nil, offices: nil, include_details_url: false, include_enrollment_counts: false, include_plan_offerings: false
 
           plan_years =  years.map do |year|
-            mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: year, as_of: TimeKeeper.date_of_record
+            mobile_plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: year, as_of: TimeKeeper.date_of_record
 
             plan_year_summary = include_plan_offerings ?
                 mobile_plan_year.render_details : mobile_plan_year.render_summary

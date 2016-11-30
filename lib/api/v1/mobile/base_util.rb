@@ -1,7 +1,7 @@
 module Api
   module V1
     module Mobile
-      class Base
+      class BaseUtil
 
         def initialize args={}
           args.each do |k, v|

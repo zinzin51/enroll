@@ -1,7 +1,7 @@
 module Api
   module V1
     module Mobile
-      class PlanYear < Base
+      class PlanYearUtil < BaseUtil
         MAX_DENTAL_PLANS = 13
         attr_accessor :plan_year
 
@@ -24,7 +24,7 @@ module Api
         def plan_offerings
           @plan_year.benefit_groups.compact.map do |benefit_group|
             {benefit_group_name: benefit_group.title,
-             eligibility_rule: Api::V1::Mobile::BenefitGroup.new(benefit_group: benefit_group).eligibility_rule,
+             eligibility_rule: Api::V1::Mobile::BenefitGroupUtil.new(benefit_group: benefit_group).eligibility_rule,
              health: health_offering(benefit_group),
              dental: dental_offering(benefit_group)}
           end
