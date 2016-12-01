@@ -24,8 +24,12 @@ module Api
         def roster_employees
           cache = plan_and_benefit_group @employees, @employer_profile
           @employees.compact.map { |ee|
-            benefit_group_assignments = cache[:employees_benefits].detect { |b| b.keys.include? ee.id.to_s }.try(:[], :benefit_group_assignments)
-            roster_employee ee, benefit_group_assignments, cache[:grouped_bga_enrollments]
+            if cache
+              benefit_group_assignments = cache[:employees_benefits].detect { |b| b.keys.include? ee.id.to_s }.try(:[], :benefit_group_assignments) || []
+              roster_employee ee, benefit_group_assignments, cache[:grouped_bga_enrollments]
+            else
+              roster_employee ee, ee.benefit_group_assignments
+            end
           }
         end
 
@@ -68,22 +72,33 @@ module Api
           end.flatten
         end
 
-        def roster_employee employee, benefit_group_assignments, grouped_bga_enrollments
+        def roster_employee employee, benefit_group_assignments, grouped_bga_enrollments=nil
+          result = employee_hash employee
+          enrollment_util = Api::V1::Mobile::EnrollmentUtil.new(
+              assignments: current_or_upcoming_assignments(benefit_group_assignments))
+          enrollment_util.grouped_bga_enrollments = grouped_bga_enrollments if grouped_bga_enrollments
+          result[:enrollments] = enrollment_util.employee_enrollments
+          add_dependents employee, result
+          result
+        end
+
+        def add_dependents employee, result
+          result[:dependents] = dependents_of(employee).map do |d|
+            basic_individual(d).merge(relationship: relationship_with(d))
+          end
+        end
+
+        def current_or_upcoming_assignments benefit_group_assignments
+          benefit_group_assignments.select do |a|
+            Api::V1::Mobile::PlanYearUtil.new(plan_year: a.plan_year).is_current_or_upcoming?
+          end
+        end
+
+        def employee_hash employee
           result = basic_individual employee
           result[:id] = employee.id
           result[:hired_on] = employee.hired_on
           result[:is_business_owner] = employee.is_business_owner
-
-          assignments = benefit_group_assignments.select do |a|
-            Api::V1::Mobile::PlanYearUtil.new(plan_year: a.plan_year).is_current_or_upcoming?
-          end
-
-          result[:enrollments] = Api::V1::Mobile::EnrollmentUtil.new(
-              assignments: assignments, grouped_bga_enrollments: grouped_bga_enrollments).employee_enrollments
-          result[:dependents] = dependents_of(employee).map do |d|
-            basic_individual(d).merge(relationship: relationship_with(d))
-          end
-
           result
         end
 

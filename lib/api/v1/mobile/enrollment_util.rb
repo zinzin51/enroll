@@ -2,6 +2,7 @@ module Api
   module V1
     module Mobile
       class EnrollmentUtil < BaseUtil
+        attr_accessor :grouped_bga_enrollments
 
         def benefit_group_assignment_ids enrolled, waived, terminated
           yield bg_assignment_ids(enrolled), bg_assignment_ids(waived), bg_assignment_ids(terminated)
@@ -12,7 +13,8 @@ module Api
             hbx_enrollments = @grouped_bga_enrollments[assignment.id.to_s] unless !@grouped_bga_enrollments || @grouped_bga_enrollments.empty?
             enrollment_year = {start_on: assignment.plan_year.start_on}
             %w{health dental}.each do |coverage_kind|
-              enrollment, rendered_enrollment = initialize_enrollment hbx_enrollments, coverage_kind
+              enrollments = hbx_enrollments ? hbx_enrollments : assignment.hbx_enrollments
+              enrollment, rendered_enrollment = initialize_enrollment enrollments, coverage_kind
 
               EmployeeUtil::ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
                 value = enrollment.plan.try(field)
