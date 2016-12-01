@@ -4,12 +4,13 @@ module Api
       include Api::V1::Mobile::RendererUtil
 
       before_filter :employer_profile, except: :employers_list
+      Mobile = Api::V1::Mobile
 
       def employers_list
         execute {
-          authorized = Api::V1::Mobile::SecurityUtil.new(user: current_user, params: params).authorize_employer_list
+          authorized = Mobile::SecurityUtil.new(user: current_user, params: params).authorize_employer_list
           if authorized[:status] == 200
-            employer = Api::V1::Mobile::EmployerUtil.new authorized: authorized, user: current_user
+            employer = Mobile::EmployerUtil.new authorized: authorized, user: current_user
             render_employers_list employer.employers_and_broker_agency
           else
             render_employers_list_error authorized[:status]
@@ -19,8 +20,8 @@ module Api
 
       def employer_details
         execute {
-          if Api::V1::Mobile::SecurityUtil.new(user: current_user, employer_profile: @employer_profile).can_view_employer_details?
-            employer = Api::V1::Mobile::EmployerUtil.new employer_profile: employer_profile, report_date: params[:report_date]
+          if Mobile::SecurityUtil.new(user: current_user, employer_profile: @employer_profile).can_view_employer_details?
+            employer = Mobile::EmployerUtil.new employer_profile: employer_profile, report_date: params[:report_date]
             render_employer_details employer.details
           else
             render_employer_details_error
@@ -30,8 +31,8 @@ module Api
 
       def employee_roster
         execute {
-          if Api::V1::Mobile::SecurityUtil.new(user: current_user, employer_profile: @employer_profile).can_view_employee_roster?
-            employees = Api::V1::Mobile::EmployeeUtil.new(employer_profile: @employer_profile,
+          if Mobile::SecurityUtil.new(user: current_user, employer_profile: @employer_profile).can_view_employee_roster?
+            employees = Mobile::EmployeeUtil.new(employer_profile: @employer_profile,
                                                       employee_name: params[:employee_name],
                                                       status: params[:status]).employees_sorted_by
             employees ? render_employee_roster(employees) : render_employee_roster_error

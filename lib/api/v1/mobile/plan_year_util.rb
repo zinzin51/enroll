@@ -24,7 +24,7 @@ module Api
         def plan_offerings
           @plan_year.benefit_groups.compact.map do |benefit_group|
             {benefit_group_name: benefit_group.title,
-             eligibility_rule: Api::V1::Mobile::BenefitGroupUtil.new(benefit_group: benefit_group).eligibility_rule,
+             eligibility_rule: BenefitGroupUtil.new(benefit_group: benefit_group).eligibility_rule,
              health: health_offering(benefit_group),
              dental: dental_offering(benefit_group)}
           end

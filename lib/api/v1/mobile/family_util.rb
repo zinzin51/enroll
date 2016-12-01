@@ -4,7 +4,7 @@ module Api
       class FamilyUtil < BaseUtil
 
         def hbx_enrollments
-          families = ::Family.where(:'households.hbx_enrollments'.elem_match => {
+          families = Family.where(:'households.hbx_enrollments'.elem_match => {
               :'benefit_group_assignment_id'.in => @benefit_group_assignment_ids,
               :aasm_state.in => @aasm_states,
               :kind => 'employer_sponsored',

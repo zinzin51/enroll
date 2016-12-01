@@ -31,7 +31,7 @@ module Api
         private
 
         def hbx_enrollments benefit_group_assignment_ids
-          families = ::Family.where(:'households.hbx_enrollments'.elem_match => {
+          families = Family.where(:'households.hbx_enrollments'.elem_match => {
               :'benefit_group_assignment_id'.in => benefit_group_assignment_ids
           })
           families.map { |f| f.households.map { |h| h.hbx_enrollments } }.flatten.compact

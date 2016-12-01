@@ -48,8 +48,8 @@ module Api
           terminated = HbxEnrollment::TERMINATED_STATUSES
 
           id_list = @benefit_group_assignments.map(&:id)
-          all_enrollments = Api::V1::Mobile::FamilyUtil.new(benefit_group_assignment_ids: id_list, aasm_states: enrolled_or_renewal + waived + terminated).hbx_enrollments
-          enrollment = Api::V1::Mobile::EnrollmentUtil.new all_enrollments: all_enrollments
+          all_enrollments = FamilyUtil.new(benefit_group_assignment_ids: id_list, aasm_states: enrolled_or_renewal + waived + terminated).hbx_enrollments
+          enrollment = EnrollmentUtil.new all_enrollments: all_enrollments
 
           # return count of enrolled, count of waived, count of terminated
           # only including those originally asked for
@@ -74,7 +74,7 @@ module Api
 
         def roster_employee employee, benefit_group_assignments, grouped_bga_enrollments=nil
           result = employee_hash employee
-          enrollment_util = Api::V1::Mobile::EnrollmentUtil.new(
+          enrollment_util = EnrollmentUtil.new(
               assignments: current_or_upcoming_assignments(benefit_group_assignments))
           enrollment_util.grouped_bga_enrollments = grouped_bga_enrollments if grouped_bga_enrollments
           result[:enrollments] = enrollment_util.employee_enrollments
@@ -89,9 +89,7 @@ module Api
         end
 
         def current_or_upcoming_assignments benefit_group_assignments
-          benefit_group_assignments.select do |a|
-            Api::V1::Mobile::PlanYearUtil.new(plan_year: a.plan_year).is_current_or_upcoming?
-          end
+          benefit_group_assignments.select { |a| PlanYearUtil.new(plan_year: a.plan_year).is_current_or_upcoming? }
         end
 
         def employee_hash employee
