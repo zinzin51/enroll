@@ -5,7 +5,7 @@ qs = Queries::PolicyAggregationPipeline.new
 
 qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
 
-qs.add({ "$match" => {"policy_purchased_at" => {"$gt" => window_start, "$lt" => window_end)}}})
+qs.add({ "$match" => {"policy_purchased_at" => {"$gt" => window_start, "$lt" => window_end}}})
 
 all_active_selections = []
 
