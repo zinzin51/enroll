@@ -1,6 +1,6 @@
 amqp_environment_name = "preprod"
-window_start = Time.mktime(2016,11,22,0,0,0)
-window_end = Time.mktime(2016,12,5,0,0,0)
+window_start = Time.mktime(2016,11,2,0,0,0)
+window_end = Time.mktime(2016,12,5,16,0,0)
 qs = Queries::PolicyAggregationPipeline.new
 
 qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
