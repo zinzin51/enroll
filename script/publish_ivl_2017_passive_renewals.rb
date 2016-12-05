@@ -1,12 +1,12 @@
-amqp_environment_name = "preprod"
-window_start = Time.mktime(2016,10,31,0,0,0)
-window_end = Time.mktime(2016, 12, 1, 12, 0, 0)
+amqp_environment_name = "prod"
+window_start = Time.mktime(2016,10,28,0,0,0)
+window_end = Time.mktime(2016, 12, 6, 12, 0, 0)
 
 qs = Queries::PolicyAggregationPipeline.new
 
 qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
 
-qs.add({ "$match" => {"policy_purchased_at" => {"$gt" => window_start, "$lte" => window_end}}})
+qs.add({ "$match" => {"policy_purchased_at" => {"$gt" => window_start}}})
 
 enroll_pol_ids = []
 
@@ -16,6 +16,10 @@ qs.evaluate.each do |r|
   end
 end
 
+glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip)
+
+missing = (enroll_pol_ids - glue_list)
+
 remote_broker_uri = Rails.application.config.acapi.remote_broker_uri
 target_queue = "dc0.#{amqp_environment_name}.q.gluedb.enrollment_query_result_handler"
 
@@ -24,7 +28,7 @@ conn.start
 chan = conn.create_channel
 chan.confirm_select
 dex = chan.default_exchange
-enroll_pol_ids.each do |pol_id|
+missing.each do |pol_id|
  dex.publish(
    "",
    {
