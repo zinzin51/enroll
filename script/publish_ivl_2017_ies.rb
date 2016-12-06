@@ -31,9 +31,9 @@ active_selection_families.each do |fam|
     end
     if !found_a_2016
       if policy_for_2017.subscriber.present?
-      if policy_for_2017.subscriber.family_member == policy_for_2017.household.family.primary_applicant
+#      if policy_for_2017.subscriber.family_member == policy_for_2017.household.family.primary_applicant
         active_selection_new_enrollments << policy_for_2017.hbx_id
-      end
+#      end
       end
     end
   end

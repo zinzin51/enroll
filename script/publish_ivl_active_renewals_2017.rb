@@ -1,6 +1,6 @@
 amqp_environment_name = "preprod"
-window_start = Time.mktime(2016,11,2,0,0,0)
-window_end = Time.mktime(2016,12,5,16,0,0)
+window_start = Time.mktime(2016,11,1,0,0,0)
+window_end = Time.mktime(2016,12,6,0,0,0)
 qs = Queries::PolicyAggregationPipeline.new
 
 qs.filter_to_individual.filter_to_active.with_effective_date({"$gt" => Date.new(2016,12,31)}).eliminate_family_duplicates
@@ -31,9 +31,7 @@ active_selection_families.each do |fam|
     end
     if found_a_2016
       if policy_for_2017.subscriber.present?
-      if policy_for_2017.subscriber.family_member == policy_for_2017.household.family.primary_applicant
         active_selection_new_enrollments << policy_for_2017.hbx_id
-      end
       end
     end
   end
