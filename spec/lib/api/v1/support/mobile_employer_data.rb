@@ -125,12 +125,39 @@ module MobileEmployerData
         e.save
         e
       end
+
       let (:employer_profile2) do
         e = FactoryGirl.create(:employer_profile, organization: organization)
         e.broker_agency_accounts << broker_agency_account2
         e.save
         e
       end
+
+        let(:staff_user) { FactoryGirl.create(:user) }
+        let(:staff) do
+          s = FactoryGirl.create(:person, :with_work_email, :male)
+          s.user = staff_user
+          s.first_name = "Seymour"
+          s.emails.clear
+          s.emails << ::Email.new(:kind => 'work', :address => 'seymour@example.com')
+          s.phones << ::Phone.new(:kind => 'mobile', :area_code => '202', :number => '555-0000')
+          s.save
+          s
+        end
+
+        let(:staff_user2) { FactoryGirl.create(:user) }
+        let(:staff2) do
+          s = FactoryGirl.create(:person, :with_work_email, :male)
+          s.user = staff_user2
+          s.first_name = "Beatrice"
+          s.emails.clear
+          s.emails << ::Email.new(:kind => 'work', :address => 'beatrice@example.com')
+          s.phones << ::Phone.new(:kind => 'work', :area_code => '202', :number => '555-0001')
+          s.phones << ::Phone.new(:kind => 'mobile', :area_code => '202', :number => '555-0002')
+          s.save
+          s
+        end
+
       let!(:benefit_group_assignment) {send(benefit_group_assignment_id)}
       let!(:hbx_enrollment) {send(shop_enrollment_id)}
 

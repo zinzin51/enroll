@@ -3,7 +3,7 @@ module Api
     class MobileApiController < ApplicationController
       include Api::V1::Mobile::RendererUtil
 
-      before_filter :employer_profile, except: :employers_list
+      before_filter :employer_profile, except: [:employers_list, :my_employee_roster, :my_employer_details]
       Mobile = Api::V1::Mobile
 
       def employers_list
@@ -13,32 +13,36 @@ module Api
             employer = Mobile::EmployerUtil.new authorized: authorized, user: current_user
             render_employers_list employer.employers_and_broker_agency
           else
-            render_employers_list_error authorized[:status]
+            render_employers_list nil, authorized[:status]
           end
         }
       end
 
       def employer_details
         execute {
-          if Mobile::SecurityUtil.new(user: current_user, employer_profile: @employer_profile).can_view_employer_details?
-            employer = Mobile::EmployerUtil.new employer_profile: employer_profile, report_date: params[:report_date]
-            render_employer_details employer.details
-          else
-            render_employer_details_error
-          end
+          can_view = Mobile::SecurityUtil.new(user: current_user, employer_profile: @employer_profile).can_view_employer_details?
+          render_employer can_view
+        }
+      end
+
+      def my_employer_details
+        execute {
+          @employer_profile ||= Mobile::EmployerUtil.employer_profile_for_user current_user
+          render_employer @employer_profile!=nil?
         }
       end
 
       def employee_roster
         execute {
-          if Mobile::SecurityUtil.new(user: current_user, employer_profile: @employer_profile).can_view_employee_roster?
-            employees = Mobile::EmployeeUtil.new(employer_profile: @employer_profile,
-                                                      employee_name: params[:employee_name],
-                                                      status: params[:status]).employees_sorted_by
-            employees ? render_employee_roster(employees) : render_employee_roster_error
-          else
-            render_employee_roster_error
-          end
+          can_view = Mobile::SecurityUtil.new(user: current_user, employer_profile: @employer_profile).can_view_employee_roster?
+          render_employees can_view
+        }
+      end
+
+      def my_employee_roster
+        execute {
+          @employer_profile ||= Mobile::EmployerUtil.employer_profile_for_user current_user
+          render_employees @employer_profile!=nil?
         }
       end
 
@@ -46,6 +50,30 @@ module Api
       # Private
       #
       private
+
+      def render_employer can_view
+        execute {
+          if can_view
+            employer = Mobile::EmployerUtil.new employer_profile: @employer_profile, report_date: params[:report_date]
+            render_employer_details employer.details
+          else
+            render_employer_details
+          end
+        }
+      end
+
+      def render_employees can_view
+        execute {
+          if can_view
+            employees = Mobile::EmployeeUtil.new(employer_profile: @employer_profile,
+                                                 employee_name: params[:employee_name],
+                                                 status: params[:status]).employees_sorted_by
+            employees ? render_employee_roster(employees) : render_employee_roster
+          else
+            render_employee_roster
+          end
+        }
+      end
 
       def execute
         begin

@@ -26,6 +26,18 @@ module Api
           details
         end
 
+        class << self
+
+          def employer_profile_for_user user
+            employer_staff_roles = user.person.try(:employer_staff_roles)
+            unless employer_staff_roles.nil? || employer_staff_roles.empty?
+              employer_profile_id = employer_staff_roles.detect { |x| x.is_active }.try(:employer_profile_id)
+              EmployerProfile.find(employer_profile_id) if employer_profile_id
+            end
+          end
+
+        end
+
         #
         # Private
         #
