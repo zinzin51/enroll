@@ -1,142 +1,126 @@
 require "rails_helper"
 require 'support/brady_bunch'
-
+require 'lib/api/v1/support/mobile_employer_data'
 
 RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
+  include_context 'employer_data'
+
+  shared_examples 'organizations_by' do |desc|
+    it "should #{desc}" do
+      organizations = employer.send(:organizations)
+      expect(organizations).to be_a_kind_of Mongoid::Criteria
+      org = organizations.first
+      expect(org).to be_a_kind_of Organization
+      expect(org.hbx_id).to_not be_nil
+      expect(org.legal_name).to_not be_nil
+      expect(org.fein).to_not be_nil
+      expect(org.dba).to_not be_nil
+    end
+  end
 
   context 'Enrollment Status' do
-    let!(:employer_profile_cafe) { FactoryGirl.create(:employer_profile) }
-    let!(:employer_profile_salon) { FactoryGirl.create(:employer_profile) }
-    let!(:calender_year) { TimeKeeper.date_of_record.year + 1 }
 
-    let!(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
+    it 'initializes the plan year' do
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile_cafe
+      plan_years = employer.instance_variable_get(:@plan_years)
+      expect(plan_years.count).to eq 1
+      expect(plan_years[0]).to be_a_kind_of PlanYear
+    end
 
-    let!(:shop_family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let!(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
-    let!(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
-    let!(:open_enrollment_start_on) { Date.new(calender_year - 1, 11, 1) }
-    let!(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
-    let!(:effective_date) { plan_year_start_on }
-
-    ["cafe", "salon"].each do |id|
-      employer_profile_id = "employer_profile_#{id}".to_sym
-      plan_year_id = "plan_year_#{id}".to_sym
-      let!(plan_year_id) {
-        py = FactoryGirl.create(:plan_year,
-                                start_on: plan_year_start_on,
-                                end_on: plan_year_end_on,
-                                open_enrollment_start_on: open_enrollment_start_on,
-                                open_enrollment_end_on: open_enrollment_end_on,
-                                employer_profile: send(employer_profile_id))
-
-        blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
-        white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
-        py.benefit_groups = [blue, white]
-        py.save
-        py.update_attributes({:aasm_state => 'published'})
-        py
+    it_behaves_like 'organizations_by', 'get organization by broker agency profile' do
+      let!(:employer) {
+        allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
+        Api::V1::Mobile::Employer.new user: user, authorized: {broker_agency_profile: broker_agency_profile}
       }
     end
 
-
-    [{id: :barista, name: 'John', coverage_kind: "health", works_at: 'cafe', collar: "blue"},
-     {id: :manager, name: 'Grace', coverage_kind: "health", works_at: 'cafe', collar: "white"},
-     {id: :janitor, name: 'Bob', coverage_kind: "dental", works_at: 'cafe', collar: "blue"},
-     {id: :hairdresser, name: 'Tatiana', coverage_kind: "health", works_at: 'salon', collar: "blue"}
-    ].each_with_index do |record, index|
-      id = record[:id]
-      name = record[:name]
-      works_at = record[:works_at]
-      coverage_kind = record[:coverage_kind]
-      social_class = "#{record[:collar]} collar"
-      employer_profile_id = "employer_profile_#{works_at}".to_sym
-      plan_year_id = "plan_year_#{works_at}".to_sym
-      census_employee_id = "census_employee_#{id}".to_sym
-      employee_role_id = "employee_role_#{id}".to_sym
-      benefit_group_assignment_id = "benefit_group_assignment_#{id}".to_sym
-      shop_enrollment_id = "shop_enrollment_#{id}".to_sym
-      get_benefit_group = -> (year) { year.benefit_groups.detect { |bg| bg.title == social_class } }
-
-      let!(id) {
-        FactoryGirl.create(:person, first_name: name, last_name: 'Smith',
-                           dob: '1966-10-10'.to_date, ssn: rand.to_s[2..10])
+    it_behaves_like 'organizations_by', 'get organization by broker role' do
+      let!(:employer) {
+        allow(employer_profile2).to receive(:broker_agency_accounts).and_return([broker_agency_account2])
+        Api::V1::Mobile::Employer.new user: user, authorized: {broker_role: broker_role}
       }
-
-      let!(census_employee_id) {
-        FactoryGirl.create(:census_employee, first_name: name, last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: "99966770#{index}", created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year)
-      }
-
-      let!(employee_role_id) {
-        send(record[:id]).employee_roles.create(
-            employer_profile: send(employer_profile_id),
-            hired_on: send(census_employee_id).hired_on,
-            census_employee_id: send(census_employee_id).id
-        )
-      }
-
-      let!(benefit_group_assignment_id) {
-        BenefitGroupAssignment.create({
-                                          census_employee: send(census_employee_id),
-                                          benefit_group: get_benefit_group.call(send(plan_year_id)),
-                                          start_on: plan_year_start_on
-                                      })
-      }
-
-      let!(shop_enrollment_id) {
-        benefit_group = get_benefit_group.call(send(plan_year_id))
-        bga_id = send(benefit_group_assignment_id).id
-        FactoryGirl.create(:hbx_enrollment,
-                           household: shop_family.latest_household,
-                           coverage_kind: coverage_kind,
-                           effective_on: effective_date,
-                           enrollment_kind: "open_enrollment",
-                           kind: "employer_sponsored",
-                           submitted_at: effective_date - 10.days,
-                           benefit_group_id: benefit_group.id,
-                           employee_role_id: send(employee_role_id).id,
-                           benefit_group_assignment_id: bga_id
-        )
-      }
-
-      let!(:broker_role) { FactoryGirl.create(:broker_role) }
-      let!(:person) { double("person", broker_role: broker_role, first_name: "Brunhilde") }
-      let!(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :person => person) }
-      let!(:organization) {
-        o = FactoryGirl.create(:employer)
-        a = o.primary_office_location.address
-        a.address_1 = '500 Employers-Api Avenue'
-        a.address_2 = '#555'
-        a.city = 'Washington'
-        a.state = 'DC'
-        a.zip = '20001'
-        o.primary_office_location.phone = Phone.new(:kind => 'main', :area_code => '202', :number => '555-9999')
-        o.save
-        o
-      }
-      let!(:broker_agency_profile) {
-        profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
-        broker_role.broker_agency_profile_id = profile.id
-        profile
-      }
-      let!(:broker_agency_account) {
-        FactoryGirl.build(:broker_agency_account, broker_agency_profile: broker_agency_profile)
-      }
-      let (:employer_profile) do
-        e = FactoryGirl.create(:employer_profile, organization: organization)
-        e.broker_agency_accounts << broker_agency_account
-        e.save
-        e
-      end
-
-      before do
-        benefit_group_assignment = send(benefit_group_assignment_id)
-        allow(send(employee_role_id)).to receive(:benefit_group).and_return(benefit_group_assignment.benefit_group)
-        allow(send(census_employee_id)).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
-        allow(send(shop_enrollment_id)).to receive(:employee_role).and_return(send(employee_role_id))
-
-        @employer = Api::V1::Mobile::Employer.new
-      end
     end
+
+    it 'should count by enrollment status' do
+      
+      plan_year = employer_profile_cafe.show_plan_year
+      mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: plan_year, as_of: Time.now
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile_cafe
+
+      result = employer.send(:count_by_enrollment_status, mobile_plan_year)
+      expect(result).to eq [2, 0, 0]
+    end
+
+
+    def confirm_expected_plan_year_summary_fields_for_cafe plan_year
+      expect(plan_year[:open_enrollment_begins]).to eq Date.parse('2016-11-01')
+      expect(plan_year[:open_enrollment_ends]).to eq Date.parse('2016-12-10')
+      expect(plan_year[:plan_year_begins]).to eq Date.parse('2017-01-01')
+      expect(plan_year[:renewal_application_available]).to eq Date.parse('2016-10-01')
+      expect(plan_year[:renewal_application_due]).to eq Date.parse('2016-12-05')
+      expect(plan_year[:renewal_in_progress]).to be_falsey
+      expect(plan_year[:minimum_participation_required]).to eq 2
+    end
+
+    it 'should return the summary details,including URLs' do
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile
+      summary = employer.send(:summary_details, {employer_profile: employer_profile_cafe, years: employer_profile_cafe.plan_years, include_enrollment_counts: true, include_details_url: true})
+      expect(summary).to include(:employer_name, :binder_payment_due, :employees_total, :plan_years,
+        :employer_details_url, :employee_roster_url)
+      expect(summary[:plan_years].first).to include(:minimum_participation_required,
+                                 :open_enrollment_begins, :open_enrollment_ends, :plan_year_begins, 
+                                 :renewal_application_available, :renewal_application_due, 
+                                 :renewal_in_progress, :state)
+        
+      expect(summary[:employer_name]).to eq employer_profile_cafe.legal_name
+      expect(summary[:employees_total]).to eq 0
+      
+      expect(summary[:employer_details_url]).to include('/api/v1/mobile_api/employer_details/')
+      expect(summary[:employee_roster_url]).to include('/api/v1/mobile_api/employee_roster/')
+      confirm_expected_plan_year_summary_fields_for_cafe summary[:plan_years].first
+      expect(summary[:plan_years].first[:employees_enrolled]).to eq 2
+      expect(summary[:plan_years].first[:employees_waived]).to eq 0
+      expect(summary[:plan_years].first[:employees_terminated]).to eq 0
+
+      summary = employer.send(:summary_details, {employer_profile: employer_profile_cafe, 
+                                                 years: employer_profile_cafe.plan_years,
+                                                 staff: [FactoryGirl.create(:person)], offices: [FactoryGirl.build(:office_location)]})
+      expect(summary).to include(:contact_info)
+      contact_info = summary[:contact_info]
+      expect(contact_info).to be_a_kind_of Array
+      expect(contact_info.size).to eq 2
+      offices = contact_info.pop
+      staff = contact_info.pop
+      expect(staff).to include(:first, :last, :phone, :mobile, :emails)
+      expect(offices).to include(:first, :last, :phone, :address_1, :address_2, :city, :state, :zip)
+      expect(staff[:emails]).to be_a_kind_of Array
+      expect(staff[:first]).to_not be_nil
+      expect(staff[:last]).to_not be_nil
+      expect(offices[:first]).to_not be_nil
+      expect(offices[:last]).to_not be_nil
+      expect(offices[:phone]).to_not be_nil
+      expect(offices[:address_1]).to_not be_nil
+      expect(offices[:address_2]).to_not be_nil
+      expect(offices[:city]).to_not be_nil
+      expect(offices[:state]).to_not be_nil
+      expect(offices[:zip]).to_not be_nil
+    end
+
+    it 'should return the details' do
+      employer = Api::V1::Mobile::Employer.new user: user, employer_profile: employer_profile_cafe
+      summary = employer.details
+
+      expect(summary).to include(:employer_name, :binder_payment_due, :employees_total, :plan_years,
+        :active_general_agency)
+      expect(summary[:plan_years].first).to include(:minimum_participation_required,
+                                 :open_enrollment_begins, :open_enrollment_ends, :plan_year_begins, 
+                                 :renewal_application_available, :renewal_application_due, 
+                                 :renewal_in_progress, :state, :plan_offerings)
+      expect(summary[:plan_years].first[:plan_offerings].count).to eq 2
+      expect(summary[:plan_years].first[:plan_offerings].first).to include(:benefit_group_name, :eligibility_rule, :health, :dental)
+
+      confirm_expected_plan_year_summary_fields_for_cafe summary[:plan_years].first
+      end
 
     it 'counts by enrollment status' do
       mobile_plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year
@@ -148,28 +132,23 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
       expect(result).to eq [1, 0, 0]
     end
 
-    it 'returns employer summaries' do
+    it 'should return employer summaries' do
       employer = Api::V1::Mobile::Employer.new(employer_profiles: [employer_profile_cafe])
       summaries = employer.send(:marshall_employer_summaries)
       expect(summaries).to be_a_kind_of Array
       expect(summaries.size).to eq 1
 
       summary = summaries.first
-      expect(summary).to include(:employer_name, :employees_total, #:employees_enrolled, :employees_waived,
-                                 :open_enrollment_begins, :open_enrollment_ends, :plan_year_begins, :renewal_in_progress,
-                                 :renewal_application_available, :renewal_application_due, :binder_payment_due,
-                                 :minimum_participation_required, :contact_info, :employer_details_url,
-                                 :employee_roster_url)
 
-      expect(summary[:employer_name]).to eq 'Turner Agency, Inc'
-      expect(summary[:open_enrollment_begins]).to eq Date.parse('2016-11-01')
-      expect(summary[:open_enrollment_ends]).to eq Date.parse('2016-12-10')
-      expect(summary[:plan_year_begins]).to eq Date.parse('2017-01-01')
-      expect(summary[:renewal_application_available]).to eq Date.parse('2016-10-01')
-      expect(summary[:renewal_application_due]).to eq Date.parse('2016-12-05')
-      expect(summary[:renewal_in_progress]).to be_falsey
-      expect(summary[:employees_total]).to eq 0
-      expect(summary[:minimum_participation_required]).to eq 2
+      expect(summary).to include(:employer_name, :binder_payment_due, :employees_total, :plan_years,
+        :employer_details_url, :employee_roster_url)
+      expect(summary[:plan_years].first).to include(:minimum_participation_required,
+                                 :open_enrollment_begins, :open_enrollment_ends, :plan_year_begins, 
+                                 :renewal_application_available, :renewal_application_due, 
+                                 :renewal_in_progress, :state)
+        
+      confirm_expected_plan_year_summary_fields_for_cafe summary[:plan_years].first
+
       expect(summary[:employer_details_url]).to include('/api/v1/mobile_api/employer_details/')
       expect(summary[:employee_roster_url]).to include('/api/v1/mobile_api/employee_roster/')
 
@@ -183,31 +162,20 @@ RSpec.describe Api::V1::Mobile::Employer, dbclean: :after_each do
     it 'returns employer details' do
       employer = Api::V1::Mobile::Employer.new employer_profile: employer_profile_cafe, report_date: TimeKeeper.date_of_record
       details = employer.details
-      expect(details).to include(:employer_name, :employees_total, #:employees_enrolled, :employees_waived,
-                                 :open_enrollment_begins, :open_enrollment_ends, :plan_year_begins, :renewal_in_progress,
-                                 :renewal_application_available, :renewal_application_due, :binder_payment_due,
-                                 # :employer_contribution, :employee_contribution, :total_premium, :employees_terminated,
-                                 :minimum_participation_required, :active_general_agency)
-
-      expect(details[:employer_name]).to eq 'Turner Agency, Inc'
-      expect(details[:open_enrollment_begins]).to eq Date.parse('2016-11-01')
-      expect(details[:open_enrollment_ends]).to eq Date.parse('2016-12-10')
-      expect(details[:plan_year_begins]).to eq Date.parse('2017-01-01')
-      expect(details[:renewal_application_available]).to eq Date.parse('2016-10-01')
-      expect(details[:renewal_application_due]).to eq Date.parse('2016-12-05')
-      expect(details[:renewal_in_progress]).to be_falsey
-      expect(details[:employees_total]).to eq 0
-      expect(details[:minimum_participation_required]).to eq 2
-
-      expect(details[:plan_offerings]).to include(:active)
-      expect(details[:plan_offerings][:active]).to be_a_kind_of Array
-      active = details[:plan_offerings][:active].pop
+      expect(details).to include(:employer_name, :binder_payment_due, :employees_total, :plan_years,
+        :active_general_agency)
+      expect(details[:plan_years].first).to include(:minimum_participation_required,
+                                 :open_enrollment_begins, :open_enrollment_ends, :plan_year_begins, 
+                                 :renewal_application_available, :renewal_application_due, 
+                                 :renewal_in_progress, :state, :plan_offerings)
+      confirm_expected_plan_year_summary_fields_for_cafe details[:plan_years].first
+      expect(details[:plan_years].first[:plan_offerings].count).to eq 2
+      active = details[:plan_years].first[:plan_offerings].first
       expect(active).to include(:benefit_group_name, :eligibility_rule, :health, :dental)
-
-      expect(active[:benefit_group_name]).to eq 'white collar'
+      expect(active[:benefit_group_name]).to include 'collar'
       expect(active[:eligibility_rule]).to eq 'First of the month following or coinciding with date of hire'
-      expect(active[:health]).to include(:reference_plan_name, :reference_plan_HIOS_id, :carrier_name, :plan_type,
-                                         :metal_level, :plan_option_kind)
+      expect(active[:health]).to include(:reference_plan_name, :reference_plan_HIOS_id, :carrier_name, 
+                                         :plan_type, :metal_level, :plan_option_kind)
 
       expect(active[:health][:reference_plan_name]).to include 'BLUECHOICE SILVER'
       expect(active[:health][:reference_plan_HIOS_id]).to include '41842DC04000'
