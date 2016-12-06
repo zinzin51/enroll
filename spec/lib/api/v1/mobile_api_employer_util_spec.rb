@@ -117,7 +117,7 @@ RSpec.describe Api::V1::Mobile::EmployerUtil, dbclean: :after_each do
 
     it 'should return the details' do
       employer = Api::V1::Mobile::EmployerUtil.new user: user, employer_profile: employer_profile_cafe
-      summary = employer.details
+      summary = employer.employer_details
 
       expect(summary).to include(:employer_name, :binder_payment_due, :employees_total, :plan_years,
                                  :active_general_agency)
@@ -170,7 +170,7 @@ RSpec.describe Api::V1::Mobile::EmployerUtil, dbclean: :after_each do
 
     it 'returns employer details' do
       employer = Api::V1::Mobile::EmployerUtil.new employer_profile: employer_profile_cafe, report_date: TimeKeeper.date_of_record
-      details = employer.details
+      details = employer.employer_details
       expect(details).to include(:employer_name, :binder_payment_due, :employees_total, :plan_years,
                                  :active_general_agency)
       expect(details[:plan_years].first).to include(:minimum_participation_required,

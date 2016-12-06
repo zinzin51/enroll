@@ -55,7 +55,7 @@ module Api
         execute {
           if can_view
             employer = Mobile::EmployerUtil.new employer_profile: @employer_profile, report_date: params[:report_date]
-            render_employer_details employer.details
+            render_employer_details employer.employer_details
           else
             render_employer_details
           end
