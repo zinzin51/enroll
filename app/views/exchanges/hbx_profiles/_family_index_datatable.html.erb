@@ -29,8 +29,8 @@
 
 <script type="text/javascript" charset="utf-8">
  initializeDataTables();
- <% if @selector == 'assited' %>
-    $('#Tab\\:by_enrollment_individual_market').click();
-    $('#Tab\\:by_enrollment_individual_market-all_assistance_receiving').addClass('active');
+ <% if @is_assited_individual.present? %>
+    $('[data-key="by_enrollment_individual_market"]').click();
+    $('[data-key="all_assistance_receiving"]').click();
   <% end %>
 </script>

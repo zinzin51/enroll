@@ -197,7 +197,7 @@ def employer_poc
   end
 
   def family_index_dt
-    @selector = params[:scopes][:selector] if params[:scopes].present?
+    @is_assited_individual = params[:filter]
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
