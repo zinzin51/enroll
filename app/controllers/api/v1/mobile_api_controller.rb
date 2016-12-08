@@ -28,7 +28,7 @@ module Api
       def my_employer_details
         execute {
           @employer_profile ||= Mobile::EmployerUtil.employer_profile_for_user current_user
-          render_employer @employer_profile!=nil?
+          render_employer !@employer_profile.nil?
         }
       end
 
@@ -42,7 +42,7 @@ module Api
       def my_employee_roster
         execute {
           @employer_profile ||= Mobile::EmployerUtil.employer_profile_for_user current_user
-          render_employees @employer_profile!=nil?
+          render_employees !@employer_profile.nil?
         }
       end
 
