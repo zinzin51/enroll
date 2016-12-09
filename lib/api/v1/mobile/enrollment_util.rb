@@ -1,7 +1,8 @@
 module Api
   module V1
     module Mobile
-      class Enrollment < Base
+      class EnrollmentUtil < BaseUtil
+        attr_accessor :grouped_bga_enrollments
 
         def benefit_group_assignment_ids enrolled, waived, terminated
           yield bg_assignment_ids(enrolled), bg_assignment_ids(waived), bg_assignment_ids(terminated)
@@ -9,11 +10,13 @@ module Api
 
         def employee_enrollments
           @assignments.map do |assignment|
-            enrollment_year = { start_on: assignment.plan_year.start_on }
+            hbx_enrollments = @grouped_bga_enrollments[assignment.id.to_s] unless !@grouped_bga_enrollments || @grouped_bga_enrollments.empty?
+            enrollment_year = {start_on: assignment.plan_year.start_on}
             %w{health dental}.each do |coverage_kind|
-              enrollment, rendered_enrollment = initialize_enrollment assignment, coverage_kind
+              enrollments = hbx_enrollments ? hbx_enrollments : assignment.hbx_enrollments
+              enrollment, rendered_enrollment = initialize_enrollment enrollments, coverage_kind
 
-              Employee::ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
+              EmployeeUtil::ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER.each do |field|
                 value = enrollment.plan.try(field)
                 rendered_enrollment[field] = value if value
               end if enrollment && enrollment.plan
@@ -54,8 +57,8 @@ module Api
           rendered_enrollment[:terminate_reason] = enrollment.terminate_reason
         end
 
-        def initialize_enrollment assignment, coverage_kind
-          enrollment = assignment.hbx_enrollments.detect { |e| e.coverage_kind == coverage_kind } if assignment #doing a query on Families
+        def initialize_enrollment hbx_enrollments, coverage_kind
+          enrollment = hbx_enrollments.flatten.detect { |e| e.coverage_kind == coverage_kind } unless !hbx_enrollments || hbx_enrollments.empty?
           rendered_enrollment = if enrollment
                                   {status: status_label_for(enrollment.aasm_state),
                                    employer_contribution: enrollment.total_employer_contribution,
@@ -64,7 +67,7 @@ module Api
                                    plan_name: enrollment.plan.try(:name),
                                    plan_type: enrollment.plan.try(:plan_type),
                                    metal_level: enrollment.plan.try(coverage_kind == :health ? :metal_level : :dental_level),
-                                   benefit_group_name: enrollment.benefit_group.title
+                                   benefit_group_name: enrollment.try(:benefit_group).try(:title)
                                   }
                                 else
                                   {status: 'Not Enrolled'}

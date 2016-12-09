@@ -1,7 +1,7 @@
 module Api
   module V1
     module Mobile
-      class Staff < Base
+      class StaffUtil < BaseUtil
 
         # Returns a hash of arrays of staff members, keyed by employer id
         def keyed_by_employer_id

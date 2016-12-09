@@ -1,32 +1,32 @@
 require "rails_helper"
 require 'lib/api/v1/support/mobile_employer_data'
 
-RSpec.describe Api::V1::Mobile::PlanYear, dbclean: :after_each do
+RSpec.describe Api::V1::Mobile::PlanYearUtil, dbclean: :after_each do
   include_context 'employer_data'
 
   context 'Plan' do
 
     it 'should check if the plan is in open enrollment' do
-      plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2016-12-05')
+      plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2016-12-05')
       expect(plan_year.open_enrollment?).to be_truthy
 
-      plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2014-12-05')
+      plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2014-12-05')
       expect(plan_year.open_enrollment?).to be_falsey
 
-      plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year
+      plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_cafe.show_plan_year
       expect(plan_year.open_enrollment?).to be_falsey
 
       allow(employer_profile_cafe.show_plan_year).to receive_message_chain(:employer_profile, :census_employees, :count).and_return(99)
-      plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2016-12-05')
+      plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2016-12-05')
       expect(plan_year.open_enrollment?).to be_truthy
 
       allow(employer_profile_cafe.show_plan_year).to receive_message_chain(:employer_profile, :census_employees, :count).and_return(100)
-      plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2016-12-05')
+      plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2016-12-05')
       expect(plan_year.open_enrollment?).to be_falsey
     end
 
     it 'should return plan offerings' do
-      plan_year = Api::V1::Mobile::PlanYear.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2016-12-05')
+      plan_year = Api::V1::Mobile::PlanYearUtil.new plan_year: employer_profile_cafe.show_plan_year, as_of: Date.parse('2016-12-05')
       plan_offerings = plan_year.plan_offerings
       expect(plan_offerings).to be_a_kind_of Array
       expect(plan_offerings.size).to eq 2

@@ -1,7 +1,8 @@
 module Api
   module V1
     module Mobile
-      class Employee < Base
+      class EmployeeUtil < BaseUtil
+        include CacheUtil
         ROSTER_ENROLLMENT_PLAN_FIELDS_TO_RENDER = [:plan_type, :deductible, :family_deductible, :provider_directory_url, :rx_formulary_url]
 
         def initialize args={}
@@ -21,7 +22,15 @@ module Api
         end
 
         def roster_employees
-          @employees.compact.map { |ee| roster_employee ee }
+          cache = plan_and_benefit_group @employees, @employer_profile
+          @employees.compact.map { |ee|
+            if cache
+              benefit_group_assignments = cache[:employees_benefits].detect { |b| b.keys.include? ee.id.to_s }.try(:[], :benefit_group_assignments) || []
+              roster_employee ee, benefit_group_assignments, cache[:grouped_bga_enrollments]
+            else
+              roster_employee ee, ee.benefit_group_assignments
+            end
+          }
         end
 
         #
@@ -39,8 +48,8 @@ module Api
           terminated = HbxEnrollment::TERMINATED_STATUSES
 
           id_list = @benefit_group_assignments.map(&:id)
-          all_enrollments = Api::V1::Mobile::Family.new(benefit_group_assignment_ids: id_list, aasm_states: enrolled_or_renewal + waived + terminated).hbx_enrollments
-          enrollment = Api::V1::Mobile::Enrollment.new all_enrollments: all_enrollments
+          all_enrollments = FamilyUtil.new(benefit_group_assignment_ids: id_list, aasm_states: enrolled_or_renewal + waived + terminated).hbx_enrollments
+          enrollment = EnrollmentUtil.new all_enrollments: all_enrollments
 
           # return count of enrolled, count of waived, count of terminated
           # only including those originally asked for
@@ -63,21 +72,31 @@ module Api
           end.flatten
         end
 
-        def roster_employee employee
+        def roster_employee employee, benefit_group_assignments, grouped_bga_enrollments=nil
+          result = employee_hash employee
+          enrollment_util = EnrollmentUtil.new(
+              assignments: current_or_upcoming_assignments(benefit_group_assignments))
+          enrollment_util.grouped_bga_enrollments = grouped_bga_enrollments if grouped_bga_enrollments
+          result[:enrollments] = enrollment_util.employee_enrollments
+          add_dependents employee, result
+          result
+        end
+
+        def add_dependents employee, result
+          result[:dependents] = dependents_of(employee).map do |d|
+            basic_individual(d).merge(relationship: relationship_with(d))
+          end
+        end
+
+        def current_or_upcoming_assignments benefit_group_assignments
+          benefit_group_assignments.select { |a| PlanYearUtil.new(plan_year: a.plan_year).is_current_or_upcoming? }
+        end
+
+        def employee_hash employee
           result = basic_individual employee
           result[:id] = employee.id
           result[:hired_on] = employee.hired_on
           result[:is_business_owner] = employee.is_business_owner
-
-          assignments = employee.benefit_group_assignments.select do |a| 
-            Api::V1::Mobile::PlanYear.is_current_or_upcoming? a.plan_year
-          end
-
-          result[:enrollments] = Api::V1::Mobile::Enrollment.new(assignments: assignments).employee_enrollments
-          result[:dependents] = dependents_of(employee).map do |d|
-            basic_individual(d).merge(relationship: relationship_with(d))
-          end
-
           result
         end
 
