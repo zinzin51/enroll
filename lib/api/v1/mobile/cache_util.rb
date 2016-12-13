@@ -14,8 +14,8 @@ module Api
             indexed_plans = Plan.where(:'id'.in => plan_ids).index_by(&:id)
             benefit_groups = employer_profile.plan_years.map { |p| p.benefit_groups }.flatten.compact.index_by(&:id)
             enrollments_for_benefit_groups.map { |e|
-              e.plan = indexed_plans[e.plan_id]
-              e.benefit_group = benefit_groups[e.benefit_group_id]
+              e.plan = indexed_plans[e.plan_id] if e.plan_id
+              e.benefit_group = benefit_groups[e.benefit_group_id] if e.benefit_group_id
             }
             result = {employees_benefits: employees_benefits, grouped_bga_enrollments: grouped_bga_enrollments}
           rescue Exception => e
@@ -34,7 +34,7 @@ module Api
           families = Family.where(:'households.hbx_enrollments'.elem_match => {
               :'benefit_group_assignment_id'.in => benefit_group_assignment_ids
           })
-          families.map { |f| f.households.map { |h| h.hbx_enrollments } }.flatten.compact
+          families.map { |f| f.households.map { |h| h.hbx_enrollments.show_enrollments_sans_canceled } }.flatten.compact
         end
 
       end
