@@ -5,8 +5,7 @@ module Api
 
         def initialize args={}
           super args
-          all_years = @employer_profile.try(:plan_years) || []
-          @plan_years = all_years.select { |y| PlanYearUtil.new(plan_year: y).is_current_or_upcoming? }
+          @plan_years = select_current_and_upcoming (@employer_profile.try(:plan_years) || [])
         end
 
         def employers_and_broker_agency
@@ -43,6 +42,10 @@ module Api
         #
         private
 
+        def select_current_and_upcoming years
+          years.select { |y| PlanYearUtil.new(plan_year: y).is_current_or_upcoming? }
+        end
+
         def organizations
           @organizations ||= @authorized.has_key?(:broker_role) ? Organization.by_broker_role(@authorized[:broker_role].id) :
               Organization.by_broker_agency_profile(@authorized[:broker_agency_profile]._id)
@@ -53,7 +56,7 @@ module Api
           staff_by_employer_id = StaffUtil.new(employer_profiles: @employer_profiles).keyed_by_employer_id
           @employer_profiles.map do |er|
             summary_details employer_profile: er,
-                            years: er.plan_years,
+                            years: select_current_and_upcoming(er.plan_years),
                             staff: staff_by_employer_id[er.id],
                             offices: er.organization.office_locations.select { |loc| loc.primary_or_branch? },
                             include_details_url: true
