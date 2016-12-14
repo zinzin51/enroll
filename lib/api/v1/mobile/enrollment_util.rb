@@ -1,6 +1,14 @@
 module Api
   module V1
     module Mobile
+
+      module EnrollmentConstants
+        WAIVED = 'Waived'
+        TERMINATED = 'Terminated'
+        ENROLLED = 'Enrolled'
+        RENEWING = 'Renewing'
+      end
+
       class EnrollmentUtil < BaseUtil
         attr_accessor :grouped_bga_enrollments
 
@@ -22,6 +30,7 @@ module Api
               end if enrollment && enrollment.plan
 
               enrollment_termination! enrollment, rendered_enrollment
+              enrollment_waived! enrollment, rendered_enrollment
               enrollment_year[coverage_kind] = rendered_enrollment
             end
             enrollment_year
@@ -52,9 +61,15 @@ module Api
         end
 
         def enrollment_termination! enrollment, rendered_enrollment
-          return unless rendered_enrollment[:status] == 'Terminated'
-          rendered_enrollment[:terminated_on] = enrollment.terminated_on
+          return unless rendered_enrollment[:status] == EnrollmentConstants::TERMINATED
+          rendered_enrollment[:terminated_on] = format_date enrollment.terminated_on
           rendered_enrollment[:terminate_reason] = enrollment.terminate_reason
+        end
+
+        def enrollment_waived! enrollment, rendered_enrollment
+          return unless rendered_enrollment[:status] == EnrollmentConstants::WAIVED
+          rendered_enrollment[:waived_on] = format_date(enrollment.submitted_at || enrollment.created_at)
+          rendered_enrollment[:waiver_reason] = enrollment.waiver_reason
         end
 
         def initialize_enrollment hbx_enrollments, coverage_kind
@@ -78,10 +93,10 @@ module Api
 
         def status_label_for enrollment_status
           {
-              'Waived' => HbxEnrollment::WAIVED_STATUSES,
-              'Enrolled' => HbxEnrollment::ENROLLED_STATUSES,
-              'Terminated' => HbxEnrollment::TERMINATED_STATUSES,
-              'Renewing' => HbxEnrollment::RENEWAL_STATUSES
+              EnrollmentConstants::WAIVED => HbxEnrollment::WAIVED_STATUSES,
+              EnrollmentConstants::ENROLLED => HbxEnrollment::ENROLLED_STATUSES,
+              EnrollmentConstants::TERMINATED => HbxEnrollment::TERMINATED_STATUSES,
+              EnrollmentConstants::RENEWING => HbxEnrollment::RENEWAL_STATUSES
           }.inject(nil) do |result, (label, enrollment_statuses)|
             enrollment_statuses.include?(enrollment_status.to_s) ? label : result
           end

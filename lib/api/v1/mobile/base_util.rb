@@ -9,6 +9,15 @@ module Api
           end
         end
 
+        #
+        # Protected
+        #
+        protected
+
+        def format_date date
+          date.strftime('%m-%d-%Y') if date.respond_to?(:strftime)
+        end
+
       end
     end
   end
