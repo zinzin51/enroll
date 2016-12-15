@@ -87,9 +87,6 @@ RSpec.describe Api::V1::Mobile::EmployerUtil, dbclean: :after_each do
       expect(summary[:employer_details_url]).to include('/api/v1/mobile_api/employer_details/')
       expect(summary[:employee_roster_url]).to include('/api/v1/mobile_api/employee_roster/')
       confirm_expected_plan_year_summary_fields_for_cafe summary[:plan_years].first
-      expect(summary[:plan_years].first[:employees_enrolled]).to eq 2
-      expect(summary[:plan_years].first[:employees_waived]).to eq 0
-      expect(summary[:plan_years].first[:employees_terminated]).to eq 0
 
       summary = employer.send(:summary_details, {employer_profile: employer_profile_cafe,
                                                  years: employer_profile_cafe.plan_years,
