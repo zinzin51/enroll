@@ -5,11 +5,14 @@ def create_directory(path)
   Dir.mkdir path
 end
 
-people_to_check = Person.where("consumer_role.lawful_presence_determination.aasm_state" => "verification_outstanding")
-puts "Candidate People: #{people_to_check.count}"
-
-families = Family.where("family_members.person_id" => {"$in" => people_to_check.map(&:_id)})
-puts "Candidate Families: #{families.count}"
+families = Family.where({
+  "households.hbx_enrollments" => {
+    "$elemMatch" => {
+      "aasm_state" => { "$in" => ["enrolled_contingent"] },
+      "effective_on" => { "$gte" => Date.new(2016,1,1)},
+      "submitted_at" => { "$gt" => Date.new(2016,7,22)},
+  } }
+}).to_a
 
 mailing_address_missing = []
 coverage_not_found = []
@@ -23,28 +26,27 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
   csv << [
     'Family Id',
     'Family ECase ID',
-    'Primary Firstname', 
-    'Primary Lastname'
+    'Person name', 
+    'Hbx ID'
   ]
 
   count   = 0
   counter = 0
 
   families.each do |family|
+
+    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lt => Date.new(2016,10,26)).present?
     counter += 1
-
-    # next unless family.id.to_s == "5619ca5554726532e58b2201"
-    next if family.id.to_s == "564d098469702d174fa10000"
-
-    person = family.primary_applicant.person
-
-    if person.consumer_role.blank?
-      count += 1
-      next
-    end
-
     begin
+      person = family.primary_applicant.person
+
+      if person.consumer_role.blank?
+        count += 1
+        next
+      end
+
       event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+
       notice_trigger = event_kind.notice_triggers.first 
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {
@@ -53,7 +55,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
         mpi_indicator: notice_trigger.mpi_indicator
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
 
-      csv << [family.id, family.e_case_id, person.full_name]
+      csv << [family.id, family.e_case_id, person.full_name, person.hbx_id]
 
       puts 'processed--' + person.full_name
 
@@ -66,7 +68,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
       when 'active coverage not found!'
         coverage_not_found << person.full_name
       else 
-        others << person.full_name 
+        puts "#{family.e_case_id}----#{e.to_s}"
       end
     end
 

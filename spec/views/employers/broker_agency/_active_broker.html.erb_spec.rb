@@ -1,12 +1,13 @@
 require 'rails_helper'
 
 describe "employers/broker_agency/_active_broker.html.erb" do
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile) }
+  let(:employer_profile) { broker_agency_account.employer_profile }
+  let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account) }
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
 
   before :each do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
     sign_in user
     employer_profile.broker_agency_profile = broker_agency_account.broker_agency_profile
     employer_profile.save
@@ -38,7 +39,7 @@ describe "employers/broker_agency/_active_broker.html.erb" do
     end
 
     it "should show Broker Agency name" do
-      expect(rendered).to have_selector('.tt-u', text: broker_agency_account.broker_agency_profile.legal_name)
+      expect(rendered).to have_selector('span', text: broker_agency_account.broker_agency_profile.legal_name)
     end
 
     it "show should the Broker email" do

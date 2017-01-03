@@ -54,12 +54,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
     #@organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
 
     @organization = Organization.find(params[:organization][:id])
-
     @organization_dup = @organization.office_locations.as_json
 
     #clear office_locations, don't worry, we will recreate
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
+    person = @broker_agency_profile.primary_broker_role.person
+    person.update_attributes(person_profile_params)
 
 
 
@@ -75,24 +76,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
       #render "edit"
       redirect_to broker_agencies_profile_path(@broker_agency_profile)
 
-    end
-  end
-
-  def broker_profile_params
-    params.require(:organization).permit(
-      #:employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
-      :office_locations_attributes => [
-        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
-        :phone_attributes => [:kind, :area_code, :number, :extension],
-        :email_attributes => [:kind, :address]
-      ]
-    )
-  end
-
-  def sanitize_broker_profile_params
-    params[:organization][:office_locations_attributes].each do |key, location|
-      params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
     end
   end
 
@@ -126,8 +109,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
     if page.present?
       @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
-    elsif @q
-       @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{@q}/i }
+    elsif @q.present?
+      query= Regexp.escape(@q)
+      query_args= query.split("\\ ")
+      reg_ex = query_args.join('(.*)?')
+      @families = total_families.select{|v| v.primary_applicant.person.full_name =~ /#{reg_ex}/i }
     else
       @families = total_families[0..20]
     end
@@ -300,12 +286,35 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   private
 
+  def broker_profile_params
+    params.require(:organization).permit(
+      #:employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :office_locations_attributes => [
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+        :phone_attributes => [:kind, :area_code, :number, :extension],
+        :email_attributes => [:kind, :address]
+      ]
+    )
+  end
+
+  def person_profile_params
+    params.require(:organization).permit(:first_name, :last_name, :dob)
+  end
+
+  def sanitize_broker_profile_params
+    params[:organization][:office_locations_attributes].each do |key, location|
+      params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
+      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
+    end
+  end
+
   def find_hbx_profile
     @profile = current_user.person.hbx_staff_role.hbx_profile
   end
 
   def find_broker_agency_profile
     @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+    authorize @broker_agency_profile, :access_to_broker_agency_profile?
   end
 
   def check_admin_staff_role
