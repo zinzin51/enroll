@@ -433,11 +433,11 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       published_plan_year.update_attributes('aasm_state' => 'published')
     end  
 
-    it "should be true for individual qle" do
+    it "should return true for individual qle" do
       expect(ivl_qle_sep.send(:is_eligible?)).to be_truthy
     end
 
-    it "should be true for person with employee roles" do
+    it "should return true for person with employee roles" do
       shop_family.primary_applicant.person.employee_roles.create(
         employer_profile: published_plan_year.employer_profile,
         hired_on: census_employee.hired_on,
@@ -446,7 +446,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       expect(sep.send(:is_eligible?)).to be_truthy
     end
 
-    it "should be return false for person with no employee roles" do
+    it "should return false for person with no employee roles" do
       expect(sep.send(:is_eligible?)).to be_falsey
     end
   end
