@@ -390,7 +390,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
     let(:sep){
       sep = shop_family.special_enrollment_periods.new
-      sep.effective_on_kind = 'first_of_next_month'
+      sep.effective_on_kind = 'first_of_month'
       sep.qualifying_life_event_kind= qle_first_of_month
       sep.qle_on= Date.new(TimeKeeper.date_of_record.year, 03, 14)
       sep
@@ -407,6 +407,47 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
     it "should return a sep with an effective date that equals to employers plan year start-date when sep_effective_date  < plan_year_start_on" do
       expect(sep.effective_on).to eq published_plan_year.start_on
+    end
+  end
+
+  context "for is_eligible for employee_roles " do
+    let(:plan_year_start_on) { Date.new(TimeKeeper.date_of_record.year, 04, 01) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'Sin', last_name: 'Sin', dob: '1980-10-10'.to_date, ssn: '356288288', hired_on: Date.new(TimeKeeper.date_of_record.year, 01, 01)) }
+    let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member)  }
+    let(:ivl_qle_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle) }
+    let!(:published_plan_year) { FactoryGirl.create(:plan_year, start_on: plan_year_start_on) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+      
+    let(:sep){
+        sep = shop_family.special_enrollment_periods.new
+        sep.effective_on_kind = 'first_of_month'
+        sep.qualifying_life_event_kind= qle_first_of_month
+        sep.qle_on= Date.new(TimeKeeper.date_of_record.year, 03, 14)
+        sep
+    }
+        
+    before do
+      census_employee.benefit_group_assignments = [benefit_group_assignment]
+      census_employee.save
+      published_plan_year.update_attributes('aasm_state' => 'published')
+    end  
+
+    it "should be true for individual qle" do
+      expect(ivl_qle_sep.send(:is_eligible?)).to be_truthy
+    end
+
+    it "should be true for person with employee roles" do
+      shop_family.primary_applicant.person.employee_roles.create(
+        employer_profile: published_plan_year.employer_profile,
+        hired_on: census_employee.hired_on,
+        census_employee_id: census_employee.id
+      )
+      expect(sep.send(:is_eligible?)).to be_truthy
+    end
+
+    it "should be return false for person with no employee roles" do
+      expect(sep.send(:is_eligible?)).to be_falsey
     end
   end
 
