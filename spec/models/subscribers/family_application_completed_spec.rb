@@ -311,6 +311,10 @@ describe Subscribers::FamilyApplicationCompleted do
       it "updates the address for the primary applicant's person" do
         expect(person_db.addresses).to be_truthy
       end
+
+      it "updates the address for the primary applicant's person" do
+        expect(person_db.has_mailing_address?).to be_truthy
+      end
     end
   end
 
@@ -375,6 +379,10 @@ describe Subscribers::FamilyApplicationCompleted do
 
       it "updates the address for the primary applicant's person" do
         expect(person_db.addresses).to be_truthy
+      end
+
+      it "updates the address for the primary applicant's person" do
+        expect(person_db.has_mailing_address?).not_to be_truthy
       end
 
       it "can recieve duplicate payloads without logging errors" do

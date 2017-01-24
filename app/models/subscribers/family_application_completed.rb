@@ -41,6 +41,8 @@ module Subscribers
       new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
       verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
       import_home_address(primary_person, verified_new_address)
+      verified_mailing_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "mailing" }.first
+      import_mailing_address(primary_person, verified_mailing_address) unless verified_mailing_address.blank?
       if verified_family.broker_accounts.present?
         newest_broker = verified_family.broker_accounts.max_by{ |broker| broker.start_on}
         newest_broker_agency_account = family.broker_agency_accounts.max_by{ |baa| baa.start_on }
@@ -115,6 +117,20 @@ module Subscribers
       throw(:processing_issue, "ERROR: Failed to load home address from xml") unless new_address.valid?
       if person.home_address.present?
         person.home_address.delete
+      end
+      person.addresses << new_address
+      person.save!
+    end
+
+    def import_mailing_address(person, verified_new_address)
+      verified_address_hash = verified_new_address.to_hash
+      verified_address_hash.delete(:country)
+      new_address = Address.new(
+        verified_address_hash
+      )
+      throw(:processing_issue, "ERROR: Failed to load mailing address from xml") unless new_address.valid?
+      if person.has_mailing_address?.present?
+        person.mailing_address.delete
       end
       person.addresses << new_address
       person.save!
