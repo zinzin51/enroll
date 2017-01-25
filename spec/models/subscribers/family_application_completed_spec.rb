@@ -238,6 +238,10 @@ describe Subscribers::FamilyApplicationCompleted do
         it "updates the address for the primary applicant's person" do
           expect(person_db.addresses).to be_truthy
         end
+
+        it "updates the address for the primary applicant's person" do
+          expect(person_db.has_mailing_address?).not_to be_truthy
+        end
       end
     end
   end
@@ -512,6 +516,10 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(person_db.addresses).to be_truthy
       end
 
+      it "updates the address for the primary applicant's person" do
+        expect(person_db.has_mailing_address?).not_to be_truthy
+      end
+
       context "recieving a new payload with one family member removed" do
         let(:minus_message) { { "body" => minus_xml } }
         let(:minus_xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_minus_one_sample.xml")) }
@@ -573,6 +581,10 @@ describe Subscribers::FamilyApplicationCompleted do
 
         it "updates the address for the primary applicant's person" do
           expect(person_db.addresses).to be_truthy
+        end
+
+        it "updates the address for the primary applicant's person" do
+          expect(person_db.has_mailing_address?).not_to be_truthy
         end
       end
     end
