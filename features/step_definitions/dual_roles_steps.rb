@@ -2,7 +2,7 @@ When(/^\w+ visit family home page$/) do
   visit '/families/home'
 end
 
-When(/^I should see the group selection page$/) do
+When(/^I should see the title on the group selection page$/) do
   expect(page).to have_content "Choose Coverage for your Household"
 end
 
@@ -28,7 +28,7 @@ When(/Individual (.*) goes to register as an individual$/) do |named_person|
   find('.btn', text: 'CONTINUE').click
 end
 
-Given(/^Employer (.*) with a published health plan year$/) do |named_person|
+Given(/^Employer (.*) with a published health plan year without employees$/) do |named_person|
   person = people[named_person]
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization

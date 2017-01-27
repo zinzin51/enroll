@@ -15,12 +15,12 @@ Feature: User has dual roles (consumer & employee)
     Then Individual should see identity verification page and clicks on submit
     Then Individual should see the dependents form
     And I click on continue button on household info form
-    Then I should see the group selection page
+    Then I should see the title on the group selection page
     When I visit family home page
     And I should see the individual home page
     Then Individual logs out
 
-    Given Employer Soren White with a published health plan year
+    Given Employer Soren White with a published health plan year without employees
     And Employer Soren White login
     When Employer clicks on the Employees tab
     When Employer clicks on the add employee button
@@ -32,7 +32,7 @@ Feature: User has dual roles (consumer & employee)
     And I should see the individual home page
     And I should see the employer congratulation message
     When I click on the button of shop for plans
-    Then I should see the group selection page
+    Then I should see the title on the group selection page
     And I click on continue button on group selection page
     And I select three plans to compare
     And I should not see any plan which premium is 0
