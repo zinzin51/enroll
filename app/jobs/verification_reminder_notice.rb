@@ -1,10 +1,10 @@
-class FirstVerificationReminderNotice < ActiveJob::Base
+class VerificationReminderNotice < ActiveJob::Base
   queue_as :default
 
-  def perform(consumer_role_id)
+  def perform(consumer_role_id, event_name)
     Resque.logger.level = Logger::DEBUG
     consumer_role = ConsumerRole.find(consumer_role_id)
-    event_kind = ApplicationEventKind.where(:event_name => "first_verifications_reminder").first
+    event_kind = ApplicationEventKind.where(:event_name => event_name).first
     notice_trigger = event_kind.notice_triggers.first
     builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
               template: notice_trigger.notice_template,

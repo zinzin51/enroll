@@ -448,7 +448,7 @@ class ConsumerRole
   end
 
   def first_verification_reminder_notice
-    FirstVerificationReminderNotice.perform_later(self.id.to_s)
+    VerificationReminderNotice.perform_later(self.id.to_s, "verifications_backlog")
   end
 
   def invoke_verification!(*args)
