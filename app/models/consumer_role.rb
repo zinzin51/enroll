@@ -355,7 +355,7 @@ class ConsumerRole
     state :unverified, initial: true
     state :ssa_pending
     state :dhs_pending
-    state :verification_outstanding, :after_enter => :first_verification_reminder_notice
+    state :verification_outstanding
     state :fully_verified
     state :verification_period_ended
 
@@ -445,10 +445,6 @@ class ConsumerRole
     event :fourth_verifications_reminder, :after => [:record_transition] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
-  end
-
-  def first_verification_reminder_notice
-    VerificationReminderNotice.perform_later(self.id.to_s, "verifications_backlog")
   end
 
   def invoke_verification!(*args)
