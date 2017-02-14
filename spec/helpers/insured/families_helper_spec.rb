@@ -291,34 +291,20 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
             person.consumer_role = consumer_role
         end
 
-        context "has SSN" do
-          before do
-            person.ssn = '123456789'
-          end
-          it "should not display the download tax documents button" do   
-            expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
-          end
-        end
-
-        context "has no SSN" do
-          before do
-            person.ssn = ''
-          end
           it "should display the download tax documents button" do   
             expect(helper.show_download_tax_documents_button_on_documents_page?).to eq true
           end
-        end
       end
 
       context "person is employee role" do
         let(:employee_role) {FactoryGirl.build(:employee_role)}
         before do
           person.employee_roles = [employee_role]
-          person.ssn = ''
         end
-        it "should not display the download tax documents button" do   
-          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
-        end
+
+          it "should not display the download tax documents button" do   
+            expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+          end
       end
     end
 
@@ -329,25 +315,10 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         sign_in current_user
         person.consumer_role = consumer_role
       end
-      context "has SSN" do
-        before do
-          person.ssn = '123456789'
-        end   
-
+      
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
         end
-      end
-
-      context "has no SSN" do
-        before do
-          person.ssn = ''
-        end
-
-        it "should not display the download tax documents button" do
-          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
-        end
-      end
     end
 
     context "current user is employee and not a consumer" do
@@ -358,16 +329,9 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         person.employee_roles = [employee_role]
       end
 
-      context "has SSN" do
-        before do
-          person.ssn = '123456789'
-        end
-
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
         end
-      end
-
     end
 
     context "current user is consumer and employee" do
@@ -378,17 +342,11 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         sign_in current_user
         person.consumer_role = consumer_role
         person.employee_roles = [employee_role]
-      end 
-
-      context "has SSN" do
-        before do
-          person.ssn = '123456789'
-        end   
+      end   
 
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
         end
-      end
     end
   end
 end

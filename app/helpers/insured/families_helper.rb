@@ -226,14 +226,11 @@ module Insured::FamiliesHelper
   end
 
   def show_download_tax_documents_button_on_documents_page?
-    if @person.ssn.present?
-      false
-    elsif !current_user.has_hbx_staff_role?
-      false
-    elsif @person.consumer_role.blank?
-      false
-    elsif @person.consumer_role.present?
+    if current_user.has_hbx_staff_role? && @person.consumer_role.present?
       true
+    else 
+      false
     end
   end
+  
 end
