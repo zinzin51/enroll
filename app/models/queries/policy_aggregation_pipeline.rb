@@ -122,9 +122,22 @@ module Queries
           "$or" => [
             {"households.hbx_enrollments.consumer_role_id" => {"$exists" => false}},
             {"households.hbx_enrollments.consumer_role_id" => nil}
+          ],
+          "$and" => [
+            {"households.hbx_enrollments.resident_role_id" => {"$exists" => false}},
+            {"households.hbx_enrollments.resident_role_id" => nil}
           ]
         }
       })
+      self
+    end
+
+    def filter_to_coverall
+      add({
+        "$match" => {
+          "households.hbx_enrollments.resident_role_id" => {"$ne" => nil},
+          "households.hbx_enrollments.aasm_state" => {"$ne" => "shopping" } }
+        })
       self
     end
 
