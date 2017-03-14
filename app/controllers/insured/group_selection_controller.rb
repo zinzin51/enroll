@@ -38,7 +38,7 @@ class Insured::GroupSelectionController < ApplicationController
     
 
     generate_coverage_family_members_for_cobra
-    get_new_effective_on()
+    set_new_effective_on()
   end
 
   def create
