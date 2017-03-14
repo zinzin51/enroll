@@ -1,0 +1,21 @@
+<div id="market_kinds" class='row no-buffer'>
+  <h3>Marketplace</h3>
+  <span class="clear" style="display: il"></span>
+
+  <div class="n-radio-group">
+    <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
+      <div class="n-radio-row">
+        <label class="n-radio" for="market_kind_<%= kind %>">
+          <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: (@market_kind == kind), disabled: (@disable_market_kind == kind) %>
+          <span class="n-radio">
+          </span>
+          <% if kind=="shop" %>
+          Employer-Sponsored Benefits
+          <% else %>
+          Individual Benefits
+          <% end %>
+        </label>
+      </div>
+    <% end %>
+  </div>
+</div>

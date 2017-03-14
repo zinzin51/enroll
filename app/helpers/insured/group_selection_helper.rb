@@ -29,5 +29,26 @@ module Insured
         benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship)
       end
     end
+
+    def group_selection_market_kind(person, market_kind)
+      if can_shop_shop?(person)
+        'shop'
+      elsif can_shop_individual?(person)
+        'individual'
+      elsif can_shop_resident?(person)
+        'coverall'
+      elsif market_kind.present?
+        market_kind
+      end
+    end
+
+    def benefit_type_radio(benefit_type)
+      selected = (benefit_type == :health)
+      content_tag :label, class: "n-radio", for: "coverage_kind_#{benefit_type}" do
+        radio_button_tag('coverage_kind', "#{benefit_type}", selected, id: "coverage_kind_#{benefit_type}", class: 'n-radio') +
+        content_tag(:span, '', class: 'n-radio') +
+        "#{benefit_type.to_s.classify}"
+      end
+    end
   end
 end

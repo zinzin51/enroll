@@ -1,0 +1,14 @@
+<div id="shop-coverage-household" class="<%= 'dn' if @market_kind == 'individual' %>">
+  <div class="module group-selection-table health">
+    <div class="table-responsive table-border">
+      <%= render 'coverage_household', :coverage_kind => 'health' %>
+    </div>
+  </div>
+  <% if @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+    <div class="module group-selection-table dn dental">
+      <div class="table-responsive table-border">
+        <%= render 'coverage_household', :coverage_kind => 'dental' %>
+      </div>
+    </div>
+  <% end %>
+</div>
