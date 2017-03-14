@@ -878,6 +878,18 @@ class Person
     end
   end
 
+  def market_kind
+    if self.try(:has_active_employee_role?)
+      'shop'
+    elsif self.try(:has_active_consumer_role?)
+      'individual'
+    elsif self.try(:has_active_resident_role?)
+      'coverall'
+    else
+      nil
+    end
+  end
+
   private
   def is_ssn_composition_correct?
     # Invalid compositions:
