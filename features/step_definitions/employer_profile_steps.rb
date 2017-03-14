@@ -215,6 +215,5 @@ Then /there is an unlinked POC/ do
 end
 
 AfterStep do |scenario|
-  sleep 1 if ENV['SCREENSHOTS'] == "true"
   screenshot("")
 end

@@ -29,5 +29,35 @@ module Insured
         benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship)
       end
     end
+
+     def kind_message(kind)
+      if kind=="shop"
+        "Employer-Sponsored Benefits"
+      else
+        "Individual Benefits"
+      end
+    end
+
+    def dental_offered?(person,role)
+      can_shop_shop?(person) && !role.is_dental_offered?
+    end
+
+    def market_kind_dental_offered?(role)
+      role.census_employee.active_benefit_group.present? && role.census_employee.active_benefit_group.is_offering_dental?
+    end
+
+    def kind_individual?(person,kind)
+      can_shop_shop?(person) && kind != 'individual'
+    end
+
+    def show_dental_button?(role)
+      role.census_employee.active_benefit_group.blank? || !role.census_employee.active_benefit_group.is_offering_dental?
+    end
+
+    def cover_kind_buttons?(person,role)
+      (can_shop_shop?(person) || can_shop_both_markets?(person)) && role.census_employee.active_benefit_group.present? && role.census_employee.active_benefit_group.is_offering_dental?
+    end
+
+
   end
 end

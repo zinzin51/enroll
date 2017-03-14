@@ -3,17 +3,6 @@
 <% end %>
 <div class="container group-selection">
   <div class="row">
-    <% if @aptc_blocked.present? && @aptc_blocked %>
-      <br />
-      <div class="alert alert-danger" role="alert">
-        <p>
-          We need a bit of additional information to redetermine your eligibility. Please call us at <%= Settings.contact_center.phone_number %>.
-        </p>
-        <br>
-        <a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>
-      </div>
-    <% else %>
-
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
@@ -32,7 +21,7 @@
                   <%= render 'coverage_household', :coverage_kind => 'health' %>
                 </div>
               </div>
-              <% if @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+              <% if market_kind_dental_offered?(@employee_role) %>
                 <div class="module group-selection-table dn dental">
                   <div class="table-responsive table-border">
                     <%= render 'coverage_household', :coverage_kind => 'dental' %>
@@ -43,7 +32,7 @@
           <% end %>
         
           <% if can_shop_individual?(@person) %>
-            <div id="ivl-coverage-household" class="<%= 'dn' if can_shop_shop?(@person) && @market_kind != 'individual' %>">
+            <div id="ivl-coverage-household" class="<%= 'dn' if kind_individual?(@person,@market_kind) %>">
               <div class="module group-selection-table">
                 <div class="table-responsive table-border health">
                   <% @show_residency_alert = false %>
@@ -67,20 +56,16 @@
                       <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: (@market_kind == kind), disabled: (@disable_market_kind == kind) %>
                       <span class="n-radio">
                       </span>
-                      <% if kind=="shop" %>
-                      Employer-Sponsored Benefits
-                      <% else %>
-                      Individual Benefits
-                      <% end %>
+                      <%= kind_message(kind) %>
                     </label>
                   </div>
                 <% end %>
               </div>
             </div>
           <% elsif can_shop_shop?(@person) %>
-	           <%= hidden_field_tag 'market_kind', 'shop' %>
-	        <% elsif can_shop_individual?(@person) %>
-	           <%= hidden_field_tag 'market_kind', 'individual' %>
+             <%= hidden_field_tag 'market_kind', 'shop' %>
+          <% elsif can_shop_individual?(@person) %>
+             <%= hidden_field_tag 'market_kind', 'individual' %>
           <% elsif can_shop_resident?(@person) %>
              <%= hidden_field_tag 'market_kind', 'coverall' %>
           <% else %>
@@ -94,7 +79,7 @@
           <% end %>
 
           <% if can_shop_resident?(@person) %>
-            <div id="ivl-coverage-household" class="<%= 'dn' if can_shop_shop?(@person) && @market_kind != 'individual' %>">
+            <div id="ivl-coverage-household" class="<%= 'dn' if kind_individual?(@person,@market_kind) %>">
               <div class="module group-selection-table">
                 <div class="table-responsive table-border health">
                   <% @show_residency_alert = false %>
@@ -118,7 +103,7 @@
                   </label>
                 </div>
 
-                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.is_dental_offered? %>">
+                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if dental_offered?(@person,@employee_role) %>">
                   <label class="n-radio" for="coverage_kind_dental">
                     <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
@@ -189,7 +174,6 @@
         </div>
       </div>
     <% end %>
-    <% end %>
   </div>
   <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if (@hbx_enrollment.present? && (@hbx_enrollment.employee_role.present? || @hbx_enrollment.benefit_group.present?)) %>
 </div>
@@ -220,7 +204,7 @@ function setGroupSelectionHandlers(){
   <% end %>
 
   $('#market_kind_shop').on('change', function() {
-    <% if @employee_role.census_employee.active_benefit_group.blank? || !@employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+    <% if show_dental_button?(@employee_role) %>
       $('#dental-radio-button').slideUp();
     <% end %>
     $('#shop-coverage-household').show();
@@ -244,7 +228,7 @@ function setGroupSelectionHandlers(){
   });
 <% end %>
 
-<% if (can_shop_shop?(@person) || can_shop_both_markets?(@person)) && @employee_role.census_employee.active_benefit_group.present? && @employee_role.census_employee.active_benefit_group.is_offering_dental? %>
+<% if cover_kind_buttons?(@person,@employee_role) %>
 
   $('#coverage_kind_health').on('change', function() {
     $('#shop-coverage-household .health').show();

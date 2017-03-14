@@ -1324,6 +1324,11 @@ class HbxEnrollment
    end
  end
 
+  def update_benefit_group_assignment(hbx_enrollment_id)
+      self.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment_id)
+  end
+
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.

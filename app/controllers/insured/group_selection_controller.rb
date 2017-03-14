@@ -1,5 +1,5 @@
 class Insured::GroupSelectionController < ApplicationController
-  before_action :initialize_common_vars, only: [:create, :terminate_selection]
+  before_action :initialize_common_vars, only: [:create, :terminate_selection, :new]
   # before_action :is_under_open_enrollment, only: [:new]
 
   def select_market(person, params)
@@ -17,9 +17,9 @@ class Insured::GroupSelectionController < ApplicationController
 
   def new
     set_bookmark_url
-    initialize_common_vars
+    #initialize_common_vars
     
-    @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
+    #@employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
@@ -97,7 +97,7 @@ class Insured::GroupSelectionController < ApplicationController
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       else
         # FIXME: models should update relationships, not the controller
-        hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
+        hbx_enrollment.update_benefit_group_assignment(hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       end
     else
@@ -138,7 +138,7 @@ class Insured::GroupSelectionController < ApplicationController
   def build_hbx_enrollment
     case @market_kind
     when 'shop'
-      @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
+      #@employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
       if @hbx_enrollment.present?
         @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
         if @employee_role == @hbx_enrollment.employee_role
@@ -195,6 +195,7 @@ class Insured::GroupSelectionController < ApplicationController
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
+    @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
   end
 
   def insure_hbx_enrollment_for_shop_qle_flow

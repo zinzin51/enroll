@@ -1,0 +1,11 @@
+class User
+
+
+
+
+end
+
+
+
+userobj = User.new
+
