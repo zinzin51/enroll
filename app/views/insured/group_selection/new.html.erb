@@ -1,3 +1,4 @@
+<%= javascript_include_tag "group_selection.js"%>
 <% content_for :horizontal_status do %>
   <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
 <% end %>
@@ -36,7 +37,6 @@
               <div class="module group-selection-table">
                 <div class="table-responsive table-border health">
                   <% @show_residency_alert = false %>
-
                   <%= render 'ivl_coverage_household' %>
                 </div>
               </div>
@@ -182,18 +182,7 @@
   <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if (@hbx_enrollment.present? && (@hbx_enrollment.employee_role.present? || @hbx_enrollment.benefit_group.present?)) %>
 </div>
 <script>
-  $(function(){
-    if ( $("#find_sep_link").length ) {
-      $("#find_sep_link").click(function() {
-      $(this).closest('form').attr('action', '<%= find_sep_insured_families_path %>');
-      $(this).closest('form').attr('method', 'get');
-      $(this).closest('form').submit();
-    });
-  }
-})
-
-
-function setGroupSelectionHandlers(){
+function setGroupSelectionHandlers() { 
   $('.group-selection-table .dental input').removeProp('checked');
 
   if ( $('#market_kind_shop').is(':checked') ) {
@@ -248,17 +237,6 @@ function setGroupSelectionHandlers(){
     $('#shop-coverage-household .health input').removeProp('checked');
   });
 <% end %>
-
-$("input[type='checkbox']").change(function() {
-  if ($("#coverage_kind_health").is(":checked")){
-    if($(this).is(":checked")) {
-      $(this).attr( "checked", true );
-    }else{
-      $(this).removeProp('checked');
-      $('#shop-coverage-household .dental input').removeProp('checked');
-      }
-    }
-});
 }
 
 $(document).ready(function() {
@@ -266,3 +244,4 @@ $(document).ready(function() {
 });
 
 </script>
+ 
