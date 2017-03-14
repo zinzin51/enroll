@@ -8,10 +8,24 @@ class Insured::GroupSelectionController < ApplicationController
     @market_kind = find_market_kind(:new)
     is_resident = Person.find(params[:person_id]).resident_role?
     if (@market_kind == 'individual' || (@person.try(:has_active_employee_role?) &&
-      @person.try(:has_active_consumer_role?)) || is_resident) && params[:hbx_enrollment_id].present?
-      session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
-      pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
-      pre_hbx.update_current(changing: true) if pre_hbx.present?
+      @person.try(:has_active_consumer_role?)) || is_resident)
+      if params[:hbx_enrollment_id].present?
+        session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
+        pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
+        pre_hbx.update_current(changing: true) if pre_hbx.present?
+      end
+      correct_effective_on = HbxEnrollment.calculate_effective_on_from(
+        market_kind: 'individual',
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+        family: @family,
+        employee_role: nil,
+        benefit_group: nil,
+        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+      @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp|
+        bcp.contains?(correct_effective_on)
+      }.first.benefit_packages.select{|bp|
+        bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"
+      }.first
     end
     @disable_market_kind = (@market_kind == "shop" ? "individual" : "shop") if change_by_qle_or_sep_enrollment?
     insure_hbx_enrollment_for_shop_qle_flow
