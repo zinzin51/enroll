@@ -1,21 +1,14 @@
 class Insured::GroupSelectionController < ApplicationController
   before_action :set_bookmark_url, only: [:new]
-  before_action :initialize_common_vars, only: [:create, :terminate_selection]
-  before_action :set_pre_hbx, only: [:new]
+  before_action :initialize_common_vars, only: [:new,:create, :terminate_selection]
   # before_action :is_under_open_enrollment, only: [:new]
   def new
-    set_bookmark_url
-    initialize_common_vars
 
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = @person.select_market_kind(params)
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
-      if params[:hbx_enrollment_id].present?
-        session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
-        pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
-        pre_hbx.update_current(changing: true) if pre_hbx.present?
-      end
+      set_pre_hbx
     @benefit = extracted_code(@change_plan, @enrollment_kind, @family)
     end
     if get_qle(@change_plan, @enrollment_kind)
