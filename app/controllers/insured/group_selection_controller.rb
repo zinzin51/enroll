@@ -3,10 +3,11 @@ class Insured::GroupSelectionController < ApplicationController
   # before_action :is_under_open_enrollment, only: [:new]
 
   def select_market(person, params)
+    debugger
     return params[:market_kind] if params[:market_kind].present?
-    return 'shop' if @person.has_active_employee_role?
-    return 'individual' if @person.has_active_consumer_role?
-    return 'coverall' if @person.has_active_resident_role?
+    return 'shop' if person.has_active_employee_role?
+    return 'individual' if person.has_active_consumer_role?
+    return 'coverall' if person.has_active_resident_role?
     nil
   end
 
