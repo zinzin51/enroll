@@ -877,6 +877,19 @@ class Person
       user.update_attributes(identity_final_decision_code: User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
     end
   end
+  def select_market_kind(params)
+    return params[:market_kind] if params[:market_kind].present?
+    market_kind = if has_active_employee_role?
+      'shop'
+    elsif has_active_consumer_role?
+      'individual'
+    elsif @person.try(:has_active_resident_role?)
+      'coverall'
+    else
+      nil
+    end
+    return market_kind
+  end
 
   private
   def is_ssn_composition_correct?
