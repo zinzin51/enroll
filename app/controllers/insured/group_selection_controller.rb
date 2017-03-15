@@ -29,7 +29,7 @@ class Insured::GroupSelectionController < ApplicationController
     end
     @disable_market_kind = (@market_kind == "shop" ? "individual" : "shop") if change_by_qle_or_sep_enrollment?
     insure_hbx_enrollment_for_shop_qle_flow
-
+    @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
     # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
     @new_effective_on = Enrollments::Hbx::GroupSelection.new_effective_on(
       effective_on_option_selected: params[:effective_on_option_selected],
@@ -37,7 +37,7 @@ class Insured::GroupSelectionController < ApplicationController
       qle: change_by_qle_or_sep_enrollment?,
       family: @family,
       employee_role: @employee_role
-    ) # write rspec
+    ) 
 
     generate_coverage_family_members_for_cobra
   end
@@ -83,8 +83,7 @@ class Insured::GroupSelectionController < ApplicationController
       elsif @change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       else
-        # FIXME: models should update relationships, not the controller
-        hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
+        hbx_enrollment.update_benefit_group_assignment
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       end
     else
