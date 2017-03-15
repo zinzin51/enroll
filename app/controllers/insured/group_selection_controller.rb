@@ -23,14 +23,20 @@ class Insured::GroupSelectionController < ApplicationController
         benefit_sponsorship: @benefit_sponsorship)
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
     end
-   
+     
     @disable_market_kind = Forms::GroupSelection.set_market_kind(@market_kind) if (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
   
     @hbx_enrollment = Forms::GroupSelection.insure_hbx_enrollment_for_shop(@family) if (@market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?)
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
-  
-
+     @new_effective_on = HbxEnrollment.calculate_effective_on_from(
+     market_kind:@market_kind,
+      qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+       family: @family,
+      employee_role: @employee_role,
+             benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
     @coverage_family_members_for_cobra = Forms::GroupSelection.generate_coverage_family_members_for_cobra(@family) if (@market_kind == 'shop' && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @employee_role.present? && @employee_role.is_cobra_status?)
+    
     # generate_coverage_family_members_for_cobra
     # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
     @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
