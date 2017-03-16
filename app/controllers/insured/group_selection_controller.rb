@@ -20,23 +20,10 @@ class Insured::GroupSelectionController < ApplicationController
     #initialize_common_vars
     
     #@employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
-    @market_kind = select_market(@person, params)
+    @market_kind = GroupSelectionLogic.select_market(@person, params)
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
-      if params[:hbx_enrollment_id].present?
-        session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
-        pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
-        pre_hbx.update_current(changing: true) if pre_hbx.present?
-      end
-      correct_effective_on = HbxEnrollment.calculate_effective_on_from(
-        market_kind: 'individual',
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
-        family: @family,
-        employee_role: nil,
-        benefit_group: nil,
-        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
-      @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
-      @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
+      GroupSelectionLogic.new(params).individualhealth_benifits(session)
     end
     if (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
       @disable_market_kind = @market_kind == "shop" ? "individual" : "shop"
