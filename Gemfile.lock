@@ -1,6 +1,6 @@
 GIT
-  remote: ./../ui_helpers
-  revision: bb262e14db448b4240cb06e7f22e40df192f5d2f
+  remote: git@github.com:dchbx/ui_helpers.git
+  revision: 9cf4aff6de44001d9077c2ed06ffc007100ac483
   specs:
     ui_helpers (0.0.1)
       rails (~> 4.2.3)
@@ -46,7 +46,7 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
-  remote: ./project_gems/effective_datatables-2.6.14
+  remote: project_gems/effective_datatables-2.6.14
   specs:
     effective_datatables (2.6.14)
       coffee-rails
@@ -691,4 +691,4 @@ DEPENDENCIES
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 BUNDLED WITH
-   1.13.6
+   1.14.6

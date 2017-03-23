@@ -16,14 +16,14 @@
         <div class="col-md-2">
           <div class="row">
             <!-- Tabs left of frame.  These are Workflow level 2 sub-categories -->
-            <ul class="nav nav-pills nav-stacked" role="tab-list">
-              <li role="presentation" class="active"><a href="#subtopic_a" aria-controls="subtopic_a" role="pill" data-toggle="pill">Subtopic A</a> </li>
-              <li role="presentation"><a href="#subtopic_b" aria-controls="subtopic_b" role="pill" data-toggle="pill">Subtopic B</a></li>
-              <li role="presentation"><a href="#subtopic_c" aria-controls="subtopic_c" role="pill" data-toggle="pill">Subtopic C</a></li>
-            </ul>
+            <%= nav class: 'nav-pills nav-stacked', role: 'tab-list' do |n| %>
+              <%= n.pill :subtopic_a, 'Subtopic A', active: true %>
+              <%= n.pill :subtopic_b, 'Subtopic B' %>
+              <%= n.pill :subtopic_c, 'Subtopic C' %>
+            <% end %>
 
             <div class="tab-content">
-              <div role="tabpanel" class="tab-pane active" id="subtopic_a"><%= render "tab_pane" %></div>
+              <div role="tabpanel" class="tab-pane active" id="subtopic_a"><%= %></div>
               <div role="tabpanel" class="tab-pane" id="subtopic_b"><h1>This is Subtopic B</h1></div>
               <div role="tabpanel" class="tab-pane" id="subtopic_c"><h1>This is Subtopic C</h1></div>
             </div>

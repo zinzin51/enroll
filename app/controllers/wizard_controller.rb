@@ -1,5 +1,10 @@
 class WizardController < ApplicationController
-  def index
+  skip_before_filter :authenticate_user!
+  skip_before_filter :require_login
+  skip_before_filter :authenticate_me!
+
+  def show
+    render :index
   end
 
   def create
