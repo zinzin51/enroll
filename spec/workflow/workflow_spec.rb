@@ -6,36 +6,36 @@ RSpec.describe Workflow::Workflow do
     let(:workflow3) { Workflow::Workflow.new }
 
     context "from hash" do
-
       context "is empty hash" do
         before :each do
-          @test_yml = File.read("config/workflow/empty.yml")
+          workflow3.workflow_step = {}
+          workflow3.initialize_steps_from_hash(workflow3.workflow_step)
         end
 
         it "should be empty" do
-          expect(@test_yml).to be_empty
+          expect(workflow3.workflow_step).to be_empty
         end
       end
 
       context "non empty hash" do
         it "should not be empty" do
-          expect(workflow3.workflow_steps).not_to be_empty
-          expect(workflow3.workflow_steps).to have_key("step1")
-          expect(workflow3.workflow_steps["step1"]).not_to be_empty
+          expect(workflow3.workflow_step).not_to be_empty
+          expect(workflow3.workflow_step).to have_key("step1")
+          expect(workflow3.workflow_step["step1"]).not_to be_empty
         end
 
         it "generates the step object for step" do
-          expect(workflow3.workflow_steps).to have_key("step1")
-          step1_step_obj = Workflow::Workflowstep.new(workflow3.workflow_steps["step1"])
+          expect(workflow3.workflow_step).to have_key("step1")
+          step1_step_obj = Workflow::Workflowstep.new(workflow3.workflow_step["step1"])
           expect(step1_step_obj).to be_truthy
         end
 
         it "puts the fields in the step" do
-          expect(workflow3.workflow_steps).to have_key("step1")
-          expect(workflow3.workflow_steps["step1"]).to have_key("title")
-          expect(workflow3.workflow_steps["step1"]).to have_key("description")
-          expect(workflow3.workflow_steps["step1"]).to have_key("question")
-          expect(workflow3.workflow_steps["step1"]).not_to have_key("failed_key")
+          expect(workflow3.workflow_step).to have_key("step1")
+          expect(workflow3.workflow_step["step1"]).to have_key("title")
+          expect(workflow3.workflow_step["step1"]).to have_key("description")
+          expect(workflow3.workflow_step["step1"]).to have_key("question")
+          expect(workflow3.workflow_step["step1"]).not_to have_key("failed_key")
         end
       end
 
@@ -46,13 +46,13 @@ RSpec.describe Workflow::Workflow do
         end
 
         it "should generates steps in right order" do
-          expect(workflow3.workflow_steps["step1"]).to eq @step_1["step1"]
-          expect(workflow3.workflow_steps["step2"]).to eq @step_2["step2"]
+          expect(workflow3.workflow_step["step1"]).to eq @step_1["step1"]
+          expect(workflow3.workflow_step["step2"]).to eq @step_2["step2"]
         end
 
         it "should not generate steps in wrong order" do
-          expect(workflow3.workflow_steps["step1"]).not_to eq @step_2["step2"]
-          expect(workflow3.workflow_steps["step2"]).not_to eq @step_1["step1"]
+          expect(workflow3.workflow_step["step1"]).not_to eq @step_2["step2"]
+          expect(workflow3.workflow_step["step2"]).not_to eq @step_1["step1"]
         end
       end
     end
@@ -85,6 +85,17 @@ RSpec.describe Workflow::Workflow do
         record2 = workflow3.from_yaml("config/workflow/invalid.yml")
         expect(record2).not_to be_present
       end
+    end
+
+    context "with person" do
+      let(:person1) {FactoryGirl.create(:person)}
+      let(:workflow4) { Workflow::Workflow.new(person_id: person1.id)}
+
+      it "should have a person_id and person" do
+        expect(workflow4.person_id).not_to be nil
+        expect(workflow4.person).to be_present
+      end
+
     end
   end
 

@@ -7,11 +7,11 @@ class Workflow::Workflow
 
   embeds_many :workflow_steps
 
-  attr_reader :workflow_steps
+  attr_accessor :workflow_step
 
   field :person_id, type: BSON::ObjectId
 
-  validate :person_id
+  # validate :person_id
 
   def current_step
   end
@@ -25,20 +25,23 @@ class Workflow::Workflow
   def completed_workflow?
   end
 
-  def initialize
+  def initialize(options={})
     super
     yaml_hash = from_yaml("config/workflow/financial_assistance.yml")
-    @workflow_steps = {}
+    @workflow_step = {}
     initialize_steps_from_hash(yaml_hash)
+    self.person_id = options[:person_id]
   end
 
   def initialize_steps_from_hash(yaml_hash)
-    yaml_hash["steps"].each do |key, value|
-      @workflow_steps[key] = value
-    end
+    unless yaml_hash.blank?
+      yaml_hash["steps"].each do |key, value|
+        @workflow_step[key] = value
+      end
 
-    @workflow_steps.each do |key, value|
-      Workflow::Workflowstep.from_hash(value)
+      @workflow_step.each do |key, value|
+        Workflow::Workflowstep.from_hash(value)
+      end
     end
   end
 
@@ -48,13 +51,7 @@ class Workflow::Workflow
     rescue Exception => e
       puts "The input YAML file is badly formatted---#{e.inspect}" unless Rails.env.test?
     end
-
     return yaml_hash
-  end
-
-  def person=(new_person)
-    self.person_id = new_person._id
-    @person = new_person
   end
 
   def person
