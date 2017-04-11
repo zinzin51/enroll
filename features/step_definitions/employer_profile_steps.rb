@@ -124,10 +124,6 @@ end
 Then(/(\w+) should see successful message$/) do |name|
   expect(page).to have_content("Employer successfully Updated.")
 end
-# Then(/^ they should see Primary Office Location$/) do
-#   expect(page).to have_content 'Primary Office Location'
-#   expect(page).to have_content 'Main'
-# end
 
 Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
   person = Person.where(first_name: new_staff).first
