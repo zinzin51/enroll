@@ -13,6 +13,7 @@ export class AddressComponent {
   zip : string = "";
   state : string = "";
   stateList : string[] = [];
+  visible : boolean = true;
 
   constructor(private elementRef: ElementRef) { }
 
@@ -21,6 +22,10 @@ export class AddressComponent {
     var json_string = this.elementRef.nativeElement.getAttribute("data-angular2-address-data");
     var address_data = JSON.parse(json_string);
     var state_json = this.elementRef.nativeElement.getAttribute("data-angular2-address-state-data");
+    var hidden_address_attribute = this.elementRef.nativeElement.getAttribute("data-angular2-address-hide");
+    if (hidden_address_attribute) {
+      this.visible = false;
+    }
     this.stateList = JSON.parse(state_json);
     this.kind = address_data.kind;
     this.address_1 = address_data.address_1;

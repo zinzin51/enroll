@@ -23,7 +23,7 @@
     </div>
 
     <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true, :include_id => false do |address| %>
-	    <div data-angular2-address-control="yes" data-angular2-address-prefix="<%= address.object_name %>" data-angular2-address-data="<%= address.object.to_json %>" data-angular2-address-state-data="<%= State::NAME_IDS.map(&:last).to_json %>">
+	    <div data-angular2-address-control="yes" data-angular2-address-prefix="<%= address.object_name %>" data-angular2-address-data="<%= address.object.to_json %>" data-angular2-address-state-data="<%= State::NAME_IDS.map(&:last).to_json %>" <%= (address.object.kind == "home") ? "" : raw("data-angular2-address-hide=\"yes\"")  %>>
 	    </div>
     <% end%>
     <%= render 'shared/error_warning' %>
