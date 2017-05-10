@@ -14,14 +14,11 @@ module.exports = {
 	module: {
 		rules: [
 		{ test: /.(png|woff(2)?|eot|ttf|svg)(\?[a-z0-9=\.]+)?$/, loader: 'url-loader?limit=100000' },
-		{ test: /\.css$/, loaders: ['style-loader', 'css-loader', 'resolve-url'], exclude: [mainPath] },
 		{ test: /\.css$/, loaders: ['raw-loader'], include: [mainPath] },
-		{ test: /\.scss$/, loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap'], exclude: [mainPath] },
-		{ test: /\.scss$/, loaders: ['css-to-string', 'css', 'resolve-url', 'sass?sourceMap'], include: [mainPath] },
 		{ test: /\.ts$/,
 			loaders: ['awesome-typescript-loader?configFileName=./app/assets/angular2/tsconfig.json', 'angular2-template-loader'],
 			exclude: [/\.(spec|e2e)\.ts$/, /\.spec\.ts$/, /node_modules\/(?!(ng2-.+))/, /\.e2e-spec\.ts$/] },
-		{ test: /\.html$/, loader: 'raw-loader' }
+		{ test: /\.html$/, loader: 'raw-loader', include: [mainPath] }
 		]
 	},
 	resolve: {

@@ -2,7 +2,7 @@ import { Component, ElementRef } from '@angular/core';
 
 @Component({
   selector: "[data-angular2-address-control=yes]",
-  template: require("./address.component.html")
+  templateUrl: "./address.component.html"
 })
 export class AddressComponent { 
   kind : string = "";
