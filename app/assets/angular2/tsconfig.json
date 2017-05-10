@@ -1,0 +1,29 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc",
+    "baseUrl" : "",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "typeRoots": [
+      "typings/global",
+      "typings/modules"
+    ],
+    "types" : [
+	    "node"
+    ],
+    "lib": [
+      "es2016",
+      "dom"
+    ]
+  },
+  "awesomeTypescriptLoaderOptions": {
+	  "forkChecker": true,
+	  "useWebpackText": true
+  },
+  "include" : [  "./**/*" ]
+}

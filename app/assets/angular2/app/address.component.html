@@ -1,0 +1,22 @@
+<input name="{{namePrefix}}[kind]" type="hidden" value="{{kind}}">
+<div class="row row-form-wrapper no-buffer address-row home-div">
+	<div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+		<input name="{{namePrefix}}[address_1]" placeholder="ADDRESS LINE 1" class="floatlabel form-control" value="{{address_1}}">
+	</div>
+	<div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+		<input name="{{namePrefix}}[address_2]" placeholder="ADDRESS LINE 2" class="floatlabel form-control" value="{{address_2}}">
+	</div>
+</div>
+<div class="row row-form-wrapper no-buffer address-row home-div">
+	<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+		<input name="{{namePrefix}}[city]" placeholder="CITY" class="floatlabel form-control" value="{{city}}">
+	</div>
+	<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+		<select name="{{namePrefix}}[state]">
+			<option *ngFor="let stateOption of stateList" [value]="stateOption" [selected]="(state == stateOption) ? true : null">{{stateOption}}</option> 
+		</select>
+	</div>
+	<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+		<input name="{{namePrefix}}[zip]" placeholder="ZIP" class="number floatlabel form-control zip" value="{{zip}}">
+	</div>
+</div>

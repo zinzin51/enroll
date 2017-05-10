@@ -60,3 +60,5 @@ plan_xmls.zip
 
 # Ignore .idea
 .idea
+app/assets/javascripts/angular2.js
+app/assets/javascripts/angular2_polyfills.js
