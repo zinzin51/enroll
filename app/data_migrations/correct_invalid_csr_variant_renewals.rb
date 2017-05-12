@@ -14,6 +14,8 @@ class CorrectInvalidCsrVariantRenewals < MongoidMigrationTask
         next
       end
 
+      next if enrollment.is_shop?
+
       if enrollment.workflow_state_transitions.where(to_state: 'auto_renewing').present?
         coverage_start = enrollment.effective_on.prev_year
 
@@ -29,18 +31,22 @@ class CorrectInvalidCsrVariantRenewals < MongoidMigrationTask
 
       if enrollments.present?
         base_enrollment = enrollments.first
-
-        if has_catastrophic_plan?(base_enrollment)
+        if has_catastrophic_plan?(base_enrollment) && is_cat_plan_ineligible?(base_enrollment)
           renewal_plan = base_enrollment.plan.cat_age_off_renewal_plan
 
           if enrollment.plan.hios_id != renewal_plan.hios_id
             enrollment.update(plan_id: renewal_plan.id)
-            puts "EG #{hbx_id} is renewed into #{enrollment.plan.hios_id}...but the correct plan is #{renewal_plan.hios_id}."
           end
         end
       else
         puts "Previous Year Enrollment missing for EG Id #{hbx_id}."
       end
+    end
+  end
+
+  def is_cat_plan_ineligible?(enrollment)
+    enrollment.hbx_enrollment_members.any? do |member| 
+      member.person.age_on(renewal_begin_date) > 29
     end
   end
 
