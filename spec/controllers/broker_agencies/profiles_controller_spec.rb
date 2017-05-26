@@ -67,13 +67,13 @@ RSpec.describe BrokerAgencies::ProfilesController do
   describe "patch update" do
     let(:user) { double(has_broker_role?: true)}
     #let(:org) { double }
-    let(:org) { double("Organization", id: "test") }
-
+    let(:org) { FactoryGirl.create(:organization)}
+    let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, organization: org) }
     before :each do
       sign_in user
       #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
-      allow(Organization).to receive(:find).and_return(org)
       allow(controller).to receive(:sanitize_broker_profile_params).and_return(true)
+      allow(controller).to receive(:authorize).and_return(true)
     end
 
     it "should success with valid params" do
@@ -89,6 +89,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
       #expect(response).to render_template("edit")
       #expect(response).to have_http_status(:redirect)
       #expect(flash[:error]).to eq "Failed to Update Broker Agency Profile"
+    end
+
+    it "should update record" do
+      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates"}
+      broker_agency_profile.primary_broker_role.person.reload
+      expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
   end
 
@@ -213,31 +219,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
       families[2].primary_applicant.person.update_attributes!(last_name: 'jones3')
     end
 
-    it 'should render 21 familes' do
-      sign_in @current_user
-      xhr :get, :family_index, id: @broker_agency_profile1.id
-      expect(assigns(:families).count).to eq(21)
-      expect(assigns(:page_alphabets).count).to eq(2)
-      expect(assigns(:page_alphabets)).to include("J")
-      expect(assigns(:page_alphabets)).to include("S")
-    end
-
-    it "should render families starting with J" do
+    it "renders the families_index template" do
       current_user = @current_user
       allow(current_user).to receive(:has_broker_role?).and_return(true)
       sign_in current_user
-      broker_agency_profile.update_attributes!(aasm_state:'active')
-      xhr :get, :family_index, id: @broker_agency_profile1.id, page: 'J'
-      expect(assigns(:families).count).to eq(3)
-    end
-
-    it "should render families named Smith" do
-      current_user = @current_user
-      allow(current_user).to receive(:has_broker_role?).and_return(true)
-      sign_in current_user
-      broker_agency_profile.update_attributes!(aasm_state:'active')
-      xhr :get, :family_index, id: @broker_agency_profile1.id, q: 'Smith'
-      expect(assigns(:families).count).to eq(27)
+      xhr :get, :family_index, id: broker_agency_profile.id
+      expect(response).to render_template("broker_agencies/profiles/family_index")
     end
   end
 
@@ -260,8 +247,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
 
     context "individual market user" do
-      let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
-      let(:user) {FactoryGirl.create(:user, person: person, roles: ['consumer'])}
+      let(:person) {FactoryGirl.build(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.build(:user, person: person, roles: ['consumer'])}
 
       it "selects only 'individual' and 'both' market brokers" do
         allow(subject).to receive(:current_user).and_return(user)
@@ -274,8 +261,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
 
     context "SHOP market user" do
-      let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
-      let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+      let(:person) {FactoryGirl.build(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
       it "selects only 'shop' and 'both' market brokers" do
         allow(subject).to receive(:current_user).and_return(user)
@@ -446,6 +433,38 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in user
       xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
       expect(assigns(:notice)).to eq "Changing default general agencies may take a few minutes to update all employers."
+    end
+  end
+
+  describe "GET employer_profile datatable" do
+    let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:person) { broker_agency_staff_role.person }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker_agency_staff']) }
+    let(:organization) {FactoryGirl.create(:organization)}
+    let(:organization1) {FactoryGirl.create(:organization)}
+    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile, organization: organization)}
+    let(:broker_agency_staff_role) {FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile)}
+    let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile,employer_profile: employer_profile1)}
+    let(:broker_agency_account1) {FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile,employer_profile: employer_profile2)}
+    let(:employer_profile1) {FactoryGirl.create(:employer_profile, organization: organization)}
+    let(:employer_profile2) {FactoryGirl.create(:employer_profile, organization: organization1)}
+    let(:hbx_staff_role) {FactoryGirl.create(:hbx_staff_role, person: user.person)}
+
+    before :each do
+      user.person.hbx_staff_role = hbx_staff_role
+      employer_profile1.broker_agency_accounts << broker_agency_account
+      employer_profile2.broker_agency_accounts << broker_agency_account1
+      sign_in user
+    end
+
+    it "should search for employers in BrokerAgencies with  search string" do
+      xhr :get, :employer_datatable, id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: 'abcdefgh'}
+      expect(assigns(:employer_profiles).count).to   eq(0)
+    end
+
+    it "should search for employers in BrokerAgencies with empty search string" do
+      xhr :get, :employer_datatable, id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: ''}
+      expect(assigns(:employer_profiles).count).to   eq(2)
     end
   end
 end

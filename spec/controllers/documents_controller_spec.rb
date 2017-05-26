@@ -88,6 +88,20 @@ RSpec.describe DocumentsController, :type => :controller do
       end
     end
 
+    context "American Indian Status verification type" do
+      before do
+        person.consumer_role.update_attributes!(citizen_status: "indian_tribe_member")
+      end
+      it "should update attributes" do
+        post :update_verification_type, { person_id: person.id,
+                                          verification_type: "American Indian Status",
+                                          verification_reason: "document_in_Enroll_app"}
+        person.reload
+        expect(person.consumer_role.native_validation).to eq("valid")
+        expect(person.consumer_role.native_update_reason).to eq("document_in_Enroll_app")
+      end
+    end
+
     context "Citizenship verification type" do
       it "should update attributes" do
         post :update_verification_type, { person_id: person.id,
@@ -115,7 +129,6 @@ RSpec.describe DocumentsController, :type => :controller do
       it "should redirect to back" do
         post :update_verification_type, person_id: person.id
         expect(response).to redirect_to :back
-        expect(flash[:notice]).to eq("Verification successfully approved.")
       end
     end
   end
