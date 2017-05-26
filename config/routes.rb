@@ -160,6 +160,7 @@ Rails.application.routes.draw do
       collection do
         get 'home'
         get 'manage_family'
+        get 'family_relationships_matrix'
         get 'personal'
         get 'inbox'
         get 'brokers'
@@ -214,6 +215,8 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
+
+    resources :family_relationships
     
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
@@ -374,6 +377,8 @@ Rails.application.routes.draw do
           get :download_pdf
           get :dental_plans_data
           get :my_quotes
+          get :employees_list
+          get :employee_type
         end
         member do
           get :upload_employee_roster

@@ -29,6 +29,18 @@ describe FamilyMember, "given a person" do
   end
 end
 
+
+describe FamilyMember, "given a person" do
+  let(:person) { create :person ,:with_family }
+
+  it "should error when trying to save duplicate family member" do
+    family_member = FamilyMember.new(:person => person) 
+    person.families.first.family_members << family_member
+    person.families.first.family_members << family_member
+    expect(family_member.errors.full_messages.join(",")).to match(/Family members Duplicate family_members for person/)
+  end
+end
+
 describe FamilyMember, dbclean: :after_each do
   context "a family with members exists" do
     include_context "BradyBunchAfterAll"
@@ -46,7 +58,7 @@ describe FamilyMember, dbclean: :after_each do
     it "should be possible to find the primary_relationship" do
       mikes_family.dependents.each do |dependent|
         if brady_children.include?(dependent.person)
-          expect(dependent.primary_relationship).to eq "child"
+          expect(dependent.primary_relationship).to eq "parent"
         else
           expect(dependent.primary_relationship).to eq "spouse"
         end
@@ -172,19 +184,21 @@ describe FamilyMember, "which is inactive" do
   it "can be reactivated with a specified relationship"
 end
 
-describe FamilyMember, "given a relationship to update" do
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-  let(:relationship) { "spouse" }
-  let(:person) { FactoryGirl.build(:person) }
-  subject { FactoryGirl.build(:family_member, person: person, family: family) }
+#old_code
 
-  it "should do nothing if the relationship is the same" do
-    subject.update_relationship(subject.primary_relationship)
-  end
+# describe FamilyMember, "given a relationship to update" do
+#   let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+#   let(:relationship) { "spouse" }
+#   let(:person) { FactoryGirl.build(:person) }
+#   subject { FactoryGirl.build(:family_member, person: person, family: family) }
 
-  it "should update the relationship if different" do
-    expect(subject.primary_relationship).not_to eq relationship
-    subject.update_relationship(relationship)
-    expect(subject.primary_relationship).to eq relationship
-  end
-end
+#   it "should do nothing if the relationship is the same" do
+#     subject.update_relationship(subject.primary_relationship)
+#   end
+
+#   it "should update the relationship if different" do
+#     expect(subject.primary_relationship).not_to eq relationship
+#     subject.update_relationship(relationship)
+#     expect(subject.primary_relationship).to eq relationship
+#   end
+# end
