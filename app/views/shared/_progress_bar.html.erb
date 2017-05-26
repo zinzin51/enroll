@@ -1,0 +1,20 @@
+
+<div class="container">
+  <div class="row">
+    <ul class="nav nav-tabs" id="consumer_tabs">
+    <li class="active">
+      <a href="#">Account Registration</a>
+    </li>
+    <li class="">
+      <a href="#">Household Info</a>
+    </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  $(document).ready( function() {
+      $('.step-tabs').removeClass( 'active' );
+      $('#' + '<%= @selectedStepId %>').addClass( 'active' );
+    } );
+</script>

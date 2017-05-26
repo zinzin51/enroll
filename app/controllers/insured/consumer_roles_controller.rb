@@ -24,8 +24,15 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
+  def getStepsForAccountRegistration
+    [{"title"=>"Personal Info", "id"=>"personalInfo"}, {"title"=>"More About You", "id"=>"moreAboutYou"}, {"title"=>"Authorization & Consent", "id"=>"authorizationAndConsent"}, {"title"=>"Verify Identity", "id"=>"verifyIdentity"}, {"title"=>"", "id"=>"experianError"}]
+  end
+
 
   def search
+    @selectedTab = "accountRegistration"
+    @allSteps = getStepsForAccountRegistration
+    @selectedStepId = "personalInfo"
     @no_previous_button = true
     @no_save_button = true
     if params[:aqhp].present?
@@ -52,6 +59,9 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def match
+    @selectedTab = "accountRegistration"
+    @allSteps = getStepsForAccountRegistration
+    @selectedStepId = "personalInfo"
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
 
@@ -187,6 +197,9 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def edit
     #authorize @consumer_role, :edit?
+    @selectedTab = "accountRegistration"
+    @allSteps = getStepsForAccountRegistration
+    @selectedStepId = "moreAboutYou"
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
@@ -221,6 +234,9 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def ridp_agreement
+    @selectedTab = "accountRegistration"
+    @allSteps = getStepsForAccountRegistration
+    @selectedStepId = "authorizationAndConsent"
     set_current_person
     if @person.completed_identity_verification?
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)

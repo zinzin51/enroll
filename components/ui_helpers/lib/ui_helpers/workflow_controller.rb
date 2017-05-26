@@ -32,11 +32,27 @@ module UIHelpers
     end
 
     def current_step
+     
       if params[:step]
         @current_step = @steps.find(params[:step].to_i)
       else
         @current_step ||= @steps.find(@model.workflow['current_step'] || 1)
       end
+      @allTitlesWithStep = []
+      @step_no = (params[:step]) ? params[:step].to_i : 1
+      # TODO :- the value of selected Tab will come from different action.
+      @selectedTab = 2
+      puts "@"*50
+      puts @selectedTab
+      # get all the steps no as per the selected Tab
+      tabTitleMapping = {2 => [1,4]}
+      i = 0
+      tabTitleMapping[@selectedTab][1].times do
+        @allTitlesWithStep << [@steps.find(tabTitleMapping[@selectedTab][0] + i).heading, tabTitleMapping[@selectedTab][0] + i]
+        i = i+1
+      end
+      puts "%"*30
+      puts @allTitlesWithStep.inspect
     end
 
     def find_or_create

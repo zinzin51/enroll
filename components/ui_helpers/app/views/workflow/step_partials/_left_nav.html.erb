@@ -1,7 +1,12 @@
 <div class="col-md-3">
     <nav class=" smartscroll-nav" id="mainnav">
       <ul class="nav nav-stacked affix" id="leftNavigation">
-        <li id="accountRegistration" class="list-box">
+        <% @allTitlesWithStep.each do |title, step| %>
+          <li id="step_<%= step %>" class="list-box">
+            <a  href="#" ><%= title %></a>
+          </li>
+        <%end%>
+        <!-- <li id="accountRegistration" class="list-box">
           <a  href="#" >Account Registration</a>
         </li>
         <li id="personalInformation" class="list-box">
@@ -20,7 +25,7 @@
           <a class="" href="#">Enroll in Plan</a>
         </li>
         <li id="ConfirmPlan" class="list-box">
-          <a class="" href="#">Confirm Plan</a>
+          <a class="" href="#">Confirm Plan</a> -->
       </ul>
     </nav>
   </div>

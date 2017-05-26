@@ -62,14 +62,24 @@
     "Other Questions": "householdInfo"
   };
 
-  $(function() {
-    var currentHeading = "<%=@current_step.heading%>";
-    listID = headingMapper[currentHeading];
-    $('li#' + headingMapper[currentHeading] ).prevAll().addClass('completed');
-    $('li#' + headingMapper[currentHeading] ).addClass('active');
-  });
+  // $(function() {
+  //   var currentHeading = "<%=@current_step.heading%>";
+  //   listID = headingMapper[currentHeading];
+  //   $('li#' + headingMapper[currentHeading] ).prevAll().addClass('completed');
+  //   $('li#' + headingMapper[currentHeading] ).addClass('active');
+  // });
 
   $('input[type="submit"]').on('click',function() {
     $('form').submit();
-  })
+  });
+
+  $('ul#consumer_tabs > li').removeClass('active');
+  console.log('<%= @selectedTab%>');
+  $('ul#consumer_tabs > li:nth-child(<%= @selectedTab%>)').addClass('active');
+
+  $(function() {
+    console.log("<%= @step_no%>");
+    $('li#step_<%= @step_no%>').prevAll().addClass('completed');
+    $('li#step_<%= @step_no%>').addClass('active');
+  });
 </script>

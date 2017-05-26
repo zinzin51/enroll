@@ -2,7 +2,14 @@ module Insured
   class InteractiveIdentityVerificationsController < ApplicationController
     before_action :set_current_person
 
+    def getStepsForAccountRegistration
+      [{"title"=>"Personal Info", "id"=>"personalInfo"}, {"title"=>"More About You", "id"=>"moreAboutYou"}, {"title"=>"Authorization & Consent", "id"=>"authorizationAndConsent"}, {"title"=>"Verify Identity", "id"=>"verifyIdentity"}, {"title"=>"", "id"=>"experianError"}]
+    end
+
     def new
+      @selectedTab = "accountRegistration"
+      @allSteps = getStepsForAccountRegistration
+      @selectedStepId = "verifyIdentity"
       service = ::IdentityVerification::InteractiveVerificationService.new
       service_response = service.initiate_session(render_session_start)
       respond_to do |format|
