@@ -17,18 +17,15 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
-    @family = Family.find(params[:family_id])
-    @family_member = @family.family_members.find(params[:family_member_id])
+    @family_member = FamilyMember.find(params[:member_id])
+    @family = @family_member.family
     attributes = []
     params.each {|param| attributes << {param.first => param.second} if param.first.include?"_attributes"}
 
     attributes.each do  |attribute_params|
-      attribute_params.each do |model_key, instance_value| # model_key: applicants_attributes & instance_value: {"0"=>{"is_required_to_file_taxes"=>"no"}}
-        embedded_model = model_key.split("_").first
-        model_params = embedded_model == "applicants" ? instance_value.first.last.merge!(family_member_id: @family_member.id) : instance_value.first.last
-        build_params = survey_params(model_params)
-        @model.attributes.merge!("workflow" => {"current_step" => @current_step.to_i + 1 })
-        @model.update_attributes!(survey_params(hash_to_param(attribute_params)))
+      attribute_params.each do |model_key, params_instance|
+        update_params(model_key, params_instance, params)
+        @model.update_attributes!(permit_params(hash_to_param(attribute_params)))
       end
     end
 
@@ -39,7 +36,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       @current_step = @current_step.next_step
     end
     @model.save!
-
     render 'workflow/step'
   end
 
@@ -49,16 +45,18 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     ActionController::Parameters.new(param_hash)
   end
 
-  def survey_params(attributes)
+  def permit_params(attributes)
     attributes.permit!
   end
 
+  def update_params(model_key, params_instance, params)
+    @model.attributes.merge!("workflow" => {"current_step" => @current_step.to_i + 1 }) # Add workflow params
+    params_instance.first.last.merge!(family_member_id: params[:member_id]) if model_key == "applicants_attributes" # Add foreign key reference to appplicant
+  end
+
   def find
-    #Family.find_by(person_id: current_user.person).applications.find(params[:id]) if params.key?(:id)
+    # TODO:Find the latest application in-progress
     current_user.person.primary_family.applications.find(params[:id]) if params.key?(:id)
-    # Can you have two active application ?
-    # Which one does it pick on “Add Info?”
-    #TODO: Baaed on the above find the application that is currently in progress. application_in_progress?
   end
 
   def create
