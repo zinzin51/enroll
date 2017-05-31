@@ -43,6 +43,7 @@ class FinancialAssistance::Applicant
     undergraduate
     vocational
   )
+  field :family_member_id, type: BSON::ObjectId
 
   field :has_fixed_address, type: Boolean, default: true
   field :is_living_in_state, type: Boolean, default: true
@@ -100,6 +101,8 @@ class FinancialAssistance::Applicant
   field :is_resident_post_092296, type: Boolean, default: false
   field :is_vets_spouse_or_child, type: Boolean, default: false
 
+  field :workflow, type: Hash, default: { }
+  
   embeds_many :incomes,     inverse_of: :income,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  inverse_of: :deduction,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    inverse_of: :benefit,    class_name: "::FinancialAssistance::Benefit"
@@ -173,8 +176,7 @@ class FinancialAssistance::Applicant
   end
 
   def family_member
-    return @family_member if defined?(@family_member)
-    @family_member = family_members.detect { |member| member.is_primary_applicant? }
+    @family_member ||= FamilyMember.find(family_member_id)
   end
 
   def consumer_role
@@ -183,8 +185,7 @@ class FinancialAssistance::Applicant
   end
 
   def person
-    return @person if defined?(@person)
-    @person = family_member.person
+    @person ||= family_member.person
   end
 
   # Use income entries to determine hours worked
