@@ -2,19 +2,29 @@
 <div class="container">
   <div class="row">
     <ul class="nav nav-tabs" id="consumer_tabs">
-    <li class="active">
+    <% @allTabs.each do |tab| %>
+      <li class="main-head-tabs" id="<%= tab['id'] %>">
+        <a href="#"><%= tab["title"] %></a>
+      </li>
+    <% end %>
+    <!-- <li class="active">
       <a href="#">Account Registration</a>
     </li>
     <li class="">
       <a href="#">Household Info</a>
-    </li>
+    </li> -->
     </ul>
   </div>
 </div>
 
 <script>
   $(document).ready( function() {
-      $('.step-tabs').removeClass( 'active' );
-      $('#' + '<%= @selectedStepId %>').addClass( 'active' );
+      $('.step-tabs').removeClass( 'activer' );
+      $('#' + '<%= @selectedStepId %>').addClass( 'activer' );
+    } );
+
+  $(document).ready( function() {
+      $('.main-head-tabs').removeClass( 'activer' );
+      $('#' + '<%= @selectedTab %>').addClass( 'activer' );
     } );
 </script>

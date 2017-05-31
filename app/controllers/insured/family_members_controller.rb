@@ -1,8 +1,14 @@
 class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
+  include NavigationHelper
 
   before_action :set_current_person, :set_family
   def index
+    @selectedTab = "householdInfo"
+    @selectedStepId = "householdInfoStep"
+    @allTabs = NavigationHelper::getAllTabs
+    @allSteps = NavigationHelper::getStepsOfTab(@selectedTab)
+
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
 

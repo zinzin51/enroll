@@ -29,6 +29,10 @@ Rails.application.routes.draw do
       post :step, on: :collection
       get 'step/:step/:member_id', on: :member, action: 'step', as: 'go_to_step'
     end
+    resources :pre_workflow, controller: 'pre_workflow' do
+      get 'help_paying_coverage/:id',on: :collection, action: 'help_paying_coverage', as: 'help_paying_coverage'
+      get 'application_checklist/:id',on: :collection, action: 'application_checklist', as: 'application_checklist'
+    end
   end
 
   namespace :exchanges do
