@@ -596,7 +596,7 @@ def employer_poc
 
       if latest_terminated_plan_year(employer_profile).present?
         process_reinstate_initial_plan_year(employer_profile)
-        flash["notice"] = "Initial plan year cancelled for employer: #{employer_profile.legal_name}"
+        flash["notice"] = "Plan year reinstated for employer: #{employer_profile.legal_name}"
         return_status = 200
       else
         raise("Terminated plan year not found.")
@@ -698,6 +698,7 @@ private
   end
 
   def process_reinstate_initial_plan_year(employer_profile)
+
     plan_year = latest_terminated_plan_year(employer_profile)
 
     plan_year.hbx_enrollments.each do |enrollment|
