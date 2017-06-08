@@ -702,10 +702,21 @@ private
     plan_year = latest_terminated_plan_year(employer_profile)
 
     plan_year.hbx_enrollments.each do |enrollment|
+      current_state = enrollment.aasm_state
       enrollment.update_attributes!({ aasm_state: "coverage_enrolled", terminated_on: nil })
+      enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: current_state,
+          to_state: "coverage_enrolled"
+      )
+      enrollment.save!
     end
 
     plan_year.update_attributes!({aasm_state: "active"})
+    current_state = plan_year.aasm_state
+    plan_year.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: current_state,
+        to_state: "active")
+      plan_year.save!
   end
 
 end
