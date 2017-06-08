@@ -531,7 +531,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       before :each do
         hbx_enrollment.update_attribute(:aasm_state, "coverage_terminated")
         allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-        #allow(subject).to receive(:process_reinstate_initial_plan_year).with(employer_profile)
+        allow_any_instance_of(Exchanges::HbxProfilesHelper).to receive(:latest_terminated_plan_year).with(employer_profile).and_return(plan_year)
         allow_any_instance_of(PlanYear).to receive(:hbx_enrollments).and_return([hbx_enrollment])
         sign_in user
       end
