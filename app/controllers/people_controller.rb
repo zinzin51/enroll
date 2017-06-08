@@ -201,12 +201,16 @@ class PeopleController < ApplicationController
       redirect_path = family_account_path
     end
 
-
-    respond_to do |format|
+     respond_to do |format|
       if @person.update_attributes(person_params)
-        format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
-        format.json { head :no_content }
-      else
+        if params[:page].eql? "from_registration"
+          format.js
+          format.html{redirect_to :back}
+        else
+          format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
+          format.json { head :no_content }
+        end
+       else
         @person.addresses = @old_addresses
         if @person.has_active_consumer_role?
           bubble_consumer_role_errors_by_person(@person)
