@@ -55,6 +55,13 @@ $(document).on('ready page:load', function () {
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
   Responsive.setSizeListeners();
+  $("[data-angular2-address-control]").each(function() {
+	  var data = JSON.parse($(this).attr('data-angular2-address-data'));
+	  data['namePrefix'] = $(this).attr('data-angular2-address-prefix');
+	  data['stateData'] = JSON.parse($(this).attr('data-angular2-address-state-data'));
+	  data['hidden'] = ($(this).attr('data-angular2-address-hide') == "yes");
+     window.initReactAddressFields(this, data);
+  });
 });
 
 function applyMultiLanguageSelect() {

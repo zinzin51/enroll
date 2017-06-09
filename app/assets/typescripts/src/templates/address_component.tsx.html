@@ -1,23 +1,26 @@
-<div>
-	<input name={kind_input_name} type="hidden" value={address_kind} />
-	<div className="row row-form-wrapper no-buffer address-row home-div" hidden={!visible}>
+<div hidden={hidden}>
+	<input name={kind_input_name} type="hidden" defaultValue={address_kind} />
+	<div className="row row-form-wrapper no-buffer address-row home-div">
 		<div className="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-			<input name={address_1_input_name} placeholder="ADDRESS LINE 1" className="floatlabel form-control" value={address_1}/>
+			<input name={address_1_input_name} placeholder="ADDRESS LINE 1" className="floatlabel form-control" defaultValue={address_1}/>
 		</div>
 		<div className="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-			<input name={address_2_input_name} placeholder="ADDRESS LINE 2" className="floatlabel form-control" value={address_2}/>
+			<input name={address_2_input_name} placeholder="ADDRESS LINE 2" className="floatlabel form-control" defaultValue={address_2}/>
 		</div>
 	</div>
-	<div className="row row-form-wrapper no-buffer address-row home-div" hidden={!visible}>
+	<div className="row row-form-wrapper no-buffer address-row home-div">
 		<div className="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-			<input name={city_input_name} placeholder="CITY" className="floatlabel form-control" value={city}/>
+			<input name={city_input_name} placeholder="CITY" className="floatlabel form-control" defaultValue={city}/>
 		</div>
 		<div className="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-			<select name={state_input_name}>
+			<select name={state_input_name} defaultValue={state_value}>
+				{state_data.map(function(sd) {
+				return(<option value={sd} key={sd}>{sd}</option>);
+				})}
 			</select>
 		</div>
 		<div className="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-			<input name={zip_input_name} placeholder="ZIP" className="number floatlabel form-control zip" value={zip}/>
+			<input name={zip_input_name} placeholder="ZIP" className="number floatlabel form-control zip" defaultValue={zip}/>
 		</div>
 	</div>
 </div>
