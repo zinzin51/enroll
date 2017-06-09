@@ -594,10 +594,11 @@ def employer_poc
     begin
       employer_profile = EmployerProfile.find(params[:id])
       hbx_enrollments = employer_profile.published_plan_year.hbx_enrollments
+      plan_year = employer_profile.published_plan_year
 
       if is_initial_or_conversion_employer?(employer_profile) && can_cancel_employer_plan_year?(employer_profile)
         process_cancel_initial_plan_year(hbx_enrollments, employer_profile)
-        post_cancel_conditions(employer_profile)
+        post_cancel_conditions(employer_profile, plan_year)
         flash["notice"] = "Initial plan year cancelled for employer: #{employer_profile.legal_name}"
       else
         raise("Internal error.")
@@ -705,7 +706,17 @@ private
     employer_profile.published_plan_year.cancel!
   end
 
-  def post_cancel_conditions(employer_profile)
+  def post_cancel_conditions(employer_profile, plan_year)
+    employer_profile.census_employees.each do |census_employee|
+      assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => plan_year.benefit_groups.map(&:id))
+      assignments.each do |assignment|
+        if assignment.may_delink_coverage?
+          assignment.delink_coverage!
+          assignment.update_attribute(:is_active, false)
+        end
+      end
+    end
+
     employer_profile.aasm_state = 'applicant' unless employer_profile.applicant?
     employer_profile.save!
   end
