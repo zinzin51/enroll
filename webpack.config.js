@@ -3,7 +3,6 @@ const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const mainPath = path.resolve(__dirname, 'app/assets/vues');
 const assetPath = path.resolve(__dirname, 'app/assets/javascripts');
 
-
 module.exports = {
 	entry: {
 		typescripts: (mainPath + "/src/vues.ts")
@@ -19,7 +18,10 @@ module.exports = {
 	resolve: {
 		// Add '.ts' and '.tsx' as resolvable extensions.
 		modules: [nodeModulesPath],
-		extensions: [".ts", ".js", ".json", ".html"]
+		extensions: [".ts", ".js", ".json", ".html"],
+		    alias: {
+			          'vue$': 'vue/dist/vue.common.js'
+					      }
 	},
 
 	module: {
@@ -31,5 +33,4 @@ module.exports = {
                   {test: /\.html$/, loader: 'raw-loader'},
       		  { enforce: "pre", test: /\.js$/, loader: "source-map-loader" } ]
 	}
-
 };

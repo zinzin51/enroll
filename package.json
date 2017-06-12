@@ -10,6 +10,7 @@
     "raw-loader": "^0.5.1",
     "source-map-loader": "^0.2.1",
     "typescript": "^2.3.4",
+    "vue-property-decorator": "^5.1.0",
     "webpack": "^2.6.1"
   }
 }
