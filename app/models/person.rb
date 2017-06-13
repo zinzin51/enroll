@@ -36,10 +36,6 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
-  field :is_incarcerated_pending_charge_disposition, type: Boolean
-  field :is_incarcerated_in_dc, type: Boolean
-  field :incarceration_date, type: Date
-  field :expected_release_date, type: Date
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
@@ -169,6 +165,8 @@ class Person
 
   # PersonRelationship child model indexes
   # index({"person_relationship.relative_id" =>  1}) #old_code
+  index({"person_relationship.predecessor_id" =>  1})
+  index({"person_relationship.successor_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
 
