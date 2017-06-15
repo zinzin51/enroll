@@ -974,7 +974,7 @@ class Family
 
   def find_missing_relationships(matrix)
     id_map = {}
-    family_members_id = family_members.map(&:person_id)
+    family_members_id = family_members.where(is_active: true).map(&:person_id)
     family_members_id.each_with_index { |hmid, index| id_map.merge!(index => hmid ) }
     missing_relationships = []
     matrix.each_with_index do |x, xi|
