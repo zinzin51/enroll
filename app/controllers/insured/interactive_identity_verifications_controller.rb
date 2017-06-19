@@ -24,6 +24,7 @@ module Insured
     end
 
     def create
+      binding.pry
       @interactive_verification = ::IdentityVerification::InteractiveVerification.new(params.require(:interactive_verification).permit!)
       respond_to do |format|
         format.html do
