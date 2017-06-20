@@ -22,7 +22,7 @@ class FinancialAssistance::PreWorkflowController < ApplicationController
     else
       #TODO redirect the user to household info page
       @transaction_id = params[:id]
-      #redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     end
   end
 end
