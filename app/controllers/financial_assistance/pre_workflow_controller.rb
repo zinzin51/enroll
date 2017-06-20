@@ -17,7 +17,7 @@ class FinancialAssistance::PreWorkflowController < ApplicationController
     if family.is_applying_for_assistance
       application = family.applications.build(aasm_state: "inprogress")
       application.applicants.build(has_fixed_address: false, tax_filer_kind: "single", family_member_id: family.primary_applicant.id)
-      @transaction_id = application.id
+      @transaction_id = params[:id]
       family.save!
     else
       #TODO redirect the user to household info page
