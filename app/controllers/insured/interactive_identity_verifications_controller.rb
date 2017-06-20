@@ -84,8 +84,7 @@ module Insured
         consumer_user.identity_verified_date = TimeKeeper.date_of_record
         consumer_user.save!
       end
-      #redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
-      redirect_to help_paying_coverage_financial_assistance_pre_workflow_index_path(:id => service_response.transaction_id)
+      redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
     end
 
     def render_session_start
