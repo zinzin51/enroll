@@ -1,11 +1,8 @@
 module Insured
   class InteractiveIdentityVerificationsController < ApplicationController
-    include NavigationHelper
     before_action :set_current_person
 
     def new
-      @selectedTab = "moreAboutYou"
-      @allTabs = NavigationHelper::getAllTabs
       service = ::IdentityVerification::InteractiveVerificationService.new
       service_response = service.initiate_session(render_session_start)
       respond_to do |format|
@@ -84,7 +81,8 @@ module Insured
         consumer_user.identity_verified_date = TimeKeeper.date_of_record
         consumer_user.save!
       end
-      redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
+      #redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
+      redirect_to help_paying_coverage_financial_assistance_pre_workflow_index_path(:id => service_response.transaction_id)
     end
 
     def render_session_start
