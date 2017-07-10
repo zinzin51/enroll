@@ -17,7 +17,7 @@ class DelinkBroker < MongoidMigrationTask
 
       hbx_office = OfficeLocation.new(
       is_primary: true, 
-      address: {kind: "work", address_1: "10 Post Office Rd #233", address_2: "", city: "Silver Spring", state: "MD", zip: "20910" },
+      address: {kind: "work", address_1: "21 Church St Suite 100", address_2: "", city: "Rockville", state: "MD", zip: "20850" },
       phone: {kind: "main", area_code: "301", number: "509-3088"}
       )
 
