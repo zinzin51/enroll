@@ -48,6 +48,7 @@
                     model: application
                     name: years_to_renew
                     attribute: years_to_renew
+                    id: 'years_to_renew'
                   - gutter: 12
                     type: label_radio
                     label: 4 years

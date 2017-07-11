@@ -84,6 +84,7 @@
                   required: true
                   values:
                     - Select who will claim this person
+                  id: 'claimed_as_tax_dependent_by_id'
                   model: applicant
                   attribute: claimed_as_tax_dependent_by
 - step:
