@@ -307,6 +307,17 @@
 							}
 						}
 					}
+          td {
+            vertical-align: middle;
+            &.table-functions-terminate-pending {
+              min-width: 70px;
+              .fa {
+                display: inline-block;
+                color: #b7b7b7;
+                margin-left: 5px;
+              }
+            }
+          }
 					&:hover {
 						td {
 							&.table-functions {
@@ -370,7 +381,7 @@
       font-size: 0.9em;
       vertical-align: middle;
     }
-    .verification-update-reason {
+    .verification-update-reason, .return-for-def-reason, .fedhub-request {
       margin-top: 10px;
       padding-bottom: 10px;
       display: none;

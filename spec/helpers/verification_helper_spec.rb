@@ -243,21 +243,21 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:hbx_enrollment) { HbxEnrollment.new(:review_status => "ready") }
     context "if verification needed" do
       before :each do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.any?").and_return(true)
       end
       it "returns true if enrollment has complete review status" do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment_incomplete)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.first").and_return(hbx_enrollment_incomplete)
         expect(helper.hbx_enrollment_incomplete).to be_truthy
       end
       it "returns false for not incomplete status" do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.first").and_return(hbx_enrollment)
         expect(helper.hbx_enrollment_incomplete).to be_falsey
       end
     end
 
     context "without enrollments that needs verification" do
       before :each do
-        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(false)
+        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.any?").and_return(false)
       end
 
       it "returns false without enrollments" do
@@ -370,5 +370,20 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "documents uploaded for one verification type", "Citizenship", 1, 1
     it_behaves_like "documents uploaded for one verification type", "Immigration status", 1, 1
     it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
+  end
+
+  describe "#build_admin_actions_list" do
+    shared_examples_for "admin actions dropdown list" do |type, status, actions|
+      before do
+        allow(helper).to receive(:verification_type_status).and_return status
+      end
+      it "returns admin actions array" do
+        expect(helper.build_admin_actions_list(person, type)).to eq actions
+      end
+    end
+
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "View History", "Call HUB"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Return for Deficiency", "View History", "Call HUB"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Return for Deficiency", "View History", "Call HUB"]
   end
 end

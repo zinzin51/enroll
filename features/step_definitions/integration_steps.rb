@@ -38,7 +38,7 @@ def people
       first_name: 'Broker',
       last_name: 'Assisted',
       dob: "05/02/1976",
-      ssn: "761234567",
+      ssn: "761234467",
       email: 'broker.assisted@dc.gov',
       password: 'aA1!aA1!aA1!'
     },
@@ -46,7 +46,7 @@ def people
       first_name: 'Fred',
       last_name: 'Thirteen',
       dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
-      ssn: defined?(@u) ? @u.ssn : "761234567",
+      ssn: defined?(@u) ? @u.ssn : "761234467",
       email: defined?(@u) ? @u.email : 'fred@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -54,7 +54,7 @@ def people
       first_name: 'Megan',
       last_name: 'Smith',
       dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
-      ssn: defined?(@u) ? @u.ssn : "761234567",
+      ssn: defined?(@u) ? @u.ssn : "761234467",
       email: defined?(@u) ? @u.email : 'megan@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -91,7 +91,7 @@ def people
       legal_name: "Turner Agency, Inc",
       dba: "Turner Agency, Inc",
       fein: defined?(@u) ? @u.fein : '123123123',
-      ssn: defined?(@u) ? @u.ssn : "761234567",
+      ssn: defined?(@u) ? @u.ssn : "761234467",
       email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -99,7 +99,7 @@ def people
       first_name: "Jack",
       last_name: "Cobra",
       dob: "08/10/1960",
-      ssn: "196008107",
+      ssn: "887788766",
       email: "jack@cobra.com",
       password: 'aA1!aA1!aA1!'
     },
@@ -107,7 +107,7 @@ def people
       first_name: "Jack",
       last_name: "Employee",
       dob: "08/10/1960",
-      ssn: "196008111",
+      ssn: "887788789",
       email: "jack@employee.com",
       password: 'aA1!aA1!aA1!'
     },
@@ -430,7 +430,8 @@ When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, prima
   fill_in 'organization[area_code]', :with => '202'
   fill_in 'organization[number]', :with => '5551212'
   fill_in 'organization[extension]', :with => '22332'
-
+  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Only Electronic communications')]]").click
+  find(:xpath, "//select[@name='organization[contact_method]']/option[@value='Paper and Electronic communications']")
   find('.interaction-click-control-confirm').click
 end
 
@@ -589,7 +590,6 @@ Then(/^Employee (.+) should see coverage effective date/) do |named_person|
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
-
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
   wait_for_ajax
@@ -649,6 +649,7 @@ end
 
 Then(/^.+ should see the new dependent form$/) do
 
+  expect(page).to have_content('Lives with primary subscriber')
   expect(page).to have_content('Confirm Member')
 end
 

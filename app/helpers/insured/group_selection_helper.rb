@@ -30,14 +30,15 @@ module Insured
       end
     end
 
-    def calculate_effective_on(market_kind:, employee_role:, benefit_group:)
+    def calculate_effective_on(market_kind:, employee_role:, benefit_group:, effective_on_option_selected:)
       HbxEnrollment.calculate_effective_on_from(
         market_kind: market_kind,
         qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
         family: @family,
         employee_role: employee_role,
         benefit_group: benefit_group,
-        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship),
+        effective_on_option_selected: effective_on_option_selected)
     end
 
     def insure_hbx_enrollment_for_shop_qle_flow

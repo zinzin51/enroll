@@ -13,7 +13,7 @@ class InsuredEligibleForBenefitRule
 
   def initialize(role, benefit_package, options = {})
     @role = role
-    @family = options[:family]
+    @family = options[:family] || @role.person.families.first
     @benefit_package = benefit_package
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
     @new_effective_on = options[:new_effective_on]
@@ -57,7 +57,7 @@ class InsuredEligibleForBenefitRule
 
   def set_status_and_error_if_not_applying_coverage
     status = false
-    @errors << ["Did not apply for coverage."]
+    @errors = ["Did not apply for coverage."]
     return status
   end
 
@@ -112,7 +112,9 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_citizenship_status_satisfied?
-    @role.citizen_status == "not_lawfully_present_in_us" ? false : true
+    return true if @role.is_a?(ResidentRole)
+    return false if @role.citizen_status.blank?
+    !ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.include? @role.citizen_status
   end
 
   def is_ethnicity_satisfied?
@@ -143,7 +145,6 @@ class InsuredEligibleForBenefitRule
 
   def is_age_range_satisfied?
     return true if @benefit_package.age_range == (0..0)
-
     age = age_on_next_effective_date(@role.dob)
     @benefit_package.age_range.cover?(age)
   end
@@ -171,7 +172,8 @@ class InsuredEligibleForBenefitRule
 
   def age_on_next_effective_date(dob)
     today = TimeKeeper.date_of_record
-    today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
+    age_on = @benefit_package.benefit_coverage_period.earliest_effective_date
+    # today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
     age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
   end
 

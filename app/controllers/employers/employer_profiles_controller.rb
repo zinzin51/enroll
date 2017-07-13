@@ -1,16 +1,18 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote]
+                                       :bulk_employee_upload, :bulk_employee_upload_form,
+                                       :download_invoice, :show_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls, :wells_fargo_sso]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
   before_action :check_access_to_organization, only: [:edit]
-  before_action :check_and_download_invoice, only: [:download_invoice]
+  before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
+  #before_action :nfp_soap_request, only: [:show]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -29,11 +31,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       else
         flash[:error] = 'There was issue claiming this quote.'
       end
-
     end
 
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
-
   end
 
   def index
@@ -118,6 +118,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
+      when 'accounts'
+        collect_and_sort_invoices(params[:sort_order])
+        @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
@@ -257,10 +260,24 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def bulk_employee_upload_form
   end
 
+  def generate_checkbook_urls
+    @employer_profile.generate_checkbook_notices
+    flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
+    redirect_to action: :show, :tab => :employees
+  end
+
   def download_invoice
     options={}
     options[:content_type] = @invoice.type
     options[:filename] = @invoice.title
+    send_data Aws::S3Storage.find(@invoice.identifier) , options
+  end
+
+  def show_invoice
+    options={}
+    options[:filename] = @invoice.title
+    options[:type] = 'application/pdf'
+    options[:disposition] = 'inline'
     send_data Aws::S3Storage.find(@invoice.identifier) , options
   end
 
@@ -289,8 +306,48 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
+  def wells_fargo_sso
+    sso_req = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id,@employer_profile.hbx_id)
+    sso_req.token
+    @redirct_url = sso_req.url
+    unless @redirct_url.nil?
+      redirect_to @redirct_url
+    else
+      redirect_to employers_employer_profile_path(tab:"home")
+    end
+  end
 
   private
+
+  def nfp_soap_request
+    # this is for using hbx enterprise
+    # @employer_profile.notify_enrollment_data_request
+    # @employer_profile.notify_payment_history_request
+    # @employer_profile.notify_pdf_request
+    # @employer_profile.notify_statement_summary_request
+
+    # this is for making the soap request from EA
+    find_employer
+
+    # make request and store token
+
+    nfp_request = NfpIntegration::SoapServices::Nfp.new(@employer_profile.hbx_id)
+
+
+    # check to see that the request returned a token before making additional requests
+    unless nfp_request.display_token.nil?
+      nfp_payment_history = nfp_request.payment_history
+      nfp_statement_summary = nfp_request.statement_summary
+    end
+
+    # parse payload from statement_summary and store in instance variables
+    @most_recent_payment_date, @past_due, @previous_balance, @new_charges, @adjustments, @payments, @total_due = nil
+    @past_due, @previous_balance, @new_charges, @adjustments, @payments, @total_due = nfp_request.parse_statement_summary(nfp_statement_summary) if nfp_statement_summary
+
+    # get the date for the most recent payment
+    @most_recent_payment_date = nfp_request.get_most_recent_payment_date(nfp_payment_history) if nfp_statement_summary
+
+  end
 
   def updateable?
     authorize EmployerProfile, :updateable?
@@ -298,6 +355,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)
+    @invoice_years = (Settings.aca.shop_market.employer_profiles.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
   end
 
@@ -404,7 +462,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def find_employer
-    id_params = params.permit(:id, :employer_profile_id)
+    id_params = params.permit(:id, :employer_profile_id, :tab)
     id = id_params[:id] || id_params[:employer_profile_id]
     @employer_profile = EmployerProfile.find(id)
     render file: 'public/404.html', status: 404 if @employer_profile.blank?
@@ -419,7 +477,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},

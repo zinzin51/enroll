@@ -246,7 +246,7 @@ class BrokerRole
       transitions from: :broker_agency_pending, to: :broker_agency_declined
     end
 
-    event :broker_agency_terminate, :after => :record_transition do
+    event :broker_agency_terminate, :after => [:record_transition, :remove_from_employer_profile] do
       transitions from: :active, to: :broker_agency_terminated
     end
 
@@ -255,7 +255,7 @@ class BrokerRole
       transitions from: :broker_agency_pending, to: :denied
     end
 
-    event :decertify, :after => :record_transition  do
+    event :decertify, :after => [:record_transition, :remove_from_employer_profile]  do
       transitions from: :active, to: :decertified
     end
 
@@ -298,7 +298,8 @@ class BrokerRole
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event
     )
   end
 
@@ -341,5 +342,14 @@ class BrokerRole
 
   def current_state
     aasm_state.gsub(/\_/,' ').camelcase
+  end
+  
+  def remove_from_employer_profile
+    @orgs = Organization.by_broker_role(id)
+    @employers = @orgs.map(&:employer_profile)
+
+    @employers.each do |e|
+      e.fire_broker_agency
+    end
   end
 end

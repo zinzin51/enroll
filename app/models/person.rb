@@ -37,6 +37,10 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
+  field :is_incarcerated_pending_charge_disposition, type: Boolean
+  field :is_incarcerated_in_dc, type: Boolean
+  field :incarceration_date, type: Date
+  field :expected_release_date, type: Date
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
@@ -691,7 +695,7 @@ class Person
       if first_name.present? && last_name.present? && dob_query.present?
         first_exp = /^#{first_name}$/i
         last_exp = /^#{last_name}$/i
-        matches.concat Person.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
+        matches.concat Person.active.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
       end
       matches.uniq
     end
@@ -732,6 +736,7 @@ class Person
       return false, 'Person does not exist on the HBX Exchange' if person.count == 0
 
       employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      employer_staff_role.approve! if !employer_staff_role.present?
       employer_staff_role.save
       return true, person.first
     end
@@ -869,6 +874,16 @@ class Person
       user.ridp_by_paper_application
     end
   end
+  # Makes user the primary poc
+  def make_primary(role)
+    self.active_employer_staff_roles.update(primary_poc: role)
+  end
+  
+  def is_primary_poc
+    if active_employer_staff_roles.present?
+      active_employer_staff_roles.first.primary_poc
+    end
+  end
 
   private
   def is_ssn_composition_correct?
@@ -878,19 +893,42 @@ class Person
     #   0000 in the serial number (last four digits)
 
     if ssn.present?
-      invalid_area_numbers = %w(000 666)
-      invalid_area_range = 900..999
-      invalid_group_numbers = %w(00)
-      invalid_serial_numbers = %w(0000)
-
-      return false if ssn.to_s.blank?
-      return false if invalid_area_numbers.include?(ssn.to_s[0,3])
-      return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
-      return false if invalid_group_numbers.include?(ssn.to_s[3,2])
-      return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
+      errors.add(:base, 'SSN is invalid') if is_ssn_invalid? || is_ssn_sequential? || is_ssn_has_same_number?
     end
+  end
 
-    true
+  def is_ssn_invalid?
+    invalid_area_numbers = %w(000 666)
+    invalid_area_range = 900..999
+    invalid_group_numbers = %w(00)
+    invalid_serial_numbers = %w(0000)
+    invalid_area_numbers.include?(ssn.to_s[0,3]) || invalid_area_range.include?(ssn.to_s[0,3].to_i) || invalid_group_numbers.include?(ssn.to_s[3,2]) || invalid_serial_numbers.include?(ssn.to_s[5,4])
+  end
+
+  def is_ssn_sequential?
+    # SSN should not have 6 or more sequential numbers
+    sequences = []
+    ssn.split('').map(&:to_i).each_cons(2) do |a, b|
+      if b == a + 1
+        sequences << [a, b]
+        return true if sequences.size == 5
+      else
+        sequences = []
+      end
+    end
+  end
+
+  def is_ssn_has_same_number?
+    # SSN should not have 6 or more of the same number in a row
+    sequences = []
+    ssn.split('').map(&:to_i).each_cons(2) do |a, b|
+      if b == a
+        sequences << [a, b]
+        return true if sequences.size == 5
+      else
+        sequences = []
+      end
+    end
   end
 
   def create_inbox
@@ -913,7 +951,7 @@ class Person
       end
     end
   end
-
+  
   # Verify basic date rules
   def date_functional_validations
     date_of_birth_is_past

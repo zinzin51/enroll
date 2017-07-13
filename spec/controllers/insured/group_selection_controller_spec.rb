@@ -175,6 +175,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
+
+      it "should set a session variable effective_on_option_selected to effective_on_option_selected if present" do
+        sign_in user
+        get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123", effective_on_option_selected: Date.new(TimeKeeper.date_of_record.year,12,06)
+        expect(session[:effective_on_option_selected]).to eq Date.new(TimeKeeper.date_of_record.year,12,06)
+      end
     end
   end
 
@@ -228,7 +234,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
-    let(:census_employee) {FactoryGirl.create(:census_employee)}
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
 
     before do
       allow(coverage_household).to receive(:household).and_return(household)
@@ -320,7 +326,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
-    
+
     it "for cobra with invalid date" do
       user = FactoryGirl.create(:user, id: 196, person: FactoryGirl.create(:person))
       sign_in user

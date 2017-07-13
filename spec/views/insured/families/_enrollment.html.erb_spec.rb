@@ -260,6 +260,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "should not disable the Make Changes button" do
       expect(rendered).to_not have_selector('.cna')
     end
+
+    it "should show plan contact information" do
+      expect(rendered).to have_selector('div',text: 'Plan Contact Info')
+    end
+
+    it "should not show carrier contact information" do
+      expect(rendered).not_to have_selector('div',text: 'Carrier Contact Info')
+    end
   end
 
   context "when the enrollment is coverage_terminated" do
