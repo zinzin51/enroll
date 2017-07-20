@@ -30,7 +30,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.verification_type_status("Social Security Number", person)).to eq "in review"
       end
 
-      it "returns outstanding for consumer whose socail security number is rejected" do
+      it "returns outstanding for consumer whose social security number is rejected" do
         person.consumer_role.ssn_rejected = true
         expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"
       end

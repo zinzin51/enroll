@@ -370,6 +370,38 @@ context "Verification process and notices" do
 
   end
 
+  describe "#mark_doc_type_uploaded" do
+    let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+    it "updates ssn rejected to false if type is Social Security Number" do
+      consumer_role.ssn_rejected = true
+      v_type = 'Social Security Number'
+      consumer_role.send(:mark_doc_type_uploaded, v_type)
+      expect(consumer_role.ssn_rejected).to eq(false)
+    end
+
+    it "updates lawful presence rejected to false if type is Citizenship" do
+      consumer_role.lawful_presence_rejected = true
+      v_type = 'Citizenship'
+      consumer_role.send(:mark_doc_type_uploaded, v_type)
+      expect(consumer_role.lawful_presence_rejected).to eq(false)
+    end
+
+    it "updates lawful presence rejected to false if type is Immigration status" do
+      consumer_role.lawful_presence_rejected = true
+      v_type = 'Immigration status'
+      consumer_role.send(:mark_doc_type_uploaded, v_type)
+      expect(consumer_role.lawful_presence_rejected).to eq(false)
+    end
+
+    it "updates lawful presence rejected to false if type is American Indian Status" do
+      consumer_role.lawful_presence_rejected = true
+      v_type = 'American Indian Status'
+      consumer_role.send(:mark_doc_type_uploaded, v_type)
+      expect(consumer_role.native_rejected).to eq(false)
+    end
+
+  end
+
   describe "state machine" do
     let(:consumer) { person.consumer_role }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
