@@ -11,6 +11,9 @@ FactoryGirl.define do
     vlp_documents {[FactoryGirl.build(:vlp_document)]}
     bookmark_url nil
     is_applying_coverage true
+    ssn_rejected false
+    native_rejected false
+    lawful_presence_rejected false
   end
 
   factory(:consumer_role_person, {class: ::Person}) do

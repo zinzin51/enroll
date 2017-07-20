@@ -30,6 +30,11 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.verification_type_status("Social Security Number", person)).to eq "in review"
       end
 
+      it "returns outstanding for consumer whose socail security number is rejected" do
+        person.consumer_role.ssn_rejected = true
+        expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"
+      end
+
       it "returns verified status for consumer with state residency" do
         person.consumer_role.ssn_validation = "valid"
         expect(helper.verification_type_status("Social Security Number", person)).to eq "verified"
@@ -41,6 +46,10 @@ RSpec.describe VerificationHelper, :type => :helper do
         it "returns in review status" do
           person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "American Indian Status")
           expect(helper.verification_type_status("American Indian Status", person)).to eq "in review"
+        end
+        it "returns in outstanding when person is native rejected" do
+          person.consumer_role.native_rejected = true
+          expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"
         end
       end
       context "native validation pending" do
@@ -72,6 +81,10 @@ RSpec.describe VerificationHelper, :type => :helper do
             person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
             person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Citizenship")
             expect(helper.verification_type_status("Citizenship", person)).to eq "in review"
+          end
+          it "returns in outstanding status when person is lawful_presence_rejected" do
+              person.consumer_role.native_rejected = true
+              expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"
           end
         end
         context "lawful presence determination pending" do
