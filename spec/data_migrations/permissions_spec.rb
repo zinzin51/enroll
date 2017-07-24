@@ -31,7 +31,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_complete_resident_application to true" do
-       expect(Person.all.count).to eq(1)
+       expect(Person.all.count).to eq(2)
         expect(Person.first.hbx_staff_role.permission.can_complete_resident_application).to be true
       end
     end
@@ -53,7 +53,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_complete_resident_application to true" do
-        expect(Person.all.count).to eq(3)
+        expect(Person.all.count).to eq(4)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_add_sep).to be true
         expect(@hbx_read_only_person.hbx_staff_role.permission.can_add_sep).to be false
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be false
@@ -80,7 +80,7 @@ describe DefinePermissions, dbclean: :after_each do
     end
     it "creates permissions" do
       expect(User.all.count).to eq(6)
-      expect(Person.all.count).to eq(6)
+      expect(Person.all.count).to eq(7)
       expect(Person.all.map{|p|p.hbx_staff_role.subrole}).to match_array roles
     end
   end
