@@ -19,6 +19,14 @@ GIT
       bunny (~> 1.7.0)
 
 GIT
+  remote: https://github.com/dchbx/nfp_integration.git
+  revision: 3cee6fe7e6ac3584ab42e14051417e4e45e436c1
+  branch: master
+  specs:
+    nfp_integration (0.0.1)
+      nokogiri (~> 1.6)
+
+GIT
   remote: https://github.com/dchbx/openhbx_cv2.git
   revision: 86a115f5e8e12f506057413ff1fa6c6bfaee9013
   branch: master
@@ -647,6 +655,7 @@ DEPENDENCIES
   mongoid-versioning
   mongoid_userstamp
   newrelic_rpm
+  nfp_integration!
   nokogiri (= 1.6.7.2)
   nokogiri-happymapper
   openhbx_cv2!

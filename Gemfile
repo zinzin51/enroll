@@ -59,6 +59,9 @@ gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
 
+# nfp gem for parsing and integration
+gem 'nfp_integration', git:  "https://github.com/dchbx/nfp_integration.git", branch: 'master'
+
 #For Background jobs
 gem 'resque'
 
