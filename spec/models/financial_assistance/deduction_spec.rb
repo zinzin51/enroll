@@ -22,151 +22,221 @@ RSpec.describe FinancialAssistance::Deduction, type: :model do
   end
 
   context "valid deduction" do
-    it "should save step_1 and submit" do
+    it "should save step_1" do
       expect(FinancialAssistance::Deduction.create(valid_params).valid?(:step_1)).to be_truthy
-      expect(FinancialAssistance::Deduction.create(valid_params).valid?(:submit)).to be_truthy
+    end
+
+    it "should save submission" do
+      expect(FinancialAssistance::Deduction.create(valid_params).valid?(:submission)).to be_truthy
     end
   end
 
   describe "validations" do
     let(:deduction){FinancialAssistance::Deduction.new(applicant: applicant)}
 
-    context "on step_1 and submit title validations" do
-      it "with a missing title" do
+    context "on step_1 and submission title validations" do
+      it "with a missing title on step_1" do
         deduction.title = nil
         deduction.valid?(:step_1)
         expect(deduction.errors["title"]).to be_empty
+      end
+
+      it "with a missing title on submission" do   
+        deduction.title = nil
         deduction.valid?(:submission)
         expect(deduction.errors["title"]).to be_empty
       end
 
-      it "pick a name length between 3..30" do
+      it "pick a name length between 3..30 on step_1" do
         deduction.title = 'Te'
         deduction.valid?(:step_1)
         expect(deduction.errors["title"]).to include("pick a name length between 3..30")
+       end
+
+      it "pick a name length between 3..30 on submission" do
+      	deduction.title = 'Te'
         deduction.valid?(:submission)
         expect(deduction.errors["title"]).to include("pick a name length between 3..30")
+      end
+
+      it " pick a name length between 3..30 0n step_1" do
         deduction.title = "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
         deduction.valid?(:step_1)
         expect(deduction.errors["title"]).to include("pick a name length between 3..30")
+      end
+
+      it "pick a name length between 3..30 on submission" do
+      	deduction.title = "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
         deduction.valid?(:submission)
         expect(deduction.errors["title"]).to include("pick a name length between 3..30")
       end
 
-      it "should be valid" do
+      it "should be valid on step_1" do
         deduction.amount = 'Test'
         deduction.valid?(:step_1)
         expect(deduction.errors["title"]).to be_empty
+      end
+
+      it "should be valid on submission" do
         deduction.valid?(:submission)
         expect(deduction.errors["title"]).to be_empty
       end
     end
 
-    context "on step_1 and submit amount validations" do
-      it "with a missing amount" do
+    context "on step_1 and submission amount validations" do
+      it "with a missing amount on step_1" do
         deduction.amount = nil
         deduction.valid?(:step_1)
         expect(deduction.errors["amount"]).to include("can't be blank")
+      end
+
+      it "with a missing amount on submission" do
+        deduction.amount  = nil
         deduction.valid?(:submission)
         expect(deduction.errors["amount"]).to include("can't be blank")
       end
 
-      it "amount must be greater than $0" do
+      it "amount must be greater than $0 on step_1" do
         deduction.amount = 0
         deduction.valid?(:step_1)
         expect(deduction.errors["amount"]).to include("0.0 must be greater than $0")
+      end
+
+      it "amount must be greater than $0 on submission" do
+      	deduction.amount = 0
         deduction.valid?(:submission)
         expect(deduction.errors["amount"]).to include("0.0 must be greater than $0")
       end
 
-      it "should be valid" do
+      it "should be valid on step_1" do
         deduction.amount = 10
         deduction.valid?(:step_1)
         expect(deduction.errors["amount"]).to be_empty
+      end
+
+      it "should be valid on submission" do
+      	deduction.amount = 10
         deduction.valid?(:submission)
         expect(deduction.errors["amount"]).to be_empty
       end
     end
 
-    context "if step_1 and submit kind validations" do
-      it "with a missing kind" do
+    context "if step_1 and submission kind validations" do
+      it "with a missing kind on step_1" do
         deduction.kind = nil
         deduction.valid?(:step_1)
         expect(deduction.errors["kind"]).to include("can't be blank")
+      end
+
+      it "with a missing kind on submission" do
+      	deduction.kind = nil
         deduction.valid?(:submission)
         expect(deduction.errors["kind"]).to include("can't be blank")
       end
 
-      it "is not a valid deduction type" do
+      it "is not a valid deduction type on step_1" do
         deduction.kind = 'self_employee'
         deduction.valid?(:step_1)
         expect(deduction.errors["kind"]).to include("self_employee is not a valid deduction type")
+      end
+
+      it "is not a valid deduction type on submission" do
+      	deduction.kind = 'self_employee'
         deduction.valid?(:submission)
         expect(deduction.errors["kind"]).to include("self_employee is not a valid deduction type")
       end
 
-      it "should be valid" do
+      it "should be valid on step_1" do
         deduction.kind = 'alimony_paid'
         deduction.valid?(:step_1)
         expect(deduction.errors["kind"]).to be_empty
+      end
+
+      it "should be valid on submission" do
+      	deduction.kind = 'alimony_paid'
         deduction.valid?(:submission)
         expect(deduction.errors["kind"]).to be_empty
       end
 
     end
 
-    context "if step_1 and submit frequency_kind validations" do
-      it "with a missing frequency_kind" do
+    context "if step_1 and submission frequency_kind validations" do
+      it "with a missing frequency_kind on step_1" do
         deduction.frequency_kind = nil
         deduction.valid?(:step_1)
         expect(deduction.errors["frequency_kind"]).to include("can't be blank")
+      end
+
+      it "with a missing frequency_kind on submission" do
+      	deduction.frequency_kind = nil
         deduction.valid?(:submission)
         expect(deduction.errors["frequency_kind"]).to include("can't be blank")
       end
 
-      it "is not a valid frequency" do
+      it "is not a valid frequency on step_1" do
         deduction.frequency_kind = 'self_employee'
         deduction.valid?(:step_1)
         expect(deduction.errors["frequency_kind"]).to include("self_employee is not a valid frequency")
+      end
+
+      it "is not a valid frequency on submission" do
+      	deduction.frequency_kind = 'self_employee'
         deduction.valid?(:submission)
         expect(deduction.errors["frequency_kind"]).to include("self_employee is not a valid frequency")
       end
 
-      it "should be valid" do
+      it "should be valid on step_1" do
         deduction.frequency_kind = 'monthly'
         deduction.valid?(:step_1)
         expect(deduction.errors["frequency_kind"]).to be_empty
+      end
+
+      it "should be valid on submission" do
+      	deduction.frequency_kind = 'monthly'
         deduction.valid?(:submission)
         expect(deduction.errors["frequency_kind"]).to be_empty
       end
 
     end
 
-    context "if step_1 and submit start_on validations" do
-      it "with a missing start_on" do
+    context "if step_1 and submission start_on validations" do
+      it "with a missing start_on step_1" do
         deduction.start_on = nil
         deduction.valid?(:step_1)
         expect(deduction.errors["start_on"]).to include("can't be blank")
+      end
+
+      it "with a missing start_on submission" do
+      	deduction.start_on = nil
         deduction.valid?(:submission)
         expect(deduction.errors["start_on"]).to include("can't be blank")
       end
 
-      it "should be valid" do
+      it "should be valid on step_1" do
         deduction.start_on = Date.today
         deduction.valid?(:step_1)
         expect(deduction.errors["start_on"]).to be_empty
+      end
+
+      it "should be valid on submission" do
+      	deduction.start_on = Date.today
         deduction.valid?(:submission)
         expect(deduction.errors["start_on"]).to be_empty
       end
 
     end
 
-    context "if step_1 and submit end on date occur before start on date" do
-      it "end on date can't occur before start on date" do
+    context "if step_1 and submission end on date occur before start on date" do
+      it "end on date can't occur before start on date on step_1" do
         deduction.start_on = Date.today
         deduction.end_on = Date.yesterday
         deduction.valid?(:step_1)
         expect(deduction.errors["end_on"]).to include("can't occur before start on date")
+      end
+
+      it "end on date can't occur before start on date on submission" do
+      	deduction.start_on = Date.today
+        deduction.end_on = Date.yesterday
         deduction.valid?(:submission)
         expect(deduction.errors["end_on"]).to include("can't occur before start on date")
       end
