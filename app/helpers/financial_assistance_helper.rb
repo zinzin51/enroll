@@ -23,41 +23,39 @@ module FinancialAssistanceHelper
     age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
-  def activer_for(target)
-    if controller_name == 'applicants'
-      if action_name == 'step' and defined? @current_step
-        if @current_step.to_i == 1
-          ''
-        elsif @current_step.to_i == 2 and target == 'income_and_coverage'
-          'activer'
-        end
-      elsif action_name == 'other_questions'
-        if target == 'other_questions'
-          ''
-        else
-          'activer'
-        end
+  def li_nav_classes_for(target)
+    current = if controller_name == 'applications'
+      if action_name == 'edit'
+        :household_info
       else
-        ''
+        :review_and_submit
+      end
+    elsif controller_name == 'applicants'
+      if action_name == 'step' and @current_step.try(:to_i) == 1
+        :income_and_coverage
+      elsif action_name == 'step' and @current_step.try(:to_i) == 2
+        :tax_info
+      elsif action_name == 'other_questions'
+        :other_questions
       end
     elsif controller_name == 'incomes'
-      if ['income_and_coverage', 'tax_info'].include?(target)
-        'activer'
-      else
-        ''
-      end
-    elsif controller_name == "deductions"
-      if ['income_and_coverage', 'tax_info', 'income'].include?(target)
-        'activer'
-      else
-        ''
-      end
-    elsif controller_name == "benefits"
-      if ['income_and_coverage', 'tax_info', 'income', 'income_adjustments'].include?(target)
-        'activer'
-      else
-        ''
-      end
+      :income
+    elsif controller_name == 'deductions'
+      :income_adjustments
+    elsif controller_name == 'benefits'
+      :health_coverage
+    elsif controller_name == 'family_relationships'
+      :relationships
+    end
+
+    order = [:applications, :household_info, :relationships, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
+
+    if target == current
+      'activer active'
+    elsif order.index(target) < order.index(current)
+      'activer'
+    else
+      ''
     end
   end
 
@@ -65,11 +63,7 @@ module FinancialAssistanceHelper
     if application.incomplete_applicants?
       go_to_step_financial_assistance_application_applicant_path application, application.next_incomplete_applicant, 1
     else
-      if action_name == "save_questions"
-        edit_financial_assistance_application_path(application)
-      else
-        review_and_submit_financial_assistance_application_path application
-      end
+      review_and_submit_financial_assistance_application_path application
     end
   end
 

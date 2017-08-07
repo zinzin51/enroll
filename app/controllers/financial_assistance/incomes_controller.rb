@@ -20,26 +20,28 @@
     flash[:error] = nil
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
-    format_date_params model_params
+    format_date_params model_params if model_params.present?
 
     @model.assign_attributes(permit_params(model_params)) if model_params.present?
     update_employer_contact(@model, params) if @model.income_type == job_income_type
 
-    begin
-      @model.save!
-      if params.key?(model_name)
-        @model.workflow = { current_step: @current_step.to_i + 1 }
+    if params.key?(model_name)
+      if @model.save(context: "step_#{@current_step.to_i}".to_sym)
         @current_step = @current_step.next_step if @current_step.next_step.present?
-      end
-      if params.key? :last_step
-        flash[:notice] = "Income Added - (#{@model.kind})"
-        redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
+        if params.key? :last_step
+          @model.update_attributes!(workflow: { current_step: 1 })
+          flash[:notice] = "Income Added - (#{@model.kind})"
+          redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
+        else
+          @model.update_attributes!(workflow: { current_step: @current_step.to_i })
+          render 'workflow/step', layout: 'financial_assistance'
+        end
       else
+        @model.workflow = { current_step: @current_step.to_i }
+        flash[:error] = build_error_messages(@model)
         render 'workflow/step', layout: 'financial_assistance'
       end
-    rescue
-      @model.workflow = { current_step: @current_step.to_i }
-      flash[:error] = build_error_messages(@model)
+    else
       render 'workflow/step', layout: 'financial_assistance'
     end
   end
@@ -59,11 +61,11 @@
 
   def format_date_params model_params
     model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
-    model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present?
+    model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
   end
 
   def build_error_messages(model)
-    model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first[1][0].titleize
   end
 
   def update_employer_contact model, params

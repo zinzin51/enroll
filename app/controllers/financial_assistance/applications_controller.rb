@@ -80,6 +80,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       application = old_application.dup
       application.aasm_state = "draft"
       application.submitted_at = nil
+      application.created_at = TimeKeeper.datetime_of_record
       application.save!
     end
     redirect_to edit_financial_assistance_application_path(@application)
@@ -94,12 +95,20 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     family.is_applying_for_assistance = params["is_applying_for_assistance"]
     family.save!
     if family.is_applying_for_assistance
-      application = family.applications.build(aasm_state: "draft")
-      application.applicants.build(family_member_id: family.primary_applicant.id)
-      application.save!
+      if family.applications.where(aasm_state: "draft").blank?
+        application = family.applications.build(aasm_state: "draft")
+        application.applicants.build(family_member_id: family.primary_applicant.id)
+        application.save!
+      end
       redirect_to application_checklist_financial_assistance_applications_path
     else
-      redirect_to edit_financial_assistance_application_path(@application)
+      if params["is_applying_for_assistance"].nil?
+        flash[:error] = "Please choose an option before you proceed."
+        redirect_to help_paying_coverage_financial_assistance_applications_path
+      else
+        family.applications.where(aasm_state: "draft").destroy_all
+        redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
+      end
     end
   end
 
@@ -117,10 +126,16 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def wait_for_eligibility_response
     @family = @person.primary_family
+    @application = @person.primary_family.applications.find(params[:id])
+
+    render layout: 'financial_assistance'
   end
 
   def eligibility_results
     @family = @person.primary_family
+    @application = @person.primary_family.applications.find(params[:id])
+
+    render layout: 'financial_assistance'
   end
 
   def application_publish_error

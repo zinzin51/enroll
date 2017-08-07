@@ -89,7 +89,9 @@
                   name: who_can_be_covered?
                   id: 'esi_covered'
                   values:
-                    - employee and spouse
+                    - self
+                    - self_and_spouse
+                    - family
                   model: benefit
                   attribute: esi_covered
             - cells:
@@ -136,10 +138,10 @@
                   attribute: city
                 - gutter: 4
                   type: 'dropdown'
-                  name: 'STATE'
+                  name: 'STATE *'
                   id: 'state'
+                  prompt: Choose State
                   values:
-                    - Choose State
                     - AL
                     - AK
                     - AZ
@@ -293,7 +295,8 @@
                   attribute: employee_cost
                 - gutter: 6
                   type: 'dropdown'
-                  name: 'FREQUENCY'
+                  name: 'How Often'
+                  prompt: Choose One
                   id: 'frequency'
                   values:
                     - biweekly 

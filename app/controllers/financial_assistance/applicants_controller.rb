@@ -5,7 +5,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   include UIHelpers::WorkflowController
   include FinancialAssistanceHelper
 
-  before_filter :find, :find_application, :except => [:age_18_to_26] #except the ajax request
+  before_filter :find, :find_application, :except => [:age_of_applicant] #except the ajax request
 
 
   def edit
@@ -19,10 +19,17 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def save_questions
-    format_date_params params[:financial_assistance_applicant]
+    format_date_params params[:financial_assistance_applicant] if params[:financial_assistance_applicant].present?
     @applicant = @application.applicants.find(params[:id])
-    @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
-    redirect_to find_next_application_path(@application)
+    @applicant.assign_attributes(permit_params(params[:financial_assistance_applicant])) if params[:financial_assistance_applicant].present?
+    if @applicant.save(context: :other_qns)
+      redirect_to edit_financial_assistance_application_path(@application)
+    else
+      @applicant.save(validate: false)
+      @applicant.valid?(:other_qns)
+      flash[:error] = build_error_messages_for_other_qns(@applicant)
+      redirect_to other_questions_financial_assistance_application_applicant_path(@application, @applicant)
+    end
   end
 
   def step
@@ -34,6 +41,8 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
     if params.key?(model_name)
       if @model.save(context: "step_#{@current_step.to_i}".to_sym)
+        @applicant.reload
+        @application.reload
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params.key? :last_step
           @model.update_attributes!(workflow: { current_step: 1 })
@@ -53,9 +62,9 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     end
   end
 
-  def age_18_to_26
+  def age_of_applicant
     applicant = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id])
-    render :text => "#{(18..26).include?(applicant.age_of_the_applicant)}"
+    render :text => "#{applicant.age_of_the_applicant}"
   end
 
   private
@@ -67,7 +76,11 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def build_error_messages(model)
-    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first[1][0].titleize
+  end
+
+  def build_error_messages_for_other_qns(model)
+    model.valid?(:other_qns) ? nil : model.errors.messages.first[1][0].titleize
   end
 
   def find_application
