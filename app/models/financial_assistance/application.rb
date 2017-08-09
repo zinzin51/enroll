@@ -185,6 +185,10 @@ class FinancialAssistance::Application
       end
     end
 
+    event :determine, :after => :record_transition do
+      transitions from: :submitted, to: :determined
+    end
+
   end
 
   # def applicant
@@ -402,7 +406,7 @@ class FinancialAssistance::Application
     verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
     verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
     #Saving EDs only if all the tax_households get the EDs from Haven
-    if verified_tax_households.present? && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+    if verified_tax_households.present?# && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
 
       # verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       # primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
@@ -415,19 +419,16 @@ class FinancialAssistance::Application
       tax_households.each { |th| tax_households_hbx_assigned_ids << th.hbx_assigned_id.to_s}
 
       benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
-
       verified_tax_households.each do |vthh|
         #If taxhousehold exists in our DB
         if tax_households_hbx_assigned_ids.include?(vthh.hbx_assigned_id)
           tax_household = tax_households.where(hbx_assigned_id: vthh.hbx_assigned_id).first
-
           #Update required attributes for that particular TaxHouseHold
           tax_household.update_attributes(effective_starting_on: vthh.start_date)
 
           #Applicant/TaxHouseholdMember block start
           applicants_persons_hbx_ids = []
           applicants.each { |appl| applicants_persons_hbx_ids << appl.person.hbx_id.to_s}
-
           vthh.tax_household_members.each do |thhm|
             #If applicant exisits in our db.
             if applicants_persons_hbx_ids.include?(thhm.person_id)
@@ -435,7 +436,6 @@ class FinancialAssistance::Application
 
               # verified_family_member = verified_family.family_members.detect { |vfm| vfm.person.id == thhm.person_id }
               # applicant.update_attributes({is_without_assistance: verified_family_member.is_without_assistance, is_ia_eligible: verified_family_member.is_insurance_assistance_eligible, is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible, is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible, is_totally_ineligible: verified_family_member.is_totally_ineligible})
-
               #Updating the applicant by finding the right family member.
               verified_family.family_members.each do |verified_family_member|
                 if verified_family_member.person.hbx_id == thhm.person_id
@@ -450,22 +450,29 @@ class FinancialAssistance::Application
                     is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
                     is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
                     is_totally_ineligible: verified_family_member.is_totally_ineligible})
+                else
+                  throw(:processing_issue, "ERROR: Failed to match the Person hbx_id of a particular Applicant in our DB with the person hbx_id in xml")
                 end
               end
+            else
+              throw(:processing_issue, "ERROR: Failed to find Applicants in our DB with the ids in xml")
             end
           end
           #Applicant/TaxHouseholdMember block end
 
           #Eligibility determination start.
-          verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
+          if !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+            verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
 
-          #TODO find the right source Curam/Haven.
-          source = "Haven"
-          create_new_eligibility_determination(tax_household.id, verified_eligibility_determination, benchmark_plan_id, source) #Creating Eligibility Determination
+            #TODO find the right source Curam/Haven.
+            source = "Haven"
+            create_new_eligibility_determination(tax_household.id, verified_eligibility_determination, benchmark_plan_id, source) #Creating Eligibility Determination
+          end
           #Eligibility determination end
 
         #When taxhousehold does not exist in your DB
         else
+          throw(:processing_issue, "ERROR: Failed to find Tax Households in our DB with the ids in xml")
         end
       end
 
@@ -543,6 +550,7 @@ private
 
   def create_new_eligibility_determination(tax_household_id, verified_eligibility_determination, benchmark_plan_id, source)
     eligibility_determinations.build(
+      tax_household_id: tax_household_id,
       # e_pdc_id: verified_eligibility_determination.id,
       benchmark_plan_id: benchmark_plan_id,
       max_aptc: verified_eligibility_determination.maximum_aptc,

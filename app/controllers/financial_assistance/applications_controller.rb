@@ -97,7 +97,9 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     if family.is_applying_for_assistance
       if family.applications.where(aasm_state: "draft").blank?
         application = family.applications.build(aasm_state: "draft")
-        application.applicants.build(family_member_id: family.primary_applicant.id)
+        family.active_family_members.each do |family_member|
+          application.applicants.build(family_member_id: family_member.id)
+        end
         application.save!
       end
       redirect_to application_checklist_financial_assistance_applications_path
@@ -155,7 +157,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     end
     @model.tax_households.each do |txh|
       txh.update_attributes!(allocated_aptc: 200.00)
-      @model.eligibility_determinations.build(max_aptc: 200.00, csr_percent_as_integer: 73, csr_eligibility_kind: "csr_73", determined_on: TimeKeeper.datetime_of_record - 30.days, determined_at: TimeKeeper.datetime_of_record - 30.days, premium_credit_strategy_kind: "allocated_lump_sum_credit", e_pdc_id: "3110344", source: "Admin", tax_household_id: txh.id).save!
+      @model.eligibility_determinations.build(max_aptc: 200.00, csr_percent_as_integer: 73, csr_eligibility_kind: "csr_73", determined_on: TimeKeeper.datetime_of_record - 30.days, determined_at: TimeKeeper.datetime_of_record - 30.days, premium_credit_strategy_kind: "allocated_lump_sum_credit", e_pdc_id: "3110344", source: "Haven", tax_household_id: txh.id).save!
       @model.applicants.second.update_attributes!(is_medicaid_chip_eligible: true) if txh.applicants.count > 1
     end
   end
