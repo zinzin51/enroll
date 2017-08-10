@@ -385,26 +385,26 @@ $(document).ready(function() {
 
 
   if($('#is_veteran_or_active_military_yes').is(':checked')) {
-    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
   } else {
-    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
   }
 
   $("body").on("change", "#is_veteran_or_active_military_yes", function(){
     if ($('#is_veteran_or_active_military_yes').is(':checked')) {
-      $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+      $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
     };
   });
 
   if($('#is_veteran_or_active_military_no').is(':checked')) {
-    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').removeClass('hide');
+    $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').removeClass('hide');
   } else {
-    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
   }
 
   $("body").on("change", "#is_veteran_or_active_military_no", function(){
     if ($('#is_veteran_or_active_military_no').is(':checked')) {
-      $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').removeClass('hide');
+      $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').removeClass('hide');
     };
   });
 
@@ -467,4 +467,31 @@ $(document).ready(function() {
   }
   /* Preference Application Form Related */
 
+  /* enable or disable submit application button by electronic siganture (first/last name match)*/
+
+  function enable_submit_button_by_electronic_signature() {
+    first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
+    last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
+    subscriber_first_name = $("#subscriber_first_name").val();
+    subscriber_last_name = $("#subscriber_last_name").val();
+
+    if(last_name_thank_you == ""){
+      $('.interaction-click-control-submit-application').addClass('disabled');
+    }
+    if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
+      $('.interaction-click-control-submit-application').removeClass('disabled');
+    } else {
+      $('.interaction-click-control-submit-application').addClass('disabled');
+    }
+  }
+
+  $(window).load(function() {
+    enable_submit_button_by_electronic_signature();
+  });
+
+  $(document).on('blur keyup', 'input.thank_you_field', function() {
+    enable_submit_button_by_electronic_signature();
+  });
+
+ /* enable or disable submit application button by electronic siganture (first/last name match)*/
 });
