@@ -544,7 +544,7 @@ private
   end
 
   def create_new_eligibility_determination(tax_household_id, verified_eligibility_determination, benchmark_plan_id, source)
-    eligibility_determinations.build(
+    if eligibility_determinations.build(
       tax_household_id: tax_household_id,
       # e_pdc_id: verified_eligibility_determination.id,
       benchmark_plan_id: benchmark_plan_id,
@@ -552,11 +552,15 @@ private
       csr_percent_as_integer: verified_eligibility_determination.csr_percent,
       csr_eligibility_kind: "csr_" + verified_eligibility_determination.csr_percent.to_s ,
       determined_at: verified_eligibility_determination.determination_date,
+      determined_on: verified_eligibility_determination.determination_date,
       aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income,
       aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
       csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit,
       source: source
     ).save!
+    else
+      throw(:processing_issue, "Failed to create Eligibility Determinations")
+    end
   end
 
   def set_hbx_id
