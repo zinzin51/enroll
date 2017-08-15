@@ -24,7 +24,24 @@ input[type="radio"]:checked + label span {
 
 .knowmore {
   background-color:#fff;
-  padding:4px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px 10px 0 0;
+}
+
+.fa, .knowmore h4 {
+    color: #007BC4;
+}
+
+.knowmore .fa-arrow-down.adjustments {
+    position: relative;
+    left: 20px;
+    top: 20px;
+}
+
+.knowmore .fa-info-circle.adjustments {
+    font-size: 0.65em;
+    top: 3px;
 }
 
 #left-navigation {
@@ -32,12 +49,21 @@ input[type="radio"]:checked + label span {
     color:#C3C3C3;
   }
 
+  li:not(.activer) a:not(.disabled) {
+    color:#0088cc;
+  }
+
   .active {
-    border-left: 6px solid #92aae0
+    border-left: 6px solid #92aae0;
   }
 
   .disabled {
-    background-color: #717171;
+    background-color: white;
+  }
+
+  .active a {
+    font-weight: bolder;
+    color: white;
   }
 
   li {
