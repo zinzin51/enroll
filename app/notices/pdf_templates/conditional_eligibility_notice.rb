@@ -39,6 +39,10 @@ module PdfTemplates
       false
     end
 
+    def employee_notice?
+      false
+    end
+
     def verified_individuals
       individuals.select{|individual| individual.verified }
     end
@@ -65,6 +69,10 @@ module PdfTemplates
 
     def incarcerated
       individuals.select{|individual| individual.incarcerated}
+    end
+
+    def cover_all?
+      enrollments.select{|enrollment| enrollment.kind == "coverall"}.present?
     end
 
     def current_health_enrollments
